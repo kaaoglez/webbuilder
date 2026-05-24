@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Page {
+  id        String     @id @default(cuid())
+  name      String
+  template  String     @default("landing")
+  sections  String     @default("[]")
+  theme     String     @default("{}")
+  status    String     @default("DRAFT")
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  seo       PageSEO[]
+}
+
+model PageSEO {
+  id            String   @id @default(cuid())
+  pageId        String
+  title         String   @default("")
+  description   String   @default("")
+  keywords      String   @default("[]")
+  ogImage       String   @default("")
+  ogType        String   @default("website")
+  twitterCard   String   @default("summary_large_image")
+  canonicalUrl  String   @default("")
+  robotsIndex   Boolean  @default(true)
+  robotsFollow  Boolean  @default(true)
+  page          Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model BlogPost {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  excerpt     String   @default("")
+  content     String   @default("")
+  coverImage  String   @default("")
+  author      String   @default("")
+  category    String   @default("")
+  tags        String   @default("[]")
+  status      String   @default("draft")
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model GlobalSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String   @default("")
+  category  String   @default("general")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
