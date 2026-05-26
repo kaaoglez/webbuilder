@@ -12,6 +12,7 @@ const StatsBar = dynamic(() => import('@/components/pageforge/StatsBar').then(m 
 const ThemeEditor = dynamic(() => import('@/components/pageforge/ThemeEditor'));
 const PluginEditor = dynamic(() => import('@/components/pageforge/PluginEditor'));
 const MyProjects = dynamic(() => import('@/components/pageforge/MyProjects'));
+const SettingsPanel = dynamic(() => import('@/components/pageforge/SettingsPanel'));
 import {
   Palette,
   Puzzle,
@@ -144,6 +145,7 @@ export default function PageForgeApp() {
   const isTemplates = activeItem === 'templates';
   const isMyProjects = activeItem === 'my-projects';
   const isMedios = activeItem === 'medios';
+  const isSettings = activeItem === 'settings';
 
   return (
     <div className="min-h-screen flex flex-col bg-[#f8fafc] dark:bg-background">
@@ -242,6 +244,8 @@ export default function PageForgeApp() {
                 <MyProjects onNavigate={handleNavigate} />
               ) : isMedios ? (
                 <MediosView />
+              ) : isSettings ? (
+                <SettingsPanel />
               ) : (
                 <PlaceholderPanel item={activeItem} onNavigate={handleNavigate} />
               )}

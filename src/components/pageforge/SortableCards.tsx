@@ -143,7 +143,6 @@ export function SortableCardsProvider({
   onReorder,
   children,
 }: SortableCardsProviderProps) {
-  // Filter out null/undefined items (can happen during SSR hydration)
   const safeItems = items.filter((item): item is string | number => item != null);
 
   const sensors = useSensors(
