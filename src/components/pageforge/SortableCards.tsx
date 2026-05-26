@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useCallback, useRef, useState } from 'react';
+import React, { createContext, useCallback, useContext, useRef, useState } from 'react';
 import { GripVertical } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────
-// DragHandle — grip handle with 6-point icon (⠿)
+// DragHandle — grip handle with vertical dots icon
 // ─────────────────────────────────────────────────────────────
 
 interface DragHandleProps {
@@ -32,8 +32,17 @@ export function DragHandle({ className }: DragHandleProps) {
 }
 
 // ─────────────────────────────────────────────────────────────
+// Shared context so wrappers can talk to the provider
+// ─────────────────────────────────────────────────────────────
+
+const SortableContext = createContext<{
+  items: (string | number)[];
+  onReorder: (fromIndex: number, toIndex: number) => void;
+}>({ items: [], onReorder: () => {} });
+
+// ─────────────────────────────────────────────────────────────
 // SortableCardWrapper
-// Makes a card draggable within its parent SortableCardsProvider
+// Both a drag source AND a drop target.
 // ─────────────────────────────────────────────────────────────
 
 interface SortableCardWrapperProps {
@@ -45,23 +54,45 @@ interface SortableCardWrapperProps {
 
 export function SortableCardWrapper({ id, children, className, style }: SortableCardWrapperProps) {
   const [isDragging, setIsDragging] = useState(false);
+  const { items, onReorder } = useContext(SortableContext);
+
+  const handleDragStart = useCallback((e: React.DragEvent) => {
+    setIsDragging(true);
+    e.dataTransfer.setData('text/plain', String(id));
+    e.dataTransfer.effectAllowed = 'move';
+    const el = e.currentTarget as HTMLElement;
+    requestAnimationFrame(() => { el.style.opacity = '0.4'; });
+  }, [id]);
+
+  const handleDragEnd = useCallback((e: React.DragEvent) => {
+    setIsDragging(false);
+    (e.currentTarget as HTMLElement).style.opacity = '1';
+  }, []);
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.dataTransfer.dropEffect = 'move';
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const draggedId = e.dataTransfer.getData('text/plain');
+    if (!draggedId) return;
+    const sourceIdx = items.indexOf(draggedId);
+    const targetIdx = items.indexOf(String(id));
+    if (sourceIdx === -1 || targetIdx === -1 || sourceIdx === targetIdx) return;
+    onReorder(sourceIdx, targetIdx);
+  }, [id, items, onReorder]);
 
   return (
     <div
       draggable="true"
-      onDragStart={(e) => {
-        setIsDragging(true);
-        e.dataTransfer.setData('text/plain', String(id));
-        e.dataTransfer.effectAllowed = 'move';
-        const target = e.currentTarget as HTMLElement;
-        requestAnimationFrame(() => {
-          target.style.opacity = '0.4';
-        });
-      }}
-      onDragEnd={(e) => {
-        setIsDragging(false);
-        (e.currentTarget as HTMLElement).style.opacity = '1';
-      }}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
       style={style}
       className={className}
       data-sortable-id={String(id)}
@@ -75,14 +106,13 @@ export function SortableCardWrapper({ id, children, className, style }: Sortable
 
 // ─────────────────────────────────────────────────────────────
 // SortableCardsProvider
-// Wraps children and handles drag & drop reordering
+// Provides context for wrappers; also acts as a fallback drop zone.
 // ─────────────────────────────────────────────────────────────
 
 interface SortableCardsProviderProps {
   items: (string | number)[];
   onReorder: (oldIndex: number, newIndex: number) => void;
   children: React.ReactNode;
-  strategy?: unknown;
 }
 
 export function SortableCardsProvider({
@@ -90,54 +120,40 @@ export function SortableCardsProvider({
   onReorder,
   children,
 }: SortableCardsProviderProps) {
-  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
-    const container = containerRef.current;
-    if (!container) return;
-    const childEl = (e.target as HTMLElement).closest('[data-sortable-id]');
-    if (!childEl) { setDragOverIndex(null); return; }
-    const idx = Array.from(container.children).indexOf(childEl);
-    setDragOverIndex(idx);
   }, []);
 
+  // Fallback drop: fires when dropping on empty space between cards
   const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    setDragOverIndex(null);
     const draggedId = e.dataTransfer.getData('text/plain');
     if (!draggedId) return;
     const container = containerRef.current;
     if (!container) return;
+    const allSortable = Array.from(container.querySelectorAll('[data-sortable-id]'));
     const childEl = (e.target as HTMLElement).closest('[data-sortable-id]');
-    if (!childEl) return;
-    const targetIdx = Array.from(container.children).indexOf(childEl);
+    const targetEl = childEl || allSortable[allSortable.length - 1];
+    if (!targetEl) return;
+    const targetIdx = allSortable.indexOf(targetEl);
     if (targetIdx === -1) return;
     const sourceIdx = items.indexOf(draggedId);
     if (sourceIdx === -1 || sourceIdx === targetIdx) return;
     onReorder(sourceIdx, targetIdx);
   }, [items, onReorder]);
 
-  const handleDragLeave = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-    const container = containerRef.current;
-    if (!container) return;
-    const relatedTarget = e.relatedTarget as HTMLElement;
-    if (relatedTarget && container.contains(relatedTarget)) return;
-    setDragOverIndex(null);
-  }, []);
-
   return (
-    <div
-      ref={containerRef}
-      onDragOver={handleDragOver}
-      onDrop={handleDrop}
-      onDragLeave={handleDragLeave}
-    >
-      {children}
-    </div>
+    <SortableContext.Provider value={{ items, onReorder }}>
+      <div
+        ref={containerRef}
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
+      >
+        {children}
+      </div>
+    </SortableContext.Provider>
   );
 }
-
-export { useDragHandle };
