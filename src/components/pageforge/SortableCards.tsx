@@ -1,10 +1,33 @@
 'use client';
 
-import React, { createContext, useCallback, useContext, useRef, useState } from 'react';
+import React, { createContext, useContext } from 'react';
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────
-// DragHandle — grip handle with vertical dots icon
+// Internal context: dnd-kit listeners forwarded to DragHandle
+// ─────────────────────────────────────────────────────────────
+
+const HandleContext = createContext<{
+  attributes: Record<string, unknown>;
+  listeners: Record<string, unknown> | undefined;
+} | null>(null);
+
+// ─────────────────────────────────────────────────────────────
+// DragHandle — grip icon, ONLY initiates drag via dnd-kit listeners
 // ─────────────────────────────────────────────────────────────
 
 interface DragHandleProps {
@@ -12,10 +35,14 @@ interface DragHandleProps {
 }
 
 export function DragHandle({ className }: DragHandleProps) {
+  const ctx = useContext(HandleContext);
+
   return (
     <span
+      {...(ctx?.attributes || {})}
+      {...(ctx?.listeners || {})}
       data-drag-handle="true"
-      draggable="false"
+      suppressHydrationWarning
       className={[
         'text-gray-400 hover:text-gray-600',
         'cursor-grab active:cursor-grabbing',
@@ -32,17 +59,9 @@ export function DragHandle({ className }: DragHandleProps) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// Shared context so wrappers can talk to the provider
-// ─────────────────────────────────────────────────────────────
-
-const SortableContext = createContext<{
-  items: (string | number)[];
-  onReorder: (fromIndex: number, toIndex: number) => void;
-}>({ items: [], onReorder: () => {} });
-
-// ─────────────────────────────────────────────────────────────
-// SortableCardWrapper
-// Both a drag source AND a drop target.
+// SortableCardWrapper (public API)
+// Delegates to dnd-kit version when inside a provider,
+// or renders as plain div when outside (safe fallback).
 // ─────────────────────────────────────────────────────────────
 
 interface SortableCardWrapperProps {
@@ -53,51 +72,55 @@ interface SortableCardWrapperProps {
 }
 
 export function SortableCardWrapper({ id, children, className, style }: SortableCardWrapperProps) {
-  const [isDragging, setIsDragging] = useState(false);
-  const { items, onReorder } = useContext(SortableContext);
+  const ctx = useContext(HandleContext);
 
-  const handleDragStart = useCallback((e: React.DragEvent) => {
-    setIsDragging(true);
-    e.dataTransfer.setData('text/plain', String(id));
-    e.dataTransfer.effectAllowed = 'move';
-    const el = e.currentTarget as HTMLElement;
-    requestAnimationFrame(() => { el.style.opacity = '0.4'; });
-  }, [id]);
-
-  const handleDragEnd = useCallback((e: React.DragEvent) => {
-    setIsDragging(false);
-    (e.currentTarget as HTMLElement).style.opacity = '1';
-  }, []);
-
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    e.dataTransfer.dropEffect = 'move';
-  }, []);
-
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const draggedId = e.dataTransfer.getData('text/plain');
-    if (!draggedId) return;
-    const sourceIdx = items.indexOf(draggedId);
-    const targetIdx = items.indexOf(String(id));
-    if (sourceIdx === -1 || targetIdx === -1 || sourceIdx === targetIdx) return;
-    onReorder(sourceIdx, targetIdx);
-  }, [id, items, onReorder]);
+  // If no context, render as plain non-draggable wrapper (safe fallback)
+  if (!ctx) {
+    return (
+      <div style={style} className={className} data-sortable-id={String(id)}>
+        <div className="rounded-lg">{children}</div>
+      </div>
+    );
+  }
 
   return (
-    <div
-      draggable="true"
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-      onDragOver={handleDragOver}
-      onDrop={handleDrop}
-      style={style}
-      className={className}
-      data-sortable-id={String(id)}
-    >
-      <div className={isDragging ? 'rounded-lg opacity-90 shadow-xl ring-2 ring-emerald-400 ring-offset-2' : 'rounded-lg'}>
+    <SortableCardWrapperInner id={id} className={className} style={style}>
+      {children}
+    </SortableCardWrapperInner>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// SortableCardWrapperInner — uses dnd-kit useSortable
+// ONLY rendered when inside a SortableCardsProvider
+// ─────────────────────────────────────────────────────────────
+
+function SortableCardWrapperInner({
+  id,
+  children,
+  className,
+  style,
+}: SortableCardWrapperProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const wrapperStyle: React.CSSProperties = {
+    ...style,
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 50 : undefined,
+    position: 'relative' as const,
+  };
+
+  return (
+    <div ref={setNodeRef} style={wrapperStyle} className={className} data-sortable-id={String(id)}>
+      <div className={isDragging ? 'rounded-lg shadow-lg ring-2 ring-emerald-300 opacity-90' : 'rounded-lg'}>
         {children}
       </div>
     </div>
@@ -106,7 +129,7 @@ export function SortableCardWrapper({ id, children, className, style }: Sortable
 
 // ─────────────────────────────────────────────────────────────
 // SortableCardsProvider
-// Provides context for wrappers; also acts as a fallback drop zone.
+// Wraps children in dnd-kit DndContext + SortableContext.
 // ─────────────────────────────────────────────────────────────
 
 interface SortableCardsProviderProps {
@@ -120,40 +143,34 @@ export function SortableCardsProvider({
   onReorder,
   children,
 }: SortableCardsProviderProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
+  // Filter out null/undefined items (can happen during SSR hydration)
+  const safeItems = items.filter((item): item is string | number => item != null);
 
-  const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-  }, []);
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+  );
 
-  // Fallback drop: fires when dropping on empty space between cards
-  const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    const draggedId = e.dataTransfer.getData('text/plain');
-    if (!draggedId) return;
-    const container = containerRef.current;
-    if (!container) return;
-    const allSortable = Array.from(container.querySelectorAll('[data-sortable-id]'));
-    const childEl = (e.target as HTMLElement).closest('[data-sortable-id]');
-    const targetEl = childEl || allSortable[allSortable.length - 1];
-    if (!targetEl) return;
-    const targetIdx = allSortable.indexOf(targetEl);
-    if (targetIdx === -1) return;
-    const sourceIdx = items.indexOf(draggedId);
-    if (sourceIdx === -1 || sourceIdx === targetIdx) return;
-    onReorder(sourceIdx, targetIdx);
-  }, [items, onReorder]);
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = safeItems.indexOf(active.id);
+    const newIndex = safeItems.indexOf(over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+    onReorder(oldIndex, newIndex);
+  };
 
   return (
-    <SortableContext.Provider value={{ items, onReorder }}>
-      <div
-        ref={containerRef}
-        onDragOver={handleDragOver}
-        onDrop={handleDrop}
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+    >
+      <SortableContext
+        items={safeItems}
+        strategy={verticalListSortingStrategy}
       >
         {children}
-      </div>
-    </SortableContext.Provider>
+      </SortableContext>
+    </DndContext>
   );
 }
