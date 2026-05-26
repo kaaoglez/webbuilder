@@ -1,0 +1,66 @@
+============================================================
+PAGEFORGE v2 — ACTUALIZACIÓN: Sistema de Plantillas Auxiliares
+============================================================
+
+Se han modificado 3 archivos para implementar el sistema completo
+de 7 plantillas prediseñadas + plantillas personalizadas + exportación PHP.
+
+────────────────────────────────────────────────────────────────
+ARCHIVOS MODIFICADOS (reemplazar en el proyecto):
+────────────────────────────────────────────────────────────────
+
+1. src/lib/theme-editor-store.ts
+   - Agregadas 2 plantillas prediseñadas: "Sidebar" y "Header"
+   - Total: 7 plantillas prediseñadas (antes eran 5)
+   - Sidebar: icono PanelRight, 8 opciones de widgets
+   - Header: icono PanelTop, 6 opciones de configuración
+
+2. src/lib/wp-theme-generator.ts
+   - Nueva interfaz: PageTemplateConfig
+   - ThemeConfig actualizado con campo pageTemplates
+   - normalizeConfig actualizado para pageTemplates
+   - generateThemeFiles reescrito: genera archivos PHP solo si la plantilla está activada
+   - Funciones actualizadas: generateSinglePHP, generateArchivePHP, generateSearchPHP, 
+     generate404PHP, generateSidebarPHP (aceptan tpl?: PageTemplateConfig)
+   - Nuevas funciones: generatePagePHP, generateCustomTemplatePHP
+   - CSS nuevo: .page-with-sidebar, .page-main-content
+   - Plantillas personalizadas se exportan como template-{slug}.php con 
+     /* Template Name: Nombre */ para que WordPress las reconozca
+
+3. src/components/pageforge/TemplatesTab.tsx
+   - Imports nuevos: PanelRight, PanelTop
+   - ICON_MAP actualizado con PanelRight y PanelTop
+   - OPTION_LABEL_MAP: 14 nuevas etiquetas en español para opciones de Sidebar y Header
+
+────────────────────────────────────────────────────────────────
+FUNCIONALIDADES IMPLEMENTADAS:
+────────────────────────────────────────────────────────────────
+
+✅ 7 Plantillas Prediseñadas:
+   1. Single Post (single.php) — configuración de featured image, author box, etc.
+   2. Blog / Archive (archive.php) — excerpt, featured image en cards
+   3. Página Estática (page.php) — hero banner, sidebar, título
+   4. Página 404 (404.php) — search box, back to home
+   5. Search Results (search.php) — highlight, featured image
+   6. Sidebar (sidebar.php) — widgets configurables
+   7. Header (header.php) — logo, sticky, mobile menu, search
+
+✅ Plantillas Personalizadas:
+   - Crear desde cero con nombre + secciones + layout
+   - Secciones reutilizan los mismos tipos que front-page (hero, about, etc.)
+   - Se exportan como template-{slug}.php con Template Name header
+   - Seleccionables en WordPress al crear una página
+
+✅ Exportación PHP:
+   - Solo se generan archivos PHP de plantillas activadas (enabled: true)
+   - Las plantillas personalizadas incluyen /* Template Name: Nombre */
+   - Cada plantilla respeta su configuración de layout (sidebar, full-width)
+
+────────────────────────────────────────────────────────────────
+CÓMO INSTALAR:
+────────────────────────────────────────────────────────────────
+
+1. Copiar cada archivo a la ruta indicada (sobrescribir)
+2. Ejecutar: bun run lint
+3. Verificar que no hay errores
+
