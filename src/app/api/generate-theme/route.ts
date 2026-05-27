@@ -9,6 +9,16 @@ import {
   type ThemeConfig,
 } from '@/lib/wp-theme-generator';
 
+interface ExportSettings {
+  includeScreenshot?: boolean;
+  minifyCSS?: boolean;
+  includeREADME?: boolean;
+}
+
+interface ThemeRequest extends ThemeConfig {
+  _exportSettings?: ExportSettings;
+}
+
 /**
  * POST /api/generate-theme
  *
@@ -18,7 +28,9 @@ import {
  */
 export async function POST(request: NextRequest) {
   try {
-    const config: ThemeConfig = await request.json();
+    const config: ThemeRequest = await request.json();
+    const exportSettings: ExportSettings = config._exportSettings || { includeScreenshot: true, minifyCSS: false, includeREADME: true };
+    const { _exportSettings: _, ...cleanConfig } = config;
 
     // Validate required fields
     if (!config.name || !config.slug) {
@@ -43,7 +55,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Normalize config with defaults for any missing fields
-    const fullConfig = normalizeConfig({ ...config, slug: sanitizedSlug });
+    const fullConfig = normalizeConfig({ ...cleanConfig, slug: sanitizedSlug });
 
     // ─── Collect all base64 data:image URLs from the config ───
     const images = collectDataUrlsFromConfig(fullConfig);
@@ -64,6 +76,8 @@ export async function POST(request: NextRequest) {
 
     // ─── Add processed text files to the ZIP ─────────────────
     for (const [filePath, content] of files) {
+      // Skip readme.txt if includeREADME is false
+      if (filePath === 'readme.txt' && !exportSettings.includeREADME) continue;
       // Determine file type for image URL replacement
       const ext = filePath.split('.').pop() || '';
       let fileType: 'php' | 'css' | 'js' = 'php';
@@ -71,7 +85,15 @@ export async function POST(request: NextRequest) {
       else if (ext === 'js') fileType = 'js';
 
       // Replace any data:image URLs with WordPress-correct paths
-      const processed = processImagesInContent(content, images, fileType);
+      let processed = processImagesInContent(content, images, fileType);
+      // Minify CSS if setting is enabled
+      if (ext === 'css' && exportSettings.minifyCSS) {
+        processed = processed
+          .replace(/\/\*[\s\S]*?\*\//g, '')
+          .replace(/\s*([{}:;,])\s*/g, '$1')
+          .replace(/\n/g, '')
+          .trim();
+      }
       themeFolder.file(filePath, processed);
     }
 
@@ -86,8 +108,10 @@ export async function POST(request: NextRequest) {
     }
 
     // ─── Generate screenshot.png (1200x900) ──────────────────
-    const screenshotBuffer = await generateScreenshot(fullConfig);
-    themeFolder.file('screenshot.png', screenshotBuffer);
+    if (exportSettings.includeScreenshot) {
+      const screenshotBuffer = await generateScreenshot(fullConfig);
+      themeFolder.file('screenshot.png', screenshotBuffer);
+    }
 
     // Generate ZIP buffer and convert to Node.js Buffer for NextResponse compatibility
     const zipBuffer = await zip.generateAsync({ type: 'uint8array' });

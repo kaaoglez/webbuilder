@@ -458,7 +458,7 @@ function generateCustomPostType(config: PluginConfig): Map<string, string> {
   const taxPHP = taxonomies.map(tax => {
     const taxFn = `${cptFn}_${tax.slug.replace(/-/g, '_')}`;
     return `
-${taxFn}_register() {
+function ${taxFn}_register() {
     register_taxonomy( '${tax.slug}', '${cptSlug}', array(
         'labels' => array(
             'name'          => __( '${tax.name}', '${td}' ),

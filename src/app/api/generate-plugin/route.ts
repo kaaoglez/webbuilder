@@ -2,6 +2,20 @@ import { NextRequest, NextResponse } from 'next/server';
 import JSZip from 'jszip';
 import { generatePluginFiles, normalizePluginConfig } from '@/lib/wp-plugin-generator';
 
+interface ExportSettings {
+  includeScreenshot?: boolean;
+  minifyCSS?: boolean;
+  includeREADME?: boolean;
+}
+
+interface PluginRequest {
+  name: string;
+  slug?: string;
+  pluginType: string;
+  [key: string]: unknown;
+  _exportSettings?: ExportSettings;
+}
+
 /**
  * POST /api/generate-plugin
  *
@@ -10,7 +24,9 @@ import { generatePluginFiles, normalizePluginConfig } from '@/lib/wp-plugin-gene
  */
 export async function POST(request: NextRequest) {
   try {
-    const config = await request.json();
+    const config: PluginRequest = await request.json();
+    const exportSettings: ExportSettings = config._exportSettings || { includeScreenshot: true, minifyCSS: false, includeREADME: true };
+    const { _exportSettings: _, ...cleanConfig } = config;
 
     // Validar campos obligatorios
     if (!config.name || !config.pluginType) {
@@ -42,7 +58,7 @@ export async function POST(request: NextRequest) {
     const sanitizedSlug = rawSlug || 'my-plugin';
 
     // Normalizar configuración con valores por defecto
-    const fullConfig = normalizePluginConfig({ ...config, slug: sanitizedSlug });
+    const fullConfig = normalizePluginConfig({ ...cleanConfig, slug: sanitizedSlug });
 
     // Generar archivos del plugin
     const files = generatePluginFiles(fullConfig);
@@ -59,6 +75,8 @@ export async function POST(request: NextRequest) {
     }
 
     for (const [filePath, content] of files) {
+      // Skip readme.txt if includeREADME is false
+      if (filePath === 'readme.txt' && !exportSettings.includeREADME) continue;
       pluginFolder.file(filePath, content);
     }
 

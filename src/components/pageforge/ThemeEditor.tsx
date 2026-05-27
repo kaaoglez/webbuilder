@@ -17,6 +17,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { useProjectsStore } from '@/lib/projects-store';
+import { useSettingsStore } from '@/lib/settings-store';
 import {
   Download,
   Save,
@@ -2876,10 +2877,11 @@ export default function ThemeEditor() {
   const handleGenerate = useCallback(async () => {
     setIsGenerating(true);
     try {
+      const settings = useSettingsStore.getState();
       const res = await fetch('/api/generate-theme', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(config),
+        body: JSON.stringify({ ...config, _exportSettings: { includeScreenshot: settings.includeScreenshot, minifyCSS: settings.minifyCSS, includeREADME: settings.includeREADME } }),
       });
 
       if (!res.ok) {

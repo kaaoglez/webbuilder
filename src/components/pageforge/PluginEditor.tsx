@@ -4,6 +4,7 @@ import { useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { useProjectsStore } from '@/lib/projects-store';
+import { useSettingsStore } from '@/lib/settings-store';
 import {
   Download,
   Save,
@@ -1314,10 +1315,11 @@ function GenerateTab() {
   const handleGenerate = useCallback(async () => {
     setGenerating(true);
     try {
+      const settings = useSettingsStore.getState();
       const res = await fetch('/api/generate-plugin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(config),
+        body: JSON.stringify({ ...config, _exportSettings: { includeScreenshot: settings.includeScreenshot, minifyCSS: settings.minifyCSS, includeREADME: settings.includeREADME } }),
       });
 
       if (!res.ok) {
@@ -1448,10 +1450,11 @@ export default function PluginEditor() {
   const handleGenerate = useCallback(async () => {
     setGenerating(true);
     try {
+      const settings = useSettingsStore.getState();
       const res = await fetch('/api/generate-plugin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(config),
+        body: JSON.stringify({ ...config, _exportSettings: { includeScreenshot: settings.includeScreenshot, minifyCSS: settings.minifyCSS, includeREADME: settings.includeREADME } }),
       });
 
       if (!res.ok) {
