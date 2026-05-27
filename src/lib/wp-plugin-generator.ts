@@ -111,7 +111,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-${f}_enqueue_assets() {
+function ${f}_enqueue_assets() {
     wp_enqueue_style( '${s}-contact', plugin_dir_url( __FILE__ ) . 'assets/css/style.css', array(), '${config.version}' );
     wp_enqueue_script( '${s}-contact-js', plugin_dir_url( __FILE__ ) . 'assets/js/script.js', array(), '${config.version}', true );
     wp_localize_script( '${s}-contact-js', '${f}_ajax', array(
@@ -220,9 +220,9 @@ register_deactivation_hook( __FILE__, function() {
         var $btn = $form.find('.pf-btn-primary');
         var $response = $('#pf-form-response');
         $btn.prop('disabled', true).text('Enviando...');
-        $.post(pf_contact_ajax.ajax_url, {
+        $.post(${f}_ajax.ajax_url, {
             action: '${f}_submit',
-            nonce: pf_contact_ajax.nonce,
+            nonce: ${f}_ajax.nonce,
             pf_name: $form.find('#pf-name').val(),
             pf_email: $form.find('#pf-email').val(),
             pf_subject: $form.find('#pf-subject').val(),
@@ -272,7 +272,7 @@ function generateSlider(config: PluginConfig): Map<string, string> {
 
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
-${f}_register_cpt() {
+function ${f}_register_cpt() {
     register_post_type( 'pf_slider', array(
         'labels' => array(
             'name'               => __( 'Sliders', '${td}' ),
@@ -294,7 +294,7 @@ ${f}_register_cpt() {
 }
 add_action( 'init', '${f}_register_cpt' );
 
-${f}_enqueue() {
+function ${f}_enqueue() {
     wp_enqueue_style( '${s}-slider', plugin_dir_url( __FILE__ ) . 'assets/css/style.css', array(), '${config.version}' );
     wp_enqueue_script( '${s}-slider-js', plugin_dir_url( __FILE__ ) . 'assets/js/script.js', array(), '${config.version}', true );
 }
@@ -347,7 +347,7 @@ function ${f}_shortcode( $atts ) {
 }
 add_shortcode( 'pageforge_slider', '${f}_shortcode' );
 
-${f}_meta_boxes() {
+function ${f}_meta_boxes() {
     add_meta_box( 'pf_slide_details', __( 'Detalles de diapositiva', '${td}' ), function( $post ) {
         wp_nonce_field( '${f}_save_meta', '${f}_meta_nonce' );
         $subtitle = get_post_meta( $post->ID, '_pf_slide_subtitle', true );
@@ -495,7 +495,7 @@ add_action( 'init', '${taxFn}_register' );`;
 
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
-${f}_register_cpt() {
+function ${f}_register_cpt() {
     register_post_type( '${cptSlug}', array(
         'labels' => array(
             'name'               => __( '${cptPlural}', '${td}' ),
@@ -559,7 +559,7 @@ function generateShortcodes(config: PluginConfig): Map<string, string> {
 
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
-${f}_enqueue() {
+function ${f}_enqueue() {
     wp_enqueue_style( '${s}-shortcodes', plugin_dir_url( __FILE__ ) . 'assets/css/style.css', array(), '${config.version}' );
     wp_enqueue_script( '${s}-shortcodes-js', plugin_dir_url( __FILE__ ) . 'assets/js/script.js', array(), '${config.version}', true );
 }
@@ -714,7 +714,7 @@ function generateWidget(config: PluginConfig): Map<string, string> {
 
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
-${f}_enqueue() {
+function ${f}_enqueue() {
     wp_enqueue_style( '${s}-widget', plugin_dir_url( __FILE__ ) . 'assets/css/style.css', array(), '${config.version}' );
 }
 add_action( 'wp_enqueue_scripts', '${f}_enqueue' );
@@ -831,7 +831,7 @@ function generateSocialShare(config: PluginConfig): Map<string, string> {
 
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
-${f}_enqueue() {
+function ${f}_enqueue() {
     wp_enqueue_style( '${s}-social', plugin_dir_url( __FILE__ ) . 'assets/css/style.css', array(), '${config.version}' );
     wp_enqueue_script( '${s}-social-js', plugin_dir_url( __FILE__ ) . 'assets/js/script.js', array(), '${config.version}', true );
 }
@@ -1145,7 +1145,7 @@ function generateCountdown(config: PluginConfig): Map<string, string> {
 
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
-${f}_enqueue() {
+function ${f}_enqueue() {
     wp_enqueue_style( '${s}-countdown', plugin_dir_url( __FILE__ ) . 'assets/css/style.css', array(), '${config.version}' );
     wp_enqueue_script( '${s}-countdown-js', plugin_dir_url( __FILE__ ) . 'assets/js/script.js', array(), '${config.version}', true );
 }
@@ -1246,7 +1246,7 @@ function generatePricingTable(config: PluginConfig): Map<string, string> {
 
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
-${f}_enqueue() {
+function ${f}_enqueue() {
     wp_enqueue_style( '${s}-pricing', plugin_dir_url( __FILE__ ) . 'assets/css/style.css', array(), '${config.version}' );
 }
 add_action( 'wp_enqueue_scripts', '${f}_enqueue' );
@@ -1386,7 +1386,7 @@ function generateTestimonials(config: PluginConfig): Map<string, string> {
 
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
-${f}_register_cpt() {
+function ${f}_register_cpt() {
     register_post_type( 'pf_testimonial', array(
         'labels' => array(
             'name'               => __( 'Testimonios', '${td}' ),
@@ -1408,7 +1408,7 @@ ${f}_register_cpt() {
 }
 add_action( 'init', '${f}_register_cpt' );
 
-${f}_meta_boxes() {
+function ${f}_meta_boxes() {
     add_meta_box( 'pf_testimonial_details', __( 'Detalles del testimonio', '${td}' ), function( $post ) {
         wp_nonce_field( '${f}_save_meta', '${f}_meta_nonce' );
         $role   = get_post_meta( $post->ID, '_pf_testimonial_role', true );
@@ -1433,7 +1433,7 @@ function ${f}_save_meta( $post_id ) {
 }
 add_action( 'save_post_pf_testimonial', '${f}_save_meta' );
 
-${f}_enqueue() {
+function ${f}_enqueue() {
     wp_enqueue_style( '${s}-testimonials', plugin_dir_url( __FILE__ ) . 'assets/css/style.css', array(), '${config.version}' );
 }
 add_action( 'wp_enqueue_scripts', '${f}_enqueue' );
@@ -1522,7 +1522,7 @@ function generateMaintenanceMode(config: PluginConfig): Map<string, string> {
 
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
-${f}_enqueue() {
+function ${f}_enqueue() {
     wp_enqueue_style( '${s}-maintenance', plugin_dir_url( __FILE__ ) . 'assets/css/style.css', array(), '${config.version}' );
 }
 add_action( 'wp_enqueue_scripts', '${f}_enqueue' );
@@ -1698,7 +1698,7 @@ function generateBreadcrumbs(config: PluginConfig): Map<string, string> {
 
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
-${f}_enqueue() {
+function ${f}_enqueue() {
     wp_enqueue_style( '${s}-breadcrumbs', plugin_dir_url( __FILE__ ) . 'assets/css/style.css', array(), '${config.version}' );
 }
 add_action( 'wp_enqueue_scripts', '${f}_enqueue' );
@@ -1822,7 +1822,7 @@ function generateRelatedPosts(config: PluginConfig): Map<string, string> {
 
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
-${f}_enqueue() {
+function ${f}_enqueue() {
     wp_enqueue_style( '${s}-related', plugin_dir_url( __FILE__ ) . 'assets/css/style.css', array(), '${config.version}' );
 }
 add_action( 'wp_enqueue_scripts', '${f}_enqueue' );
