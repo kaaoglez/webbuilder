@@ -81,6 +81,33 @@ export default function MyProjects({ onNavigate }: MyProjectsProps) {
     }
   };
 
+  const handleDownload = async (project: SavedProject) => {
+    const filename = `${project.name.replace(/[^a-z0-9]/gi, '-').toLowerCase()}.zip`;
+    toast({ title: 'Generando ZIP...' });
+    try {
+      const endpoint =
+        project.type === 'theme' ? '/api/generate-theme' : '/api/generate-plugin';
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ config: project.config, exportSettings: {} }),
+      });
+      if (!res.ok) throw new Error('Error al generar el ZIP');
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast({ title: 'ZIP descargado' });
+    } catch {
+      toast({ title: 'Error al generar ZIP', variant: 'destructive' });
+    }
+  };
+
   const handleDelete = () => {
     if (!deleteTarget) return;
     deleteProject(deleteTarget.id);
@@ -277,6 +304,15 @@ export default function MyProjects({ onNavigate }: MyProjectsProps) {
                             title="Editar"
                           >
                             <Edit3 className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDownload(project)}
+                            className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
+                            title="Descargar ZIP"
+                          >
+                            <Download className="h-4 w-4" />
                           </Button>
                           <Button
                             variant="ghost"

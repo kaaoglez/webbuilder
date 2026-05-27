@@ -76,7 +76,7 @@ function ThumbnailCard({
       {/* Image */}
       <div className="relative aspect-square bg-gray-200 overflow-hidden">
         <img
-          src={item.url}
+          src={item.data || item.url}
           alt={item.alt || item.name}
           className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
         />
@@ -186,7 +186,7 @@ function AttachmentDetails({
       <div className="px-4 pt-4">
         <div className="relative rounded-lg overflow-hidden bg-gray-200 border border-gray-400">
           <img
-            src={item.url}
+            src={item.data || item.url}
             alt={item.alt || item.name}
             className="w-full h-auto max-h-64 object-contain"
           />

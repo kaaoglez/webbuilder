@@ -68,8 +68,15 @@ export const useSettingsStore = create<SettingsState & SettingsActions>()(
 
       clearAllData: () => {
         if (typeof window !== 'undefined') {
-          localStorage.clear();
-          window.location.reload();
+          // Try to clear server-side database first, then fall back to localStorage
+          fetch('/api/clear-all', { method: 'POST' })
+            .catch(() => {
+              // Graceful degradation — still clear localStorage even if API fails
+            })
+            .finally(() => {
+              localStorage.clear();
+              window.location.reload();
+            });
         }
       },
     }),

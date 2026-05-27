@@ -1233,6 +1233,7 @@ function OptionsRenderer({
 
 function GenerateTab() {
   const { config, isGenerating, setGenerating } = usePluginEditorStore();
+  const saveProject = useProjectsStore((s) => s.saveProject);
 
   const pluginMeta = useMemo(() => {
     return PLUGIN_TYPES.find((p) => p.value === config.pluginType);
@@ -1357,12 +1358,15 @@ function GenerateTab() {
       URL.revokeObjectURL(url);
 
       toast.success('¡Plugin ZIP generado exitosamente!');
+
+      // Auto-save project to DB after successful export
+      saveProject(config.name || 'Sin Nombre', 'plugin', config as Record<string, unknown>).catch(() => {});
     } catch (err) {
       toast.error(`Error al generar el plugin: ${err instanceof Error ? err.message : 'Error desconocido'}`);
     } finally {
       setGenerating(false);
     }
-  }, [config, setGenerating]);
+  }, [config, setGenerating, saveProject]);
 
   return (
     <div className="space-y-6">
@@ -1492,12 +1496,15 @@ export default function PluginEditor() {
       URL.revokeObjectURL(url);
 
       toast.success('¡Plugin ZIP generado exitosamente!');
+
+      // Auto-save project to DB after successful export
+      saveProject(config.name || 'Sin Nombre', 'plugin', config as Record<string, unknown>).catch(() => {});
     } catch (err) {
       toast.error(`Error al generar el plugin: ${err instanceof Error ? err.message : 'Error desconocido'}`);
     } finally {
       setGenerating(false);
     }
-  }, [config, setGenerating]);
+  }, [config, setGenerating, saveProject]);
 
   return (
     <div className="flex h-full flex-col">

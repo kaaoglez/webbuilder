@@ -177,8 +177,8 @@ export default function PageForgeApp() {
           <Topbar activeItem={activeItem} onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
 
           {/* Scrollable content */}
-          <main className={(isThemeEditor || isPluginEditor) ? 'flex-1 overflow-hidden' : 'flex-1 overflow-y-auto'}>
-            <div className={isThemeEditor || isPluginEditor ? 'h-full' : isMedios ? 'max-w-7xl mx-auto' : 'p-4 md:p-6 lg:p-8 max-w-7xl mx-auto'}>
+          <main className={(isThemeEditor || isPluginEditor || isMedios) ? 'flex-1 overflow-hidden' : 'flex-1 overflow-y-auto'}>
+            <div className={(isThemeEditor || isPluginEditor || isMedios) ? 'h-full' : 'p-4 md:p-6 lg:p-8 max-w-7xl mx-auto'}>
               {isDashboard ? (
                 <motion.div
                   initial={{ opacity: 0 }}

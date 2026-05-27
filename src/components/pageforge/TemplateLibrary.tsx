@@ -41,7 +41,7 @@ import {
 // Types
 // ─────────────────────────────────────────────────────────────
 
-type NavItem = 'dashboard' | 'create-theme' | 'create-plugin' | 'my-projects' | 'templates' | 'settings';
+type NavItem = 'dashboard' | 'create-theme' | 'create-plugin' | 'my-projects' | 'templates' | 'medios' | 'settings';
 
 interface TemplateLibraryProps {
   onNavigate: (item: NavItem) => void;

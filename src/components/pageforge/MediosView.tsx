@@ -83,7 +83,7 @@ function formatDate(iso: string): string {
 
 export function MediosView() {
   // Store
-  const { mediaItems, addMedia, removeMedia, updateMedia } = useMediaLibraryStore();
+  const { mediaItems, hydrated, addMedia, removeMedia, updateMedia } = useMediaLibraryStore();
 
   // UI state
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
@@ -399,7 +399,7 @@ export function MediosView() {
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                const items = mediaItems;
+                const items = filteredItems;
                 const idx = items.findIndex(i => i.id === lightboxItem.id);
                 if (idx > 0) setLightboxItem(items[idx - 1]);
               }}
@@ -410,7 +410,7 @@ export function MediosView() {
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                const items = mediaItems;
+                const items = filteredItems;
                 const idx = items.findIndex(i => i.id === lightboxItem.id);
                 if (idx < items.length - 1) setLightboxItem(items[idx + 1]);
               }}
@@ -719,8 +719,27 @@ export function MediosView() {
       <div className="flex-1 flex min-h-0 overflow-hidden bg-[#f8fafc]">
         {/* Media content area */}
         <div className="flex-1 overflow-y-auto">
+          {/* ─── Loading State ─── */}
+          {!hydrated && filteredItems.length === 0 && !isUploading && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex flex-col items-center justify-center h-full py-24 px-4"
+            >
+              <div className="rounded-full bg-gray-200 p-6 mb-4">
+                <div className="h-10 w-10 border-4 border-gray-300 border-t-emerald-500 rounded-full animate-spin" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-700 mb-1">
+                Cargando biblioteca de medios...
+              </h3>
+              <p className="text-sm text-gray-500 text-center max-w-sm">
+                Por favor, espera mientras se cargan los medios.
+              </p>
+            </motion.div>
+          )}
+
           {/* ─── Empty State ─── */}
-          {filteredItems.length === 0 && !isUploading && (
+          {hydrated && filteredItems.length === 0 && !isUploading && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -790,6 +809,9 @@ export function MediosView() {
                         } else {
                           setDetailItem(item);
                         }
+                      }}
+                      onDoubleClick={() => {
+                        setLightboxItem(item);
                       }}
                     >
                       {/* Checkbox */}

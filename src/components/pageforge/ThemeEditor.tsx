@@ -2899,6 +2899,9 @@ export default function ThemeEditor() {
       URL.revokeObjectURL(url);
 
       toast.success('¡Theme ZIP generado exitosamente!');
+
+      // Auto-save project to DB after successful export
+      saveProject(config.name || 'Sin Nombre', 'theme', config as Record<string, unknown>).catch(() => {});
     } catch (err) {
       toast.error(`Error al generar el theme: ${err instanceof Error ? err.message : 'Error desconocido'}`);
     } finally {

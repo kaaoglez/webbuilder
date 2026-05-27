@@ -224,7 +224,21 @@ export const useMediaLibraryStore = create<MediaLibraryState & MediaLibraryActio
 }),
     {
       name: 'pageforge-media-library',
-      partialize: (state) => ({ mediaItems: state.mediaItems }),
+      partialize: (state) => ({
+        // Only persist metadata — NOT base64 data (would overflow localStorage)
+        mediaItems: state.mediaItems.map((item) => ({
+          ...item,
+          data: undefined,
+        })),
+      }),
+      merge: (persisted, current) => ({
+        ...current,
+        mediaItems: (persisted.mediaItems || []).map((p: MediaItem) => {
+          // Keep in-memory data from current state if available
+          const existing = current.mediaItems.find((c: MediaItem) => c.id === p.id);
+          return { ...p, data: existing?.data || p.data };
+        }),
+      }),
     },
   ),
 );

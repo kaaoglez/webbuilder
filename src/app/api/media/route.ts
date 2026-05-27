@@ -21,7 +21,6 @@ export async function GET() {
       size: item.size,
       mimeType: item.mimeType,
       uploadedAt: item.uploadedAt.toISOString(),
-      data: item.data,
     }));
 
     return NextResponse.json(parsed);
@@ -43,8 +42,7 @@ export async function POST(request: Request) {
     const buffer = Buffer.from(bytes);
 
     // Generate unique ID for the file
-    const { nanoid } = await import('nanoid');
-    const fileId = nanoid();
+    const fileId = crypto.randomUUID().replace(/-/g, '').substring(0, 12);
     const safeFilename = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
     const fileName = `${fileId}-${safeFilename}`;
 
@@ -78,11 +76,7 @@ export async function POST(request: Request) {
       }
     }
 
-    // Create base64 data URL for quick access
-    const base64 = buffer.toString('base64');
-    const dataUrl = `data:${file.type};base64,${base64}`;
-
-    // Store metadata in DB
+    // Store metadata in DB (no base64 — file is already on disk at /public/uploads/)
     const mediaItem = await db.mediaItem.create({
       data: {
         name: file.name,
@@ -91,7 +85,6 @@ export async function POST(request: Request) {
         height,
         size: file.size,
         mimeType: file.type,
-        data: dataUrl,
       },
     });
 
@@ -106,7 +99,6 @@ export async function POST(request: Request) {
       size: mediaItem.size,
       mimeType: mediaItem.mimeType,
       uploadedAt: mediaItem.uploadedAt.toISOString(),
-      data: mediaItem.data,
     };
 
     return NextResponse.json(parsed, { status: 201 });
