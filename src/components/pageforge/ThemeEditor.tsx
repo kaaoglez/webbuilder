@@ -203,10 +203,10 @@ function ImageUrlField({
           </Button>
         </div>
         {value && (
-          <div className="mt-2 flex items-center gap-2 p-2 bg-gray-200 rounded-lg border border-gray-400">
-            <img src={value} alt="Preview" className="h-10 w-auto object-contain rounded"
+          <div className="mt-2 flex items-center gap-2 p-2 bg-gray-100 rounded-lg border border-gray-300">
+            <img src={value} alt="Preview" className="h-16 w-auto max-w-full object-contain rounded cursor-pointer"
               onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-            <span className="text-xs text-gray-500">Vista previa</span>
+            <span className="text-xs text-gray-500 shrink-0">Vista previa</span>
           </div>
         )}
       </FormField>

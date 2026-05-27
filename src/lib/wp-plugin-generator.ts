@@ -51,7 +51,8 @@ function e(str: string): string {
 }
 
 function fn(slug: string, suffix: string): string {
-  return `${slug.replace(/-/g, '_')}_${suffix}`;
+  const base = slug.replace(/-/g, '_');
+  return suffix ? `${base}_${suffix}` : base;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -167,7 +168,7 @@ function ${f}_handle_submit() {
         wp_send_json_error( array( 'message' => __( 'Por favor, completa todos los campos obligatorios.', '${td}' ) ) );
     }
 
-    $to      = get_option( 'admin_email' );
+    $to      = get_option( '${f}_recipient_email', get_option( 'admin_email' ) );
     $headers = array(
         'Content-Type: text/html; charset=UTF-8',
         'From: ' . $name . ' <' . $email . '>',
@@ -189,8 +190,32 @@ function ${f}_handle_submit() {
 add_action( 'wp_ajax_${f}_submit', '${f}_handle_submit' );
 add_action( 'wp_ajax_nopriv_${f}_submit', '${f}_handle_submit' );
 
+function ${f}_settings_page() {
+    add_options_page( __( 'Contacto \u2014 PageForge', '${td}' ), __( 'PF Contacto', '${td}' ), 'manage_options', '${s}-settings', '${f}_render_settings' );
+}
+add_action( 'admin_menu', '${f}_settings_page' );
+
+function ${f}_render_settings() {
+    if ( ! current_user_can( 'manage_options' ) ) return;
+    if ( isset( $_POST['${f}_save'] ) && check_admin_referer( '${f}_nonce', '${f}_nonce' ) ) {
+        update_option( '${f}_recipient_email', sanitize_email( wp_unslash( $_POST['pf_recipient_email'] ?? '' ) ) );
+        echo '<div class="notice notice-success"><p>' . esc_html__( 'Configuraci\u00f3n guardada.', '${td}' ) . '</p></div>';
+    }
+    $recipient = get_option( '${f}_recipient_email', get_option( 'admin_email' ) );
+    echo '<div class="wrap"><h1>' . esc_html__( 'Configuraci\u00f3n del Formulario de Contacto', '${td}' ) . '</h1>';
+    echo '<form method="post">';
+    wp_nonce_field( '${f}_nonce', '${f}_nonce' );
+    echo '<table class="form-table">';
+    echo '<tr><th>' . esc_html__( 'Email destinatario', '${td}' ) . '</th><td><input type="email" name="pf_recipient_email" value="' . esc_attr( $recipient ) . '" style="width:100%;"></td></tr>';
+    echo '</table>';
+    echo '<p class="submit"><button type="submit" name="${f}_save" class="button button-primary">' . esc_html__( 'Guardar', '${td}' ) . '</button></p>';
+    echo '</form></div>';
+}
+
 register_activation_hook( __FILE__, function() {
-    // La activación no requiere acciones adicionales
+    if ( ! get_option( '${f}_recipient_email' ) ) {
+        update_option( '${f}_recipient_email', get_option( 'admin_email' ) );
+    }
 });
 register_deactivation_hook( __FILE__, function() {
     // La desactivación no requiere acciones adicionales
@@ -671,10 +696,10 @@ function hexToRgbStr( $hex ) {
                 if (nums[1]) nums[1].textContent = String(h).padStart(2,'0');
                 if (nums[2]) nums[2].textContent = String(m).padStart(2,'0');
                 if (nums[3]) nums[3].textContent = String(s).padStart(2,'0');
-                if (diff > 0) requestAnimationFrame(tick);
+                if (diff <= 0 && _pf_cd_interval) { clearInterval(_pf_cd_interval); }
             }
             tick();
-            setInterval(tick, 1000);
+            var _pf_cd_interval = setInterval(tick, 1000);
         });
     }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initCountdowns);
@@ -1333,6 +1358,31 @@ function ${f}_render_settings() {
     echo '<input type="hidden" name="pf_plan_count" value="' . count( $plans ) . '" id="pf_plan_count">';
     echo '<p class="submit"><button type="submit" name="${f}_save" class="button button-primary">Guardar planes</button></p>';
     echo '</form></div>';
+    ?>
+    <script>
+    function addPlan() {
+        var container = document.getElementById('pf-plans-container');
+        var countEl = document.getElementById('pf_plan_count');
+        var idx = parseInt(countEl.value);
+        var row = document.createElement('div');
+        row.className = 'pf-plan-row';
+        row.innerHTML = '<strong>Plan ' + (idx+1) + '<\/strong><br>' +
+            'Nombre: <input name="pf_plan_name_' + idx + '" value=""> ' +
+            'Precio: <input name="pf_plan_price_' + idx + '" value="" style="width:80px;"> ' +
+            'Per\u00edodo: <input name="pf_plan_period_' + idx + '" value="" style="width:60px;"> ' +
+            'Destacar: <input type="checkbox" name="pf_plan_hl_' + idx + '"><br>' +
+            'Funciones: <textarea name="pf_plan_features_' + idx + '" rows="2" style="width:100%;"><\/textarea><br>' +
+            'Texto bot\u00f3n: <input name="pf_plan_cta_' + idx + '" value=""> ' +
+            'URL bot\u00f3n: <input name="pf_plan_url_' + idx + '" value=""> ' +
+            '<button type="button" class="button" onclick="removePlan(this)">Eliminar<\/button>';
+        container.appendChild(row);
+        countEl.value = idx + 1;
+    }
+    function removePlan(btn) {
+        btn.closest('.pf-plan-row').remove();
+    }
+    </script>
+    <?php
 }
 `;
 
@@ -1557,7 +1607,7 @@ function ${f}_render_settings() {
 
 function ${f}_template_redirect() {
     if ( ! get_option( '${f}_enabled', false ) ) return;
-    if ( current_user_can( 'manage_options' ) || is_user_logged_in() ) return;
+    if ( current_user_can( 'manage_options' ) ) return;
 
     $message = get_option( '${f}_message', __( 'Estamos realizando mejoras. Vuelve pronto.', '${td}' ) );
     $bg      = get_option( '${f}_bg', '#1f2937' );

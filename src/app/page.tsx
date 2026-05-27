@@ -1,11 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { Sidebar, Topbar, type NavItem } from '@/components/pageforge/Sidebar';
 import TemplateLibrary from '@/components/pageforge/TemplateLibrary';
 import MediosView from '@/components/pageforge/MediosView';
+import { useProjectsStore } from '@/lib/projects-store';
+import { useMediaLibraryStore } from '@/lib/media-library-store';
 
 const DashboardCards = dynamic(() => import('@/components/pageforge/DashboardCards').then(m => ({ default: m.DashboardCards })));
 const StatsBar = dynamic(() => import('@/components/pageforge/StatsBar').then(m => ({ default: m.StatsBar })));
@@ -134,6 +136,15 @@ export default function PageForgeApp() {
   const [activeItem, setActiveItem] = useState<NavItem>('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  const hydrateProjects = useProjectsStore((s) => s.hydrate);
+  const hydrateMedia = useMediaLibraryStore((s) => s.hydrate);
+
+  // Hydrate from DB on mount
+  useEffect(() => {
+    hydrateProjects();
+    hydrateMedia();
+  }, [hydrateProjects, hydrateMedia]);
 
   const handleNavigate = (item: NavItem) => {
     setActiveItem(item);

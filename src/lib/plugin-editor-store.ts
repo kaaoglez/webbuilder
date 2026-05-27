@@ -26,6 +26,7 @@ interface PluginEditorState {
 }
 
 interface PluginEditorActions {
+  replaceConfig: (fullConfig: Partial<PluginConfig>) => void;
   updateConfig: (partial: Partial<PluginConfig>) => void;
   setPluginType: (type: PluginType) => void;
   updateOption: (key: string, value: unknown) => void;
@@ -414,6 +415,13 @@ export const usePluginEditorStore = create<PluginEditorState & PluginEditorActio
     isGenerating: false,
 
     // Actions
+    replaceConfig: (fullConfig) =>
+      set(() => ({
+        config: { ...createInitialConfig(), ...fullConfig },
+        activeTab: 'info' as PluginEditorTab,
+        isGenerating: false,
+      })),
+
     setActiveTab: (tab) => set({ activeTab: tab }),
 
     setGenerating: (v) => set({ isGenerating: v }),

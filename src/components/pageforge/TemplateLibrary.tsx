@@ -15,6 +15,7 @@ import {
   ChevronDown,
   Sparkles,
   BookOpen,
+  X,
 } from 'lucide-react';
 import { useThemeEditorStore } from '@/lib/theme-editor-store';
 import templates, {
@@ -71,7 +72,7 @@ const SECTION_LABELS: Record<string, string> = {
 // ─────────────────────────────────────────────────────────────
 
 export default function TemplateLibrary({ onNavigate }: TemplateLibraryProps) {
-  const { updateConfig } = useThemeEditorStore();
+  const { replaceConfig } = useThemeEditorStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<TemplateCategory | 'all'>('all');
   const [previewTemplate, setPreviewTemplate] = useState<TemplateMeta | null>(null);
@@ -99,10 +100,13 @@ export default function TemplateLibrary({ onNavigate }: TemplateLibraryProps) {
 
   // Apply template to theme editor
   const handleUseTemplate = (template: TemplateMeta) => {
-    updateConfig({
+    replaceConfig({
       name: template.themeName,
       slug: template.themeSlug,
       description: template.themeDescription,
+      siteTitle: template.themeName,
+      logoUrl: '',
+      tagline: template.themeDescription,
       primaryColor: template.primaryColor,
       secondaryColor: template.secondaryColor,
       accentColor: template.accentColor,
@@ -280,6 +284,11 @@ export default function TemplateLibrary({ onNavigate }: TemplateLibraryProps) {
 // Template Card
 // ─────────────────────────────────────────────────────────────
 
+function getHeroImage(template: TemplateMeta): string | null {
+  const heroSection = template.sections.find((s) => s.type === 'hero');
+  return (heroSection?.data?.backgroundImage as string) || null;
+}
+
 function TemplateCard({
   template,
   index,
@@ -293,6 +302,7 @@ function TemplateCard({
 }) {
   const categoryMeta = TEMPLATE_CATEGORIES.find((c) => c.id === template.category);
   const sectionTypes = template.sections.map((s) => s.type);
+  const heroImage = getHeroImage(template);
 
   return (
     <motion.div
@@ -300,37 +310,66 @@ function TemplateCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: index * 0.05 }}
     >
-      <Card className="border-gray-400 bg-white overflow-hidden hover:shadow-lg hover:border-gray-400 transition-all duration-300 group h-full flex flex-col">
+      <Card className="border-gray-400 bg-white overflow-hidden hover:shadow-lg hover:border-emerald-400 transition-all duration-300 group h-full flex flex-col">
+        {/* Hero Image Preview */}
+        <div
+          className="relative h-44 overflow-hidden bg-gray-200 cursor-pointer"
+          onClick={onPreview}
+        >
+          {heroImage ? (
+            <img
+              src={heroImage}
+              alt={`${template.name} - Vista previa`}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              loading="lazy"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <BookOpen className="h-10 w-10 text-gray-400" />
+            </div>
+          )}
+          {/* Gradient overlay with template name */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+          {/* Category badge floating */}
+          <div className="absolute top-3 left-3 flex items-center gap-1.5">
+            <Badge className="bg-white/90 text-gray-700 text-[10px] font-medium border-0 backdrop-blur-sm">
+              {categoryMeta?.emoji} {categoryMeta?.label}
+            </Badge>
+            {template.badge && (
+              <Badge className="bg-emerald-500 text-white text-[10px] font-semibold border-0">
+                {template.badge}
+              </Badge>
+            )}
+          </div>
+          {/* Template name at bottom of image */}
+          <div className="absolute bottom-0 left-0 right-0 p-3">
+            <h3 className="text-white font-bold text-sm leading-tight drop-shadow-md">
+              {template.name}
+            </h3>
+            <p className="text-white/80 text-[11px] mt-0.5 line-clamp-1">
+              {template.description}
+            </p>
+          </div>
+          {/* Hover overlay with eye icon */}
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+            <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="bg-white/90 rounded-full p-3 shadow-lg">
+                <Eye className="h-5 w-5 text-gray-700" />
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Color Preview Bar */}
-        <div className="h-3 flex" style={{ width: '100%' }}>
+        <div className="h-2 flex" style={{ width: '100%' }}>
           <div className="flex-1" style={{ backgroundColor: template.primaryColor }} />
           <div className="flex-1" style={{ backgroundColor: template.secondaryColor }} />
           <div className="flex-1" style={{ backgroundColor: template.accentColor }} />
         </div>
 
-        <CardContent className="p-5 flex-1 flex flex-col">
-          {/* Category & Badge */}
-          <div className="flex items-center gap-2 mb-3">
-            <Badge variant="outline" className="text-[11px] font-medium border-gray-400">
-              {categoryMeta?.emoji} {categoryMeta?.label}
-            </Badge>
-            {template.badge && (
-              <Badge className="bg-emerald-100 text-emerald-700 text-[11px] border-0 font-semibold">
-                {template.badge}
-              </Badge>
-            )}
-          </div>
-
-          {/* Name & Description */}
-          <h3 className="font-bold text-foreground text-base mb-1.5 group-hover:text-emerald-600 transition-colors">
-            {template.name}
-          </h3>
-          <p className="text-xs text-muted-foreground leading-relaxed mb-4 flex-1">
-            {template.description}
-          </p>
-
+        <CardContent className="p-4 flex-1 flex flex-col">
           {/* Design Tokens */}
-          <div className="space-y-3 mb-4">
+          <div className="space-y-2.5 mb-3">
             {/* Colors */}
             <div className="flex items-center gap-2">
               <Palette className="h-3.5 w-3.5 text-gray-500 shrink-0" />
@@ -339,7 +378,7 @@ function TemplateCard({
                   (color, i) => (
                     <div
                       key={i}
-                      className="w-5 h-5 rounded border border-gray-400"
+                      className="w-4 h-4 rounded border border-gray-300"
                       style={{ backgroundColor: color }}
                       title={color}
                     />
@@ -364,13 +403,13 @@ function TemplateCard({
                   <Badge
                     key={i}
                     variant="secondary"
-                    className="text-[10px] px-1.5 py-0 bg-gray-200 text-gray-600 border-0"
+                    className="text-[10px] px-1.5 py-0 bg-gray-100 text-gray-600 border-0"
                   >
                     {SECTION_LABELS[type] || type}
                   </Badge>
                 ))}
                 {sectionTypes.length > 6 && (
-                  <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-gray-200 text-gray-600 border-0">
+                  <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-gray-100 text-gray-600 border-0">
                     +{sectionTypes.length - 6}
                   </Badge>
                 )}
@@ -378,10 +417,10 @@ function TemplateCard({
             </div>
           </div>
 
-          <Separator className="my-3" />
+          <Separator className="my-2" />
 
           {/* Actions */}
-          <div className="flex gap-2">
+          <div className="flex gap-2 mt-auto">
             <Button
               variant="outline"
               size="sm"
@@ -420,6 +459,7 @@ function TemplatePreviewModal({
   onUse: () => void;
 }) {
   const categoryMeta = TEMPLATE_CATEGORIES.find((c) => c.id === template.category);
+  const heroImage = getHeroImage(template);
 
   return (
     <>
@@ -445,39 +485,82 @@ function TemplatePreviewModal({
           className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-full overflow-hidden flex flex-col"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Modal Header */}
-          <div className="flex-shrink-0 p-5 border-b border-gray-400">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
-                  <BookOpen className="h-5 w-5 text-emerald-600" />
+          {/* Hero Image Banner */}
+          {heroImage && (
+            <div className="relative h-56 sm:h-64 overflow-hidden shrink-0">
+              <img
+                src={heroImage}
+                alt={`${template.name} - Vista previa`}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+              {/* Template info overlay on image */}
+              <div className="absolute bottom-0 left-0 right-0 p-5">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <Badge className="bg-white/90 text-gray-700 text-[10px] font-medium border-0 backdrop-blur-sm">
+                    {categoryMeta?.emoji} {categoryMeta?.label}
+                  </Badge>
+                  {template.badge && (
+                    <Badge className="bg-emerald-500 text-white text-[10px] font-semibold border-0">
+                      {template.badge}
+                    </Badge>
+                  )}
+                  <Badge className="bg-white/20 text-white text-[10px] font-medium border-0 backdrop-blur-sm">
+                    {template.sections.length} secciones
+                  </Badge>
                 </div>
-                <div>
-                  <h2 className="font-bold text-lg text-foreground">{template.name}</h2>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <span className="text-xs text-muted-foreground">
-                      {categoryMeta?.emoji} {categoryMeta?.label}
-                    </span>
-                    {template.badge && (
-                      <Badge className="bg-emerald-100 text-emerald-700 text-[10px] border-0 font-semibold">
-                        {template.badge}
-                      </Badge>
-                    )}
-                  </div>
-                </div>
+                <h2 className="text-white font-bold text-xl">{template.name}</h2>
+                <p className="text-white/80 text-sm mt-1">{template.description}</p>
               </div>
-              <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 text-gray-500 hover:text-gray-600">
-                ✕
+              {/* Close button on image */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onClose}
+                className="absolute top-3 right-3 h-9 w-9 bg-black/30 hover:bg-black/50 text-white border-0 backdrop-blur-sm"
+              >
+                <X className="h-4 w-4" />
               </Button>
             </div>
-          </div>
+          )}
+
+          {/* Modal Header (only shown when no hero image) */}
+          {!heroImage && (
+            <div className="flex-shrink-0 p-5 border-b border-gray-400">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
+                    <BookOpen className="h-5 w-5 text-emerald-600" />
+                  </div>
+                  <div>
+                    <h2 className="font-bold text-lg text-foreground">{template.name}</h2>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-xs text-muted-foreground">
+                        {categoryMeta?.emoji} {categoryMeta?.label}
+                      </span>
+                      {template.badge && (
+                        <Badge className="bg-emerald-100 text-emerald-700 text-[10px] border-0 font-semibold">
+                          {template.badge}
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 text-gray-500 hover:text-gray-600">
+                  ✕
+                </Button>
+              </div>
+            </div>
+          )}
 
           {/* Modal Body — Scrollable */}
           <div className="flex-1 overflow-y-auto p-5 space-y-6">
-            {/* Description */}
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              {template.description}
-            </p>
+            {/* Description (only when no hero image) */}
+            {!heroImage && (
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {template.description}
+              </p>
+            )}
 
             {/* Color Palette */}
             <div>

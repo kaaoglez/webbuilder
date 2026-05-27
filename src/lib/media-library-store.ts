@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 // ─────────────────────────────────────────────────────────────
 // Types
@@ -14,16 +15,20 @@ export interface MediaItem {
   height: number;
   uploadedAt: string;
   size: number;
+  mimeType?: string;
+  data?: string; // base64 data URL for quick display
 }
 
 interface MediaLibraryState {
   mediaItems: MediaItem[];
+  hydrated: boolean;
 }
 
 interface MediaLibraryActions {
+  hydrate: () => Promise<void>;
   addMedia: (file: File) => Promise<MediaItem>;
   addMediaFromUrl: (item: Omit<MediaItem, 'id' | 'uploadedAt'>) => MediaItem;
-  removeMedia: (id: string) => void;
+  removeMedia: (id: string) => Promise<void>;
   updateMedia: (id: string, partial: Partial<MediaItem>) => void;
   clearAll: () => void;
 }
@@ -62,12 +67,47 @@ function formatFileSize(bytes: number): string {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
+function mapApiItemToMediaItem(item: Record<string, unknown>): MediaItem {
+  return {
+    id: item.id as string,
+    name: item.name as string,
+    url: item.url as string,
+    alt: (item.alt as string) ?? '',
+    caption: (item.caption as string) ?? '',
+    width: (item.width as number) ?? 0,
+    height: (item.height as number) ?? 0,
+    size: (item.size as number) ?? 0,
+    mimeType: (item.mimeType as string) ?? undefined,
+    data: (item.data as string) ?? undefined,
+    uploadedAt: item.uploadedAt as string,
+  };
+}
+
 // ─────────────────────────────────────────────────────────────
 // Store
 // ─────────────────────────────────────────────────────────────
 
-export const useMediaLibraryStore = create<MediaLibraryState & MediaLibraryActions>()((set, get) => ({
+export const useMediaLibraryStore = create<MediaLibraryState & MediaLibraryActions>()(
+  persist(
+    (set, get) => ({
   mediaItems: [],
+  hydrated: false,
+
+  hydrate: async () => {
+    if (typeof window === 'undefined') return;
+    try {
+      const res = await fetch('/api/media');
+      if (res.ok) {
+        const data = await res.json();
+        const items: MediaItem[] = data.map(mapApiItemToMediaItem);
+        set({ mediaItems: items, hydrated: true });
+        return;
+      }
+    } catch {
+      // API failed, rely on persisted data from zustand/persist
+    }
+    set({ hydrated: true });
+  },
 
   addMedia: async (file: File): Promise<MediaItem> => {
     const MAX_SIZE = 5 * 1024 * 1024; // 5MB
@@ -86,9 +126,35 @@ export const useMediaLibraryStore = create<MediaLibraryState & MediaLibraryActio
       throw new Error(`Tipo de archivo no soportado: ${file.type}`);
     }
 
+    // Read file for dimensions and display
     const dataUrl = await readFileAsDataUrl(file);
     const dimensions = await getImageDimensions(dataUrl);
 
+    // Try API first
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('width', String(dimensions.width));
+      formData.append('height', String(dimensions.height));
+
+      const res = await fetch('/api/media', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const apiItem = mapApiItemToMediaItem(data);
+        set((state) => ({
+          mediaItems: [apiItem, ...state.mediaItems],
+        }));
+        return apiItem;
+      }
+    } catch {
+      // API failed, fall through to local-only creation
+    }
+
+    // Fallback: create item locally without API
     const newItem: MediaItem = {
       id: generateId(),
       name: file.name,
@@ -99,6 +165,8 @@ export const useMediaLibraryStore = create<MediaLibraryState & MediaLibraryActio
       height: dimensions.height,
       uploadedAt: new Date().toISOString(),
       size: file.size,
+      mimeType: file.type,
+      data: dataUrl,
     };
 
     set((state) => ({
@@ -122,7 +190,21 @@ export const useMediaLibraryStore = create<MediaLibraryState & MediaLibraryActio
     return newItem;
   },
 
-  removeMedia: (id: string) => {
+  removeMedia: async (id: string) => {
+    // Try API first
+    try {
+      const res = await fetch(`/api/media/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        set((state) => ({
+          mediaItems: state.mediaItems.filter((item) => item.id !== id),
+        }));
+        return;
+      }
+    } catch {
+      // API failed, fall through to local-only removal
+    }
+
+    // Fallback: remove locally
     set((state) => ({
       mediaItems: state.mediaItems.filter((item) => item.id !== id),
     }));
@@ -139,7 +221,13 @@ export const useMediaLibraryStore = create<MediaLibraryState & MediaLibraryActio
   clearAll: () => {
     set({ mediaItems: [] });
   },
-}));
+}),
+    {
+      name: 'pageforge-media-library',
+      partialize: (state) => ({ mediaItems: state.mediaItems }),
+    },
+  ),
+);
 
 // ─────────────────────────────────────────────────────────────
 // Utility exports

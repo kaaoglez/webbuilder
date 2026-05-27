@@ -527,6 +527,14 @@ export const useThemeEditorStore = create<ThemeEditorState & ThemeEditorActions>
       config: { ...state.config, ...partial },
     })),
 
+  // Fully replace config (used by template load and project reload)
+  replaceConfig: (fullConfig) =>
+    set(() => ({
+      config: { ...INITIAL_CONFIG, ...fullConfig },
+      activeTab: 'info' as EditorTab,
+      activeSectionIndex: null,
+    })),
+
   // Add a new section with defaults based on type
   addSection: (type) =>
     set((state) => {

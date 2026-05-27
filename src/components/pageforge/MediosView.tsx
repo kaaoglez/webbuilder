@@ -96,6 +96,7 @@ export function MediosView() {
   const [isDragOver, setIsDragOver] = useState(false);
   const [deleteConfirmItem, setDeleteConfirmItem] = useState<MediaItem | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [lightboxItem, setLightboxItem] = useState<MediaItem | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const uploadTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -298,7 +299,9 @@ export function MediosView() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        if (editorItem) {
+        if (lightboxItem) {
+          setLightboxItem(null);
+        } else if (editorItem) {
           setEditorItem(null);
         } else if (detailItem) {
           setDetailItem(null);
@@ -307,7 +310,7 @@ export function MediosView() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [editorItem, detailItem]);
+  }, [editorItem, detailItem, lightboxItem]);
 
   const isUploading = uploadQueue.some((u) => u.status === 'uploading' || u.status === 'pending');
 
@@ -364,6 +367,94 @@ export function MediosView() {
             onSave={handleEditorSave}
             onClose={() => setEditorItem(null)}
           />
+        )}
+      </AnimatePresence>
+
+      {/* ─── Fullscreen Lightbox ─── */}
+      <AnimatePresence>
+        {lightboxItem && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-[65] bg-black/90 backdrop-blur-sm flex items-center justify-center"
+            onClick={() => setLightboxItem(null)}
+          >
+            {/* Close button */}
+            <button
+              onClick={() => setLightboxItem(null)}
+              className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
+            >
+              <X className="h-5 w-5" />
+            </button>
+            {/* Image info bar */}
+            <div className="absolute top-4 left-4 z-10 flex items-center gap-3">
+              <span className="text-white/80 text-sm font-medium drop-shadow-md">{lightboxItem.name}</span>
+              <span className="text-white/50 text-xs">
+                {lightboxItem.width}×{lightboxItem.height} • {formatFileSize(lightboxItem.size)}
+              </span>
+            </div>
+            {/* Nav buttons */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                const items = mediaItems;
+                const idx = items.findIndex(i => i.id === lightboxItem.id);
+                if (idx > 0) setLightboxItem(items[idx - 1]);
+              }}
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                const items = mediaItems;
+                const idx = items.findIndex(i => i.id === lightboxItem.id);
+                if (idx < items.length - 1) setLightboxItem(items[idx + 1]);
+              }}
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
+            >
+              <ChevronLeft className="h-5 w-5 rotate-180" />
+            </button>
+            {/* Image */}
+            <motion.img
+              key={lightboxItem.id}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.2 }}
+              src={lightboxItem.data || lightboxItem.url}
+              alt={lightboxItem.alt || lightboxItem.name}
+              className="max-w-[90vw] max-h-[85vh] object-contain rounded-lg shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            />
+            {/* Bottom actions */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setLightboxItem(null);
+                  setEditorItem(lightboxItem);
+                }}
+                className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm flex items-center gap-2 transition-colors backdrop-blur-sm"
+              >
+                <Pencil className="h-4 w-4" />
+                Editar
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  copyUrl(lightboxItem);
+                }}
+                className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm flex items-center gap-2 transition-colors backdrop-blur-sm"
+              >
+                <Copy className="h-4 w-4" />
+                Copiar URL
+              </button>
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
 
@@ -727,7 +818,7 @@ export function MediosView() {
                       {/* Thumbnail */}
                       <div className="aspect-square relative bg-gray-200 overflow-hidden">
                         <img
-                          src={item.url}
+                          src={item.data || item.url}
                           alt={item.alt || item.name}
                           className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
                           loading="lazy"
@@ -850,7 +941,7 @@ export function MediosView() {
                     {/* Thumbnail */}
                     <div className="w-10 h-10 rounded bg-gray-200 overflow-hidden border border-gray-400">
                       <img
-                        src={item.url}
+                        src={item.data || item.url}
                         alt={item.alt || item.name}
                         className="w-full h-full object-cover"
                         loading="lazy"
@@ -957,13 +1048,23 @@ export function MediosView() {
                 <div className="flex-1 overflow-y-auto">
                   {/* Preview */}
                   <div className="p-4">
-                    <div className="rounded-lg border border-gray-400 overflow-hidden bg-gray-200 flex items-center justify-center max-h-[220px]">
+                    <div
+                      className="rounded-lg border border-gray-400 overflow-hidden bg-gray-200 flex items-center justify-center cursor-pointer hover:border-emerald-400 transition-colors group/preview"
+                      onClick={() => setLightboxItem(detailItem)}
+                    >
                       <img
-                        src={detailItem.url}
+                        src={detailItem.data || detailItem.url}
                         alt={detailItem.alt || detailItem.name}
-                        className="max-w-full max-h-[220px] object-contain"
+                        className="max-w-full max-h-[280px] object-contain group-hover/preview:scale-[1.02] transition-transform duration-200"
                       />
                     </div>
+                    <button
+                      className="w-full mt-2 text-xs text-center text-emerald-600 hover:text-emerald-700 font-medium py-1.5 rounded-md bg-emerald-50 hover:bg-emerald-100 transition-colors"
+                      onClick={() => setLightboxItem(detailItem)}
+                    >
+                      <Maximize2 className="h-3.5 w-3.5 inline mr-1" />
+                      Ver imagen completa
+                    </button>
                   </div>
 
                   {/* Metadata */}

@@ -89,12 +89,7 @@ export interface PageTemplateConfig {
 
 function esc(str: string): string {
   if (!str) return '';
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
+  return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
 }
 
 function fontImportUrl(font: string): string {
@@ -396,6 +391,14 @@ function ${slug}_scripts() {
         '${config.version}'
     );
 
+    // Font Awesome (social icons, etc.)
+    wp_enqueue_style(
+        '${slug}-font-awesome',
+        'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css',
+        array(),
+        '6.5.1'
+    );
+
     // Main JS
     wp_enqueue_script(
         '${slug}-main',
@@ -533,7 +536,12 @@ function generateHeaderPHP(config: ThemeConfig): string {
                     'container'      => false,
                     'menu_class'     => 'nav-menu',
                     'fallback_cb'    => function() {
-                        echo '<ul class="nav-menu"><li><a href="' . esc_url( home_url( '/' ) ) . '">' . esc_html__( 'Home', '${config.textDomain}' ) . '</a></li></ul>';
+                        echo '<ul class="nav-menu">';
+                        $nav_items = array(${config.navItems.map(n => `array('label' => '${esc(n.label)}', 'url' => '${esc(n.url)}')`).join(', ')});
+                        foreach ( $nav_items as $item ) {
+                            echo '<li><a href="' . esc_url( $item['url'] ) . '">' . esc_html( $item['label'] ) . '</a></li>';
+                        }
+                        echo '</ul>';
                     },
                     'depth'          => 3,
                 ) );
@@ -558,7 +566,12 @@ function generateHeaderPHP(config: ThemeConfig): string {
             'container'      => false,
             'menu_class'     => 'mobile-nav-menu',
             'fallback_cb'    => function() {
-                echo '<ul class="mobile-nav-menu"><li><a href="' . esc_url( home_url( '/' ) ) . '">' . esc_html__( 'Home', '${config.textDomain}' ) . '</a></li></ul>';
+                echo '<ul class="mobile-nav-menu">';
+                $nav_items = array(${config.navItems.map(n => `array('label' => '${esc(n.label)}', 'url' => '${esc(n.url)}')`).join(', ')});
+                foreach ( $nav_items as $item ) {
+                    echo '<li><a href="' . esc_url( $item['url'] ) . '">' . esc_html( $item['label'] ) . '</a></li>';
+                }
+                echo '</ul>';
             },
             'depth'          => 2,
         ) );
@@ -612,37 +625,12 @@ ${socialHTML}
             </div>
 
             <!-- Footer Columns 2-5 -->
-            <div class="footer-col">
-                <?php if ( is_active_sidebar( 'footer-1' ) ) : ?>
-                    <?php dynamic_sidebar( 'footer-1' ); ?>
-                <?php endif; ?>
-            </div>
-            <div class="footer-col">
-                <?php if ( is_active_sidebar( 'footer-2' ) ) : ?>
-                    <?php dynamic_sidebar( 'footer-2' ); ?>
-                <?php endif; ?>
-            </div>
-            <div class="footer-col">
-                <?php if ( is_active_sidebar( 'footer-3' ) ) : ?>
-                    <?php dynamic_sidebar( 'footer-3' ); ?>
-                <?php endif; ?>
-            </div>
-            <div class="footer-col">
-                <?php if ( is_active_sidebar( 'footer-4' ) ) : ?>
-                    <?php dynamic_sidebar( 'footer-4' ); ?>
-                <?php else : ?>
-                    <h4 class="widget-title"><?php esc_html_e( 'Quick Links', '${config.textDomain}' ); ?></h4>
-                    <?php
-                    wp_nav_menu( array(
-                        'theme_location' => 'footer-menu',
-                        'container'      => false,
-                        'menu_class'     => 'footer-menu',
-                        'fallback_cb'    => false,
-                        'depth'          => 1,
-                    ) );
-                    ?>
-                <?php endif; ?>
-            </div>
+${config.footerColumns.map((col, i) => `            <div class="footer-col">
+                <h4 class="widget-title"><?php echo esc_html( '${esc(col.title)}' ); ?></h4>
+                <ul class="footer-links">
+${col.links.map(l => `                    <li><a href="<?php echo esc_url( '${esc(l.url)}' ); ?>"><?php echo esc_html( '${esc(l.label)}' ); ?></a></li>`).join('\n')}
+                </ul>
+            </div>`).join('\n')}
         </div>
 
         <div class="footer-bottom">
@@ -804,8 +792,11 @@ function generateSectionAbout(s: ThemeSection): string {
                 <div class="pf-about-image">
                     <?php
                     $about_img_id = get_theme_mod( '${s.type}_image' );
+                    $about_img_url = get_theme_mod( '${s.type}_image_url', '${esc(d.image || '')}' );
                     if ( $about_img_id ) {
                         echo wp_get_attachment_image( $about_img_id, 'large' );
+                    } elseif ( $about_img_url ) {
+                        echo '<img src="' . esc_url( $about_img_url ) . '" alt="' . esc_attr( get_theme_mod( '${s.type}_title', '${esc(s.title)}' ) ) . '" class="pf-about-img" loading="lazy">';
                     } else {
                         echo '<div class="pf-image-placeholder">' . esc_html__( 'Image', '${esc(d._td)}' ) . '</div>';
                     }
@@ -2673,34 +2664,34 @@ export function generateThemeFiles(config: ThemeConfig): Map<string, string> {
   files.set('index.php', generateIndexPHP(config));
   files.set('front-page.php', generateFrontPagePHP(config));
 
-  // ─── Auxiliary Templates (controlled by pageTemplates config) ─
-  const singleTpl = findTemplate('single');
-  if (singleTpl) {
+  // ─── Auxiliary Templates (always generated) ────────────────
+  {
+    const singleTpl = findTemplate('single');
     files.set('single.php', generateSinglePHP(config, singleTpl));
   }
 
-  const archiveTpl = findTemplate('archive');
-  if (archiveTpl) {
+  {
+    const archiveTpl = findTemplate('archive');
     files.set('archive.php', generateArchivePHP(config, archiveTpl));
   }
 
-  const pageTpl = findTemplate('page');
-  if (pageTpl) {
+  {
+    const pageTpl = findTemplate('page');
     files.set('page.php', generatePagePHP(config, pageTpl));
   }
 
-  const searchTpl = findTemplate('search');
-  if (searchTpl) {
+  {
+    const searchTpl = findTemplate('search');
     files.set('search.php', generateSearchPHP(config, searchTpl));
   }
 
-  const notFoundTpl = findTemplate('404');
-  if (notFoundTpl) {
+  {
+    const notFoundTpl = findTemplate('404');
     files.set('404.php', generate404PHP(config, notFoundTpl));
   }
 
-  const sidebarTpl = findTemplate('sidebar');
-  if (sidebarTpl) {
+  {
+    const sidebarTpl = findTemplate('sidebar');
     files.set('sidebar.php', generateSidebarPHP(config, sidebarTpl));
   }
 

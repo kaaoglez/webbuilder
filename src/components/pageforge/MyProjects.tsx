@@ -17,6 +17,7 @@ import {
   Search,
   AlertTriangle,
 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -38,6 +39,7 @@ interface MyProjectsProps {
 
 export default function MyProjects({ onNavigate }: MyProjectsProps) {
   const { projects, hydrated, hydrate, deleteProject, reorderProjects } = useProjectsStore();
+  const { toast } = useToast();
   const [search, setSearch] = useState('');
   const [filterType, setFilterType] = useState<'all' | ProjectType>('all');
   const [deleteTarget, setDeleteTarget] = useState<SavedProject | null>(null);
@@ -48,6 +50,20 @@ export default function MyProjects({ onNavigate }: MyProjectsProps) {
     hydrate();
   }, [hydrate]);
 
+  // Listen for localStorage quota errors
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<string>).detail;
+      toast({
+        title: 'Error al guardar',
+        description: detail || 'No hay suficiente espacio de almacenamiento.',
+        variant: 'destructive',
+      });
+    };
+    window.addEventListener('pageforge-storage-error', handler);
+    return () => window.removeEventListener('pageforge-storage-error', handler);
+  }, [toast]);
+
   const filtered = projects.filter((p) => {
     const matchesSearch =
       p.name.toLowerCase().includes(search.toLowerCase());
@@ -57,10 +73,10 @@ export default function MyProjects({ onNavigate }: MyProjectsProps) {
 
   const handleEdit = (project: SavedProject) => {
     if (project.type === 'theme') {
-      themeStore.updateConfig(project.config as Partial<typeof themeStore.config>);
+      themeStore.replaceConfig(project.config as Partial<typeof themeStore.config>);
       onNavigate('create-theme');
     } else {
-      pluginStore.updateConfig(project.config as Partial<typeof pluginStore.config>);
+      pluginStore.replaceConfig(project.config as Partial<typeof pluginStore.config>);
       onNavigate('create-plugin');
     }
   };
@@ -251,8 +267,8 @@ export default function MyProjects({ onNavigate }: MyProjectsProps) {
                           </div>
                         </div>
 
-                        {/* Actions */}
-                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {/* Actions - always visible on mobile, hover on desktop */}
+                        <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                           <Button
                             variant="ghost"
                             size="sm"
