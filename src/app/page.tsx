@@ -1,20 +1,17 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { Sidebar, Topbar, type NavItem } from '@/components/pageforge/Sidebar';
 import TemplateLibrary from '@/components/pageforge/TemplateLibrary';
 import MediosView from '@/components/pageforge/MediosView';
-import { useProjectsStore } from '@/lib/projects-store';
-import { useMediaLibraryStore } from '@/lib/media-library-store';
 
 const DashboardCards = dynamic(() => import('@/components/pageforge/DashboardCards').then(m => ({ default: m.DashboardCards })));
 const StatsBar = dynamic(() => import('@/components/pageforge/StatsBar').then(m => ({ default: m.StatsBar })));
 const ThemeEditor = dynamic(() => import('@/components/pageforge/ThemeEditor'));
 const PluginEditor = dynamic(() => import('@/components/pageforge/PluginEditor'));
 const MyProjects = dynamic(() => import('@/components/pageforge/MyProjects'));
-const SettingsPanel = dynamic(() => import('@/components/pageforge/SettingsPanel'));
 import {
   Palette,
   Puzzle,
@@ -137,15 +134,6 @@ export default function PageForgeApp() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
-  const hydrateProjects = useProjectsStore((s) => s.hydrate);
-  const hydrateMedia = useMediaLibraryStore((s) => s.hydrate);
-
-  // Hydrate from DB on mount
-  useEffect(() => {
-    hydrateProjects();
-    hydrateMedia();
-  }, [hydrateProjects, hydrateMedia]);
-
   const handleNavigate = (item: NavItem) => {
     setActiveItem(item);
   };
@@ -156,7 +144,6 @@ export default function PageForgeApp() {
   const isTemplates = activeItem === 'templates';
   const isMyProjects = activeItem === 'my-projects';
   const isMedios = activeItem === 'medios';
-  const isSettings = activeItem === 'settings';
 
   return (
     <div className="min-h-screen flex flex-col bg-[#f8fafc] dark:bg-background">
@@ -177,8 +164,8 @@ export default function PageForgeApp() {
           <Topbar activeItem={activeItem} onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
 
           {/* Scrollable content */}
-          <main className={(isThemeEditor || isPluginEditor || isMedios) ? 'flex-1 overflow-hidden' : 'flex-1 overflow-y-auto'}>
-            <div className={(isThemeEditor || isPluginEditor || isMedios) ? 'h-full' : 'p-4 md:p-6 lg:p-8 max-w-7xl mx-auto'}>
+          <main className={(isThemeEditor || isPluginEditor) ? 'flex-1 overflow-hidden' : 'flex-1 overflow-y-auto'}>
+            <div className={isThemeEditor || isPluginEditor ? 'h-full' : isMedios ? 'max-w-7xl mx-auto' : 'p-4 md:p-6 lg:p-8 max-w-7xl mx-auto'}>
               {isDashboard ? (
                 <motion.div
                   initial={{ opacity: 0 }}
@@ -255,8 +242,6 @@ export default function PageForgeApp() {
                 <MyProjects onNavigate={handleNavigate} />
               ) : isMedios ? (
                 <MediosView />
-              ) : isSettings ? (
-                <SettingsPanel />
               ) : (
                 <PlaceholderPanel item={activeItem} onNavigate={handleNavigate} />
               )}

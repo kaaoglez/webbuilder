@@ -10,6 +10,10 @@ import {
   Trash2,
   Check,
   FileImage,
+  FileVideo,
+  FileAudio,
+  FileText,
+  File,
   Calendar,
   Ruler,
   HardDrive,
@@ -17,10 +21,12 @@ import {
   ChevronLeft,
   Copy,
   Pencil,
+  Film,
+  Music,
 } from 'lucide-react';
 
-import { useMediaLibraryStore, formatFileSize } from '@/lib/media-library-store';
-import type { MediaItem } from '@/lib/media-library-store';
+import { useMediaLibraryStore, formatFileSize, ACCEPT_STRING } from '@/lib/media-library-store';
+import type { MediaItem, MediaType } from '@/lib/media-library-store';
 import { ImageEditor } from '@/components/pageforge/ImageEditor';
 
 import {
@@ -38,11 +44,81 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 
 // ─────────────────────────────────────────────────────────────
-// Constants
+// Helpers
 // ─────────────────────────────────────────────────────────────
 
-const ACCEPTED_TYPES = 'image/jpeg,image/png,image/gif,image/webp,image/svg+xml';
-const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+function getMediaTypeLabel(type: MediaType): string {
+  switch (type) {
+    case 'image': return 'Imagen';
+    case 'video': return 'Video';
+    case 'audio': return 'Audio';
+    case 'document': return 'Documento';
+    default: return 'Archivo';
+  }
+}
+
+function ThumbnailTypeIcon({ type }: { type: MediaType }) {
+  const className = 'h-6 w-6';
+  switch (type) {
+    case 'image': return <FileImage className={className} />;
+    case 'video': return <FileVideo className={className} />;
+    case 'audio': return <FileAudio className={className} />;
+    case 'document': return <FileText className={className} />;
+    default: return <File className={className} />;
+  }
+}
+
+function getMediaTypeBg(type: MediaType): string {
+  switch (type) {
+    case 'image': return 'bg-blue-100 text-blue-600';
+    case 'video': return 'bg-purple-100 text-purple-600';
+    case 'audio': return 'bg-amber-100 text-amber-600';
+    case 'document': return 'bg-gray-200 text-gray-600';
+    default: return 'bg-gray-200 text-gray-500';
+  }
+}
+
+// Small icon component (declared outside render)
+function MediaTypeIconBadge({ type }: { type: MediaType }) {
+  const className = 'h-3 w-3';
+  switch (type) {
+    case 'image': return <FileImage className={className} />;
+    case 'video': return <FileVideo className={className} />;
+    case 'audio': return <FileAudio className={className} />;
+    case 'document': return <FileText className={className} />;
+    default: return <File className={className} />;
+  }
+}
+
+function MediaTypeIconField({ type }: { type: MediaType }) {
+  const className = 'h-3.5 w-3.5 text-gray-500 shrink-0';
+  switch (type) {
+    case 'image': return <FileImage className={className} />;
+    case 'video': return <FileVideo className={className} />;
+    case 'audio': return <FileAudio className={className} />;
+    case 'document': return <FileText className={className} />;
+    default: return <File className={className} />;
+  }
+}
+
+function getMediaTypeBadgeColor(type: MediaType): string {
+  switch (type) {
+    case 'image': return 'bg-blue-500';
+    case 'video': return 'bg-purple-500';
+    case 'audio': return 'bg-amber-500';
+    case 'document': return 'bg-gray-500';
+    default: return 'bg-gray-400';
+  }
+}
+
+function getFileExtension(name: string): string {
+  const parts = name.split('.');
+  return parts.length > 1 ? parts[parts.length - 1].toUpperCase() : 'FILE';
+}
+
+function getItemType(item: MediaItem): MediaType {
+  return item.mediaType || 'image';
+}
 
 // ─────────────────────────────────────────────────────────────
 // Thumbnail Card
@@ -52,13 +128,17 @@ function ThumbnailCard({
   item,
   isSelected,
   onSelect,
+  onDoubleClick,
   onDelete,
 }: {
   item: MediaItem;
   isSelected: boolean;
   onSelect: () => void;
+  onDoubleClick?: () => void;
   onDelete: (e: React.MouseEvent) => void;
 }) {
+  const type = getItemType(item);
+
   return (
     <motion.div
       layout
@@ -69,42 +149,97 @@ function ThumbnailCard({
       className={`group relative cursor-pointer rounded-lg border-2 overflow-hidden transition-all ${
         isSelected
           ? 'border-emerald-500 ring-2 ring-emerald-500/30 shadow-lg'
-          : 'border-gray-400 hover:border-gray-400 hover:shadow-md'
+          : 'border-gray-300 hover:border-gray-400 hover:shadow-md'
       }`}
       onClick={onSelect}
+      onDoubleClick={onDoubleClick}
     >
-      {/* Image */}
-      <div className="relative aspect-square bg-gray-200 overflow-hidden">
-        <img
-          src={item.data || item.url}
-          alt={item.alt || item.name}
-          className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
-        />
+      {/* Preview area */}
+      <div className="relative aspect-square bg-gray-100 overflow-hidden">
+        {type === 'image' ? (
+          <>
+            <img
+              src={item.url}
+              alt={item.alt || item.name}
+              className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
+            />
+            {/* Dimensions badge */}
+            {item.width > 0 && item.height > 0 && (
+              <div className="absolute bottom-1.5 right-1.5 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded font-mono">
+                {item.width}×{item.height}
+              </div>
+            )}
+          </>
+        ) : type === 'video' ? (
+          <div className="relative h-full w-full bg-gradient-to-br from-purple-50 to-purple-100 flex items-center justify-center">
+            <video
+              src={item.url}
+              className="h-full w-full object-cover"
+              muted
+              preload="metadata"
+            />
+            {/* Play overlay */}
+            <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="bg-white/90 rounded-full p-2.5 shadow-lg">
+                <Film className="h-5 w-5 text-purple-600" />
+              </div>
+            </div>
+            {/* Video badge */}
+            <div className="absolute top-1.5 left-1.5 bg-purple-500 text-white text-[10px] px-1.5 py-0.5 rounded font-medium uppercase">
+              Video
+            </div>
+            {item.width > 0 && item.height > 0 && (
+              <div className="absolute bottom-1.5 right-1.5 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded font-mono">
+                {item.width}×{item.height}
+              </div>
+            )}
+          </div>
+        ) : type === 'audio' ? (
+          <div className="h-full w-full bg-gradient-to-br from-amber-50 to-amber-100 flex flex-col items-center justify-center gap-2 p-3">
+            <div className="rounded-full bg-amber-200 p-3">
+              <Music className="h-6 w-6 text-amber-600" />
+            </div>
+            <div className="absolute top-1.5 left-1.5 bg-amber-500 text-white text-[10px] px-1.5 py-0.5 rounded font-medium uppercase">
+              Audio
+            </div>
+          </div>
+        ) : (
+          <div className="h-full w-full bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col items-center justify-center gap-2 p-3">
+            <div className={`rounded-lg p-3 ${getMediaTypeBg(type)}`}>
+              <ThumbnailTypeIcon type={type} />
+            </div>
+            <span className="text-[10px] font-mono font-bold text-gray-500 uppercase">
+              {getFileExtension(item.name)}
+            </span>
+          </div>
+        )}
+
         {/* Selection checkmark */}
         {isSelected && (
-          <div className="absolute top-2 left-2 bg-emerald-500 text-white rounded-full p-0.5 shadow">
+          <div className="absolute top-2 left-2 bg-emerald-500 text-white rounded-full p-0.5 shadow z-10">
             <Check className="h-3.5 w-3.5" />
           </div>
         )}
+
         {/* Delete button on hover */}
         <button
           onClick={onDelete}
-          className="absolute top-2 right-2 bg-red-500/90 hover:bg-red-600 text-white rounded-full p-1.5 shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
+          className="absolute top-2 right-2 bg-red-500/90 hover:bg-red-600 text-white rounded-full p-1.5 shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-10"
           title="Eliminar"
         >
           <Trash2 className="h-3 w-3" />
         </button>
-        {/* File type badge */}
-        <div className="absolute bottom-2 right-2 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded font-mono uppercase">
-          {item.width}×{item.height}
-        </div>
       </div>
+
       {/* Filename */}
       <div className="px-2 py-1.5 bg-white">
         <p className="text-xs text-gray-700 truncate font-medium" title={item.name}>
           {item.name}
         </p>
-        <p className="text-[10px] text-gray-500">{formatFileSize(item.size)}</p>
+        <div className="flex items-center gap-1.5">
+          <span className={`inline-block w-1.5 h-1.5 rounded-full ${getMediaTypeBadgeColor(type)}`} />
+          <p className="text-[10px] text-gray-500">{formatFileSize(item.size)}</p>
+        </div>
       </div>
     </motion.div>
   );
@@ -161,9 +296,14 @@ function AttachmentDetails({
     }
   }, [item.uploadedAt]);
 
+  const type = getItemType(item);
+  const isImage = type === 'image';
+  const isVideo = type === 'video';
+  const isAudio = type === 'audio';
+
   return (
     <>
-      {editingImage && (
+      {editingImage && isImage && (
         <ImageEditor
           item={item}
           onSave={handleImageEdited}
@@ -171,132 +311,175 @@ function AttachmentDetails({
         />
       )}
       <div className="flex flex-col h-full">
-      {/* Back button */}
-      <div className="px-4 py-3 border-b border-gray-400 bg-white">
-        <button
-          onClick={onBack}
-          className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          Volver a la biblioteca
-        </button>
-      </div>
-
-      {/* Image preview */}
-      <div className="px-4 pt-4">
-        <div className="relative rounded-lg overflow-hidden bg-gray-200 border border-gray-400">
-          <img
-            src={item.data || item.url}
-            alt={item.alt || item.name}
-            className="w-full h-auto max-h-64 object-contain"
-          />
-        </div>
-      </div>
-
-      {/* Details form */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
-        {/* Filename (read-only) */}
-        <div className="space-y-1.5">
-          <Label className="text-xs font-medium text-gray-500">Nombre del archivo</Label>
-          <div className="flex items-center gap-2 px-3 py-2 bg-gray-200 rounded-md border border-gray-400">
-            <FileImage className="h-4 w-4 text-gray-500 shrink-0" />
-            <span className="text-sm text-gray-700 truncate">{item.name}</span>
-          </div>
-        </div>
-
-        {/* Alt text */}
-        <div className="space-y-1.5">
-          <Label className="text-xs font-medium text-gray-500">Texto alternativo</Label>
-          <Input
-            value={item.alt}
-            onChange={(e) => onUpdate({ alt: e.target.value })}
-            placeholder="Describe la imagen para accesibilidad..."
-            className="h-8 text-sm"
-          />
-        </div>
-
-        {/* Caption */}
-        <div className="space-y-1.5">
-          <Label className="text-xs font-medium text-gray-500">Leyenda</Label>
-          <Textarea
-            value={item.caption}
-            onChange={(e) => onUpdate({ caption: e.target.value })}
-            placeholder="Agrega una leyenda..."
-            rows={2}
-            className="text-sm"
-          />
-        </div>
-
-        {/* URL (read-only with copy) */}
-        <div className="space-y-1.5">
-          <Label className="text-xs font-medium text-gray-500">URL de la imagen</Label>
+        {/* Header: Back button + action icons */}
+        <div className="px-3 py-2.5 border-b border-gray-300 bg-white flex items-center justify-between">
+          <button
+            onClick={onBack}
+            className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-700 transition-colors"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Volver
+          </button>
           <div className="flex items-center gap-1">
-            <div className="flex-1 flex items-center gap-2 px-3 py-2 bg-gray-200 rounded-md border border-gray-400 min-w-0">
-              <span className="text-xs text-gray-500 truncate font-mono">
-                {item.url.substring(0, 60)}...
-              </span>
-            </div>
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-8 w-8 shrink-0"
-              onClick={handleCopyUrl}
-              title="Copiar URL"
+            {isImage && (
+              <button
+                onClick={() => setEditingImage(true)}
+                className="p-1.5 rounded-md text-blue-500 hover:bg-blue-50 transition-colors"
+                title="Editar imagen"
+              >
+                <Pencil className="h-4 w-4" />
+              </button>
+            )}
+            <button
+              onClick={onRemove}
+              className="p-1.5 rounded-md text-red-500 hover:bg-red-50 transition-colors"
+              title="Eliminar"
             >
-              <Copy className={`h-3.5 w-3.5 ${copied ? 'text-emerald-500' : ''}`} />
-            </Button>
+              <Trash2 className="h-4 w-4" />
+            </button>
           </div>
         </div>
 
-        <Separator />
+        {/* Preview */}
+        <div className="px-3 pt-3">
+          <div className="relative rounded-lg overflow-hidden bg-gray-100 border border-gray-300">
+            {isImage && (
+              <img
+                src={item.url}
+                alt={item.alt || item.name}
+                className="w-full h-auto max-h-36 object-contain"
+              />
+            )}
+            {isVideo && (
+              <video
+                src={item.url}
+                controls
+                className="w-full h-auto max-h-36 bg-black"
+                preload="metadata"
+              />
+            )}
+            {isAudio && (
+              <div className="flex items-center justify-center py-6 bg-gradient-to-br from-amber-50 to-amber-100">
+                <div className="text-center">
+                  <Music className="h-8 w-8 text-amber-500 mx-auto mb-2" />
+                  <audio src={item.url} controls className="w-full max-w-[280px]" />
+                </div>
+              </div>
+            )}
+            {!isImage && !isVideo && !isAudio && (
+              <div className="flex items-center justify-center py-6 bg-gray-50">
+                <div className="text-center">
+                  <FileText className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                  <p className="text-xs text-gray-500 font-mono">{getFileExtension(item.name)}</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
 
-        {/* Metadata */}
-        <div className="space-y-2.5">
-          <Label className="text-xs font-medium text-gray-500">Detalles del archivo</Label>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Ruler className="h-3.5 w-3.5 text-gray-500 shrink-0" />
-              <span>{item.width} × {item.height}px</span>
+        {/* Details form - scrollable */}
+        <div className="flex-1 overflow-y-auto px-3 py-3 space-y-3 min-h-0">
+          {/* Media type badge */}
+          <div className="flex items-center gap-2">
+            <span className={`inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full ${getMediaTypeBg(type)}`}>
+              <MediaTypeIconBadge type={type} />
+              {getMediaTypeLabel(type)}
+            </span>
+            {item.mimeType && (
+              <span className="text-[10px] text-gray-400 font-mono truncate">{item.mimeType}</span>
+            )}
+          </div>
+
+          {/* Filename (read-only) */}
+          <div className="space-y-1">
+            <Label className="text-[11px] font-medium text-gray-500">Nombre del archivo</Label>
+            <div className="flex items-center gap-2 px-2.5 py-1.5 bg-gray-100 rounded-md border border-gray-300">
+              <MediaTypeIconField type={type} />
+              <span className="text-xs text-gray-700 truncate">{item.name}</span>
             </div>
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <HardDrive className="h-3.5 w-3.5 text-gray-500 shrink-0" />
-              <span>{formatFileSize(item.size)}</span>
+          </div>
+
+          {/* Alt text - only for images */}
+          {isImage && (
+            <div className="space-y-1">
+              <Label className="text-[11px] font-medium text-gray-500">Texto alternativo</Label>
+              <Input
+                value={item.alt}
+                onChange={(e) => onUpdate({ alt: e.target.value })}
+                placeholder="Describe la imagen..."
+                className="h-7 text-xs"
+              />
             </div>
-            <div className="col-span-2 flex items-center gap-2 text-sm text-gray-600">
-              <Calendar className="h-3.5 w-3.5 text-gray-500 shrink-0" />
-              <span className="text-xs">{uploadedDate}</span>
+          )}
+
+          {/* Caption */}
+          <div className="space-y-1">
+            <Label className="text-[11px] font-medium text-gray-500">Leyenda</Label>
+            <Textarea
+              value={item.caption}
+              onChange={(e) => onUpdate({ caption: e.target.value })}
+              placeholder="Agrega una leyenda..."
+              rows={2}
+              className="text-xs"
+            />
+          </div>
+
+          {/* URL (read-only with copy) */}
+          <div className="space-y-1">
+            <Label className="text-[11px] font-medium text-gray-500">URL del archivo</Label>
+            <div className="flex items-center gap-1">
+              <div className="flex-1 flex items-center gap-2 px-2.5 py-1.5 bg-gray-100 rounded-md border border-gray-300 min-w-0">
+                <span className="text-[11px] text-gray-500 truncate font-mono">
+                  {item.url.substring(0, 50)}...
+                </span>
+              </div>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-7 w-7 shrink-0"
+                onClick={handleCopyUrl}
+                title="Copiar URL"
+              >
+                <Copy className={`h-3 w-3 ${copied ? 'text-emerald-500' : ''}`} />
+              </Button>
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Metadata - compact */}
+          <div className="space-y-1.5">
+            <Label className="text-[11px] font-medium text-gray-500">Detalles</Label>
+            <div className="grid grid-cols-2 gap-2">
+              {item.width > 0 && item.height > 0 && (
+                <div className="flex items-center gap-1.5 text-xs text-gray-600">
+                  <Ruler className="h-3 w-3 text-gray-500 shrink-0" />
+                  <span>{item.width} × {item.height}</span>
+                </div>
+              )}
+              <div className="flex items-center gap-1.5 text-xs text-gray-600">
+                <HardDrive className="h-3 w-3 text-gray-500 shrink-0" />
+                <span>{formatFileSize(item.size)}</span>
+              </div>
+              <div className="col-span-2 flex items-center gap-1.5 text-xs text-gray-600">
+                <Calendar className="h-3 w-3 text-gray-500 shrink-0" />
+                <span className="text-[11px]">{uploadedDate}</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Action buttons */}
-      <div className="px-4 py-3 border-t border-gray-400 bg-white space-y-2">
-        <Button
-          onClick={onConfirm}
-          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
-        >
-          <Check className="h-4 w-4 mr-2" />
-          Seleccionar esta imagen
-        </Button>
-        <Button
-          variant="outline"
-          onClick={() => setEditingImage(true)}
-          className="w-full border-blue-200 text-blue-600 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-300 gap-2"
-        >
-          <Pencil className="h-4 w-4" />
-          Editar Imagen
-        </Button>
-        <Button
-          variant="outline"
-          onClick={onRemove}
-          className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300"
-        >
-          <Trash2 className="h-4 w-4 mr-2" />
-          Eliminar permanentemente
-        </Button>
+        {/* PRIMARY ACTION - always visible at bottom */}
+        <div className="px-3 py-3 border-t border-gray-300 bg-white shrink-0">
+          <Button
+            onClick={onConfirm}
+            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white h-9 text-sm"
+          >
+            <Check className="h-4 w-4 mr-2" />
+            Seleccionar este {getMediaTypeLabel(type).toLowerCase()}
+          </Button>
+        </div>
       </div>
-    </div>
     </>
   );
 }
@@ -340,7 +523,7 @@ function UploadZone({
       e.stopPropagation();
       setIsDragOver(false);
 
-      const files = Array.from(e.dataTransfer.files).filter((f) => f.type.startsWith('image/'));
+      const files = Array.from(e.dataTransfer.files);
       if (files.length > 0) {
         onFilesSelected(files);
       }
@@ -372,43 +555,64 @@ function UploadZone({
       onDrop={handleDrop}
       onClick={handleClick}
       className={`
-        relative flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed
-        p-8 transition-all cursor-pointer
+        relative flex items-center justify-center gap-4 rounded-xl border-2 border-dashed
+        py-3 px-4 transition-all cursor-pointer
         ${
           isDragOver
             ? 'border-emerald-500 bg-emerald-50 scale-[1.01]'
-            : 'border-gray-400 bg-gray-200/50 hover:border-gray-400 hover:bg-gray-200'
+            : 'border-gray-300 bg-gray-50 hover:border-emerald-400 hover:bg-emerald-50/50'
         }
       `}
     >
       <input
         ref={inputRef}
         type="file"
-        accept={ACCEPTED_TYPES}
+        accept={ACCEPT_STRING}
         multiple
         className="hidden"
         onChange={handleInputChange}
       />
       <div
-        className={`rounded-full p-3 transition-colors ${
+        className={`rounded-full p-2 transition-colors shrink-0 ${
           isDragOver ? 'bg-emerald-100' : 'bg-gray-200'
         }`}
       >
         <Upload
-          className={`h-6 w-6 transition-colors ${
+          className={`h-5 w-5 transition-colors ${
             isDragOver ? 'text-emerald-600' : 'text-gray-500'
           }`}
         />
       </div>
       <div className="text-center">
         <p className="text-sm font-medium text-gray-700">
-          {isDragOver ? 'Suelta las imágenes aquí' : 'Arrastra imágenes aquí o haz clic'}
+          {isDragOver ? 'Suelta los archivos aquí' : 'Arrastra archivos aquí o haz clic para buscar'}
         </p>
-        <p className="text-xs text-gray-500 mt-1">
-          JPG, PNG, GIF, WebP, SVG — Máximo 5MB por imagen
+        <p className="text-xs text-gray-500">
+          Imágenes, Videos, Audio, Documentos — hasta 50MB
         </p>
       </div>
     </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Full-area Drag Overlay
+// ─────────────────────────────────────────────────────────────
+
+function DragOverlay() {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-emerald-500/10 backdrop-blur-sm rounded-xl border-2 border-dashed border-emerald-500"
+    >
+      <div className="rounded-full bg-emerald-100 p-5 mb-3">
+        <Upload className="h-10 w-10 text-emerald-600" />
+      </div>
+      <p className="text-lg font-semibold text-emerald-700">Suelta los archivos aquí</p>
+      <p className="text-sm text-emerald-600 mt-1">Imágenes, videos, audio y documentos</p>
+    </motion.div>
   );
 }
 
@@ -422,9 +626,9 @@ function EmptyState() {
       <div className="rounded-full bg-gray-200 p-4 mb-4">
         <ImageIcon className="h-8 w-8 text-gray-500" />
       </div>
-      <p className="text-sm font-medium text-gray-500">No hay imágenes en la biblioteca</p>
+      <p className="text-sm font-medium text-gray-500">No hay medios en la biblioteca</p>
       <p className="text-xs text-gray-500 mt-1">
-        Sube imágenes usando la zona de carga arriba
+        Sube imágenes, videos, audio o documentos usando la zona de carga
       </p>
     </div>
   );
@@ -445,6 +649,7 @@ function MediaLibraryDialogContent({
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const selectedItem = useMemo(
     () => mediaItems.find((item) => item.id === selectedId) || null,
@@ -463,16 +668,66 @@ function MediaLibraryDialogContent({
           successCount++;
         } catch (err) {
           errorCount++;
-          toast.error(err instanceof Error ? err.message : 'Error al subir imagen');
+          toast.error(err instanceof Error ? err.message : 'Error al subir archivo');
         }
       }
 
       if (successCount > 0) {
-        toast.success(`${successCount} imagen${successCount > 1 ? 'es' : ''} subida${successCount > 1 ? 's' : ''} correctamente`);
+        toast.success(
+          `${successCount} archivo${successCount > 1 ? 's' : ''} subido${successCount > 1 ? 's' : ''} correctamente`
+        );
       }
       setIsUploading(false);
     },
     [addMedia],
+  );
+
+  // ── Full-area drag handlers ──
+  const handleAreaDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // Only show overlay if dragging files (not text/links)
+    if (e.dataTransfer.types.includes('Files')) {
+      setIsDragOver(true);
+    }
+  }, []);
+
+  const handleAreaDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+  }, []);
+
+  const handleAreaDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsDragOver(false);
+
+      const files = Array.from(e.dataTransfer.files);
+      if (files.length > 0) {
+        handleFilesSelected(files);
+      }
+    },
+    [handleFilesSelected],
+  );
+
+  // ── File browser button ──
+  const handleBrowseClick = useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
+
+  const handleFileInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const files = Array.from(e.target.files || []);
+      if (files.length > 0) {
+        handleFilesSelected(files);
+      }
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    },
+    [handleFilesSelected],
   );
 
   const handleDelete = useCallback(
@@ -483,7 +738,7 @@ function MediaLibraryDialogContent({
       if (selectedId === id) {
         setSelectedId(null);
       }
-      toast.success(`"${item?.name || 'Imagen'}" eliminada`);
+      toast.success(`"${item?.name || 'Archivo'}" eliminado`);
     },
     [removeMedia, selectedId, mediaItems],
   );
@@ -507,53 +762,90 @@ function MediaLibraryDialogContent({
       const item = mediaItems.find((m) => m.id === selectedId);
       removeMedia(selectedId);
       setSelectedId(null);
-      toast.success(`"${item?.name || 'Imagen'}" eliminada`);
+      toast.success(`"${item?.name || 'Archivo'}" eliminado`);
     }
   }, [selectedId, removeMedia, mediaItems]);
 
   return (
-    <div className="flex flex-col h-[75vh] max-h-[700px]">
+    <div
+      className="relative flex flex-col h-[92vh] max-h-[900px]"
+      onDragOver={handleAreaDragOver}
+      onDragLeave={handleAreaDragLeave}
+      onDrop={handleAreaDrop}
+    >
+      {/* Hidden file input for the header buttons */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept={ACCEPT_STRING}
+        multiple
+        className="hidden"
+        onChange={handleFileInputChange}
+      />
+
+      {/* Full-area drag overlay */}
+      <AnimatePresence>
+        {isDragOver && <DragOverlay />}
+      </AnimatePresence>
+
       {/* Dark header */}
-      <div className="bg-[#1a1a1a] px-6 py-4 rounded-t-lg">
+      <div className="bg-[#1a1a1a] px-5 py-3 rounded-t-lg relative z-10">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="rounded-lg bg-white/10 p-2">
+            <div className="rounded-lg bg-white/10 p-1.5">
               <ImageIcon className="h-5 w-5 text-emerald-400" />
             </div>
             <div>
               <h2 className="text-white font-semibold text-base">Biblioteca de Medios</h2>
               <p className="text-gray-500 text-xs mt-0.5">
-                {mediaItems.length} imagen{mediaItems.length !== 1 ? 'es' : ''} en la biblioteca
+                {mediaItems.length} archivo{mediaItems.length !== 1 ? 's' : ''} en la biblioteca
               </p>
             </div>
           </div>
-          {isUploading && (
-            <div className="flex items-center gap-2 text-emerald-400 text-sm">
-              <div className="animate-spin rounded-full h-4 w-4 border-2 border-emerald-400 border-t-transparent" />
-              Subiendo...
-            </div>
-          )}
+          <div className="flex items-center gap-2">
+            {isUploading && (
+              <div className="flex items-center gap-2 text-emerald-400 text-sm">
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-emerald-400 border-t-transparent" />
+                Subiendo...
+              </div>
+            )}
+            <button
+              onClick={handleBrowseClick}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium rounded-lg transition-colors"
+            >
+              <Upload className="h-3.5 w-3.5" />
+              Subir archivos
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Upload zone */}
-      <div className="px-4 pt-4">
+      {/* Upload zone - always visible */}
+      <div className="px-4 pt-3 relative z-10">
         <UploadZone
           onFilesSelected={handleFilesSelected}
-          isDragOver={isDragOver}
-          setIsDragOver={setIsDragOver}
+          isDragOver={false}
+          setIsDragOver={() => {}}
         />
       </div>
 
       {/* Main content area */}
-      <div className="flex-1 flex overflow-hidden mt-3">
+      <div className="flex-1 flex overflow-hidden min-h-0 relative z-10">
         {/* Grid view */}
         <div className="flex-1 flex flex-col min-w-0">
-          <div className="px-4 pb-2">
+          <div className="px-4 py-2 flex items-center justify-between">
             <div className="flex items-center gap-2 text-xs text-gray-500">
               <Info className="h-3.5 w-3.5" />
-              <span>Haz clic en una imagen para ver sus detalles</span>
+              <span>Haz clic para ver detalles. Doble clic para seleccionar. Arrastra archivos para subir.</span>
             </div>
+            {children && (
+              <div className="flex items-center gap-2">
+                <p className="text-xs text-gray-500 hidden sm:block">
+                  Selecciona un archivo para insertarlo
+                </p>
+                {children}
+              </div>
+            )}
           </div>
 
           {mediaItems.length === 0 ? (
@@ -562,7 +854,7 @@ function MediaLibraryDialogContent({
             </div>
           ) : (
             <div className="flex-1 overflow-y-auto px-4 pb-4">
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2.5">
                 <AnimatePresence mode="popLayout">
                   {mediaItems.map((item) => (
                     <ThumbnailCard
@@ -570,6 +862,9 @@ function MediaLibraryDialogContent({
                       item={item}
                       isSelected={selectedId === item.id}
                       onSelect={() => handleSelectFromGrid(item.id)}
+                      onDoubleClick={() => {
+                        if (onInsert) onInsert(item.url);
+                      }}
                       onDelete={(e) => handleDelete(item.id, e)}
                     />
                   ))}
@@ -584,12 +879,12 @@ function MediaLibraryDialogContent({
           {selectedItem && (
             <motion.div
               initial={{ width: 0, opacity: 0 }}
-              animate={{ width: 320, opacity: 1 }}
+              animate={{ width: 340, opacity: 1 }}
               exit={{ width: 0, opacity: 0 }}
               transition={{ duration: 0.2, ease: 'easeInOut' }}
-              className="border-l border-gray-400 bg-[#f0f0eb] overflow-hidden shrink-0"
+              className="border-l border-gray-300 bg-[#f0f0eb] overflow-hidden shrink-0"
             >
-              <div className="w-80 h-full">
+              <div className="w-[340px] h-full">
                 <AttachmentDetails
                   item={selectedItem}
                   onUpdate={(partial) => updateMedia(selectedItem.id, partial)}
@@ -602,13 +897,6 @@ function MediaLibraryDialogContent({
           )}
         </AnimatePresence>
       </div>
-
-      {/* Footer with children (e.g., "Insertar en el tema" button from parent) */}
-      {children && (
-        <div className="px-4 py-3 border-t border-gray-400 bg-white rounded-b-lg">
-          {children}
-        </div>
-      )}
     </div>
   );
 }
@@ -649,32 +937,26 @@ export function MediaLibraryDialog({
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent
         showCloseButton={false}
-        className="sm:max-w-4xl max-w-[calc(100vw-2rem)] p-0 gap-0 overflow-hidden bg-[#f0f0eb] rounded-xl"
+        className="sm:max-w-6xl max-w-[calc(100vw-1rem)] p-0 gap-0 overflow-hidden bg-[#f0f0eb] rounded-xl"
       >
         {/* Accessibility: required by Radix Dialog */}
         <DialogHeader className="sr-only">
           <DialogTitle>Biblioteca de Medios</DialogTitle>
           <DialogDescription>
-            Sube y selecciona imágenes para tu theme WordPress
+            Sube y selecciona archivos multimedia para tu proyecto WordPress
           </DialogDescription>
         </DialogHeader>
 
         <MediaLibraryDialogContent onInsert={handleInsert}>
-          {/* Close button */}
-          <div className="flex items-center justify-between">
-            <p className="text-xs text-gray-500">
-              Selecciona una imagen para insertarla en tu proyecto
-            </p>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleOpenChange(false)}
-              className="h-8"
-            >
-              <X className="h-4 w-4 mr-1" />
-              Cerrar
-            </Button>
-          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleOpenChange(false)}
+            className="h-7 text-xs"
+          >
+            <X className="h-3.5 w-3.5 mr-1" />
+            Cerrar
+          </Button>
         </MediaLibraryDialogContent>
       </DialogContent>
     </Dialog>
@@ -748,7 +1030,7 @@ export function MediaLibraryBrowser({
     <MediaLibraryDialogContent onInsert={onInsert}>
       {onInsert && (
         <p className="text-xs text-gray-500">
-          Haz clic en una imagen para ver sus detalles, luego selecciona &quot;Seleccionar esta imagen&quot;
+          Haz clic en un archivo para ver sus detalles, luego selecciona &quot;Seleccionar&quot;
         </p>
       )}
     </MediaLibraryDialogContent>

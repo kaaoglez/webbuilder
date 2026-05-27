@@ -1,9 +1,10 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
 // ─────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────
+
+export type MediaType = 'image' | 'video' | 'audio' | 'document' | 'other';
 
 export interface MediaItem {
   id: string;
@@ -16,21 +17,20 @@ export interface MediaItem {
   uploadedAt: string;
   size: number;
   mimeType?: string;
-  data?: string; // base64 data URL for quick display
+  mediaType?: MediaType;
 }
 
 interface MediaLibraryState {
   mediaItems: MediaItem[];
-  hydrated: boolean;
 }
 
 interface MediaLibraryActions {
-  hydrate: () => Promise<void>;
   addMedia: (file: File) => Promise<MediaItem>;
-  addMediaFromUrl: (item: Omit<MediaItem, 'id' | 'uploadedAt'>) => MediaItem;
-  removeMedia: (id: string) => Promise<void>;
+  addMediaFromUrl: (item: Partial<MediaItem> & { name: string; url: string }) => MediaItem;
+  removeMedia: (id: string) => void;
   updateMedia: (id: string, partial: Partial<MediaItem>) => void;
   clearAll: () => void;
+  hydrateMedia: () => void;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -59,6 +59,69 @@ function getImageDimensions(dataUrl: string): Promise<{ width: number; height: n
   });
 }
 
+function getVideoDimensions(dataUrl: string): Promise<{ width: number; height: number }> {
+  return new Promise((resolve) => {
+    const video = document.createElement('video');
+    video.preload = 'metadata';
+    video.onloadedmetadata = () => {
+      resolve({ width: video.videoWidth || 0, height: video.videoHeight || 0 });
+      URL.revokeObjectURL(video.src);
+    };
+    video.onerror = () => {
+      resolve({ width: 0, height: 0 });
+    };
+    video.src = dataUrl;
+  });
+}
+
+function detectMediaType(mimeType: string): MediaType {
+  if (mimeType.startsWith('image/')) return 'image';
+  if (mimeType.startsWith('video/')) return 'video';
+  if (mimeType.startsWith('audio/')) return 'audio';
+  if (
+    mimeType === 'application/pdf' ||
+    mimeType.includes('document') ||
+    mimeType.includes('spreadsheet') ||
+    mimeType.includes('presentation') ||
+    mimeType === 'text/plain' ||
+    mimeType === 'text/csv'
+  ) return 'document';
+  return 'other';
+}
+
+function migrateItem(item: MediaItem): MediaItem {
+  if (item.mediaType && item.mimeType) return item;
+  const mimeType = item.mimeType || 'image/jpeg';
+  return {
+    ...item,
+    mimeType,
+    mediaType: detectMediaType(mimeType),
+  };
+}
+
+function migrateItems(items: MediaItem[]): MediaItem[] {
+  let needsMigration = false;
+  for (const item of items) {
+    if (!item.mediaType || !item.mimeType) {
+      needsMigration = true;
+      break;
+    }
+  }
+  if (!needsMigration) return items;
+  return items.map(migrateItem);
+}
+
+function getMaxFileSize(mimeType: string): number {
+  const mediaType = detectMediaType(mimeType);
+  switch (mediaType) {
+    case 'video': return 50 * 1024 * 1024; // 50MB
+    case 'audio': return 20 * 1024 * 1024; // 20MB
+    case 'document': return 25 * 1024 * 1024; // 25MB
+    case 'image': return 10 * 1024 * 1024; // 10MB
+    default: return 10 * 1024 * 1024;
+  }
+}
+
 function formatFileSize(bytes: number): string {
   if (bytes === 0) return '0 B';
   const k = 1024;
@@ -67,184 +130,174 @@ function formatFileSize(bytes: number): string {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
-function mapApiItemToMediaItem(item: Record<string, unknown>): MediaItem {
-  return {
-    id: item.id as string,
-    name: item.name as string,
-    url: item.url as string,
-    alt: (item.alt as string) ?? '',
-    caption: (item.caption as string) ?? '',
-    width: (item.width as number) ?? 0,
-    height: (item.height as number) ?? 0,
-    size: (item.size as number) ?? 0,
-    mimeType: (item.mimeType as string) ?? undefined,
-    data: (item.data as string) ?? undefined,
-    uploadedAt: item.uploadedAt as string,
-  };
+function formatMaxSize(bytes: number): string {
+  return formatFileSize(bytes);
 }
 
 // ─────────────────────────────────────────────────────────────
-// Store
+// Allowed types
 // ─────────────────────────────────────────────────────────────
 
+const ALLOWED_TYPE_PATTERNS = [
+  'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml', 'image/bmp', 'image/avif',
+  'video/mp4', 'video/webm', 'video/ogg', 'video/quicktime', 'video/x-msvideo', 'video/x-matroska',
+  'audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/ogg', 'audio/aac', 'audio/webm', 'audio/x-m4a',
+  'application/pdf',
+  'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  'text/plain', 'text/csv',
+];
+
+function isAllowedType(mimeType: string): boolean {
+  if (ALLOWED_TYPE_PATTERNS.includes(mimeType)) return true;
+  if (mimeType.startsWith('image/')) return true;
+  if (mimeType.startsWith('video/')) return true;
+  if (mimeType.startsWith('audio/')) return true;
+  return false;
+}
+
+const ACCEPT_STRING = [
+  'image/*',
+  'video/*',
+  'audio/*',
+  '.pdf',
+  '.doc', '.docx',
+  '.xls', '.xlsx',
+  '.ppt', '.pptx',
+  '.txt', '.csv',
+].join(',');
+
+// ─────────────────────────────────────────────────────────────
+// Store (with auto-migration middleware)
+// ─────────────────────────────────────────────────────────────
+
+function autoMigrateMiddleware(
+  config: Parameters<typeof create<MediaLibraryState & MediaLibraryActions>>[0]
+): Parameters<typeof create<MediaLibraryState & MediaLibraryActions>>[0] {
+  return (set, get, api) =>
+    config(
+      (partial, replace) => {
+        // Auto-migrate mediaItems whenever state is set
+        if (partial && typeof partial === 'object' && 'mediaItems' in partial) {
+          const items = (partial as Partial<MediaLibraryState>).mediaItems;
+          if (Array.isArray(items)) {
+            (partial as Partial<MediaLibraryState>).mediaItems = migrateItems(items);
+          }
+        }
+        set(partial, replace);
+      },
+      get,
+      api
+    );
+}
+
 export const useMediaLibraryStore = create<MediaLibraryState & MediaLibraryActions>()(
-  persist(
-    (set, get) => ({
-  mediaItems: [],
-  hydrated: false,
+  autoMigrateMiddleware((set, get) => ({
+    mediaItems: [],
 
-  hydrate: async () => {
-    if (typeof window === 'undefined') return;
-    try {
-      const res = await fetch('/api/media');
-      if (res.ok) {
-        const data = await res.json();
-        const items: MediaItem[] = data.map(mapApiItemToMediaItem);
-        set({ mediaItems: items, hydrated: true });
-        return;
+    addMedia: async (file: File): Promise<MediaItem> => {
+      const maxSize = getMaxFileSize(file.type);
+      if (file.size > maxSize) {
+        throw new Error(
+          `El archivo "${file.name}" excede el límite de ${formatMaxSize(maxSize)} (${formatFileSize(file.size)})`
+        );
       }
-    } catch {
-      // API failed, rely on persisted data from zustand/persist
-    }
-    set({ hydrated: true });
-  },
 
-  addMedia: async (file: File): Promise<MediaItem> => {
-    const MAX_SIZE = 5 * 1024 * 1024; // 5MB
-    if (file.size > MAX_SIZE) {
-      throw new Error(`El archivo excede el límite de 5MB (${formatFileSize(file.size)})`);
-    }
-
-    const ALLOWED_TYPES = [
-      'image/jpeg',
-      'image/png',
-      'image/gif',
-      'image/webp',
-      'image/svg+xml',
-    ];
-    if (!ALLOWED_TYPES.includes(file.type)) {
-      throw new Error(`Tipo de archivo no soportado: ${file.type}`);
-    }
-
-    // Read file for dimensions and display
-    const dataUrl = await readFileAsDataUrl(file);
-    const dimensions = await getImageDimensions(dataUrl);
-
-    // Try API first
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('width', String(dimensions.width));
-      formData.append('height', String(dimensions.height));
-
-      const res = await fetch('/api/media', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        const apiItem = mapApiItemToMediaItem(data);
-        set((state) => ({
-          mediaItems: [apiItem, ...state.mediaItems],
-        }));
-        return apiItem;
+      if (!isAllowedType(file.type)) {
+        throw new Error(`Tipo de archivo no soportado: ${file.type || 'desconocido'}`);
       }
-    } catch {
-      // API failed, fall through to local-only creation
-    }
 
-    // Fallback: create item locally without API
-    const newItem: MediaItem = {
-      id: generateId(),
-      name: file.name,
-      url: dataUrl,
-      alt: '',
-      caption: '',
-      width: dimensions.width,
-      height: dimensions.height,
-      uploadedAt: new Date().toISOString(),
-      size: file.size,
-      mimeType: file.type,
-      data: dataUrl,
-    };
+      const mediaType = detectMediaType(file.type);
+      const dataUrl = await readFileAsDataUrl(file);
 
-    set((state) => ({
-      mediaItems: [newItem, ...state.mediaItems],
-    }));
+      let width = 0;
+      let height = 0;
 
-    return newItem;
-  },
-
-  addMediaFromUrl: (item: Omit<MediaItem, 'id' | 'uploadedAt'>): MediaItem => {
-    const newItem: MediaItem = {
-      ...item,
-      id: generateId(),
-      uploadedAt: new Date().toISOString(),
-    };
-
-    set((state) => ({
-      mediaItems: [newItem, ...state.mediaItems],
-    }));
-
-    return newItem;
-  },
-
-  removeMedia: async (id: string) => {
-    // Try API first
-    try {
-      const res = await fetch(`/api/media/${id}`, { method: 'DELETE' });
-      if (res.ok) {
-        set((state) => ({
-          mediaItems: state.mediaItems.filter((item) => item.id !== id),
-        }));
-        return;
+      try {
+        if (mediaType === 'image') {
+          const dims = await getImageDimensions(dataUrl);
+          width = dims.width;
+          height = dims.height;
+        } else if (mediaType === 'video') {
+          const dims = await getVideoDimensions(dataUrl);
+          width = dims.width;
+          height = dims.height;
+        }
+      } catch {
+        // Non-dimension media is fine
       }
-    } catch {
-      // API failed, fall through to local-only removal
-    }
 
-    // Fallback: remove locally
-    set((state) => ({
-      mediaItems: state.mediaItems.filter((item) => item.id !== id),
-    }));
-  },
+      const newItem: MediaItem = {
+        id: generateId(),
+        name: file.name,
+        url: dataUrl,
+        alt: '',
+        caption: '',
+        width,
+        height,
+        uploadedAt: new Date().toISOString(),
+        size: file.size,
+        mimeType: file.type,
+        mediaType,
+      };
 
-  updateMedia: (id: string, partial: Partial<MediaItem>) => {
-    set((state) => ({
-      mediaItems: state.mediaItems.map((item) =>
-        item.id === id ? { ...item, ...partial } : item,
-      ),
-    }));
-  },
+      set((state) => ({
+        mediaItems: [newItem, ...state.mediaItems],
+      }));
 
-  clearAll: () => {
-    set({ mediaItems: [] });
-  },
-}),
-    {
-      name: 'pageforge-media-library',
-      partialize: (state) => ({
-        // Only persist metadata — NOT base64 data (would overflow localStorage)
-        mediaItems: state.mediaItems.map((item) => ({
-          ...item,
-          data: undefined,
-        })),
-      }),
-      merge: (persisted, current) => ({
-        ...current,
-        mediaItems: (persisted.mediaItems || []).map((p: MediaItem) => {
-          // Keep in-memory data from current state if available
-          const existing = current.mediaItems.find((c: MediaItem) => c.id === p.id);
-          return { ...p, data: existing?.data || p.data };
-        }),
-      }),
+      return newItem;
     },
-  ),
+
+    addMediaFromUrl: (item: Partial<MediaItem> & { name: string; url: string }): MediaItem => {
+      const mimeType = item.mimeType || 'image/jpeg';
+      const newItem: MediaItem = {
+        id: generateId(),
+        name: item.name,
+        url: item.url,
+        alt: item.alt || '',
+        caption: item.caption || '',
+        width: item.width || 0,
+        height: item.height || 0,
+        uploadedAt: new Date().toISOString(),
+        size: item.size || 0,
+        mimeType,
+        mediaType: item.mediaType || detectMediaType(mimeType),
+      };
+
+      set((state) => ({
+        mediaItems: [newItem, ...state.mediaItems],
+      }));
+
+      return newItem;
+    },
+
+    removeMedia: (id: string) => {
+      set((state) => ({
+        mediaItems: state.mediaItems.filter((item) => item.id !== id),
+      }));
+    },
+
+    updateMedia: (id: string, partial: Partial<MediaItem>) => {
+      set((state) => ({
+        mediaItems: state.mediaItems.map((item) =>
+          item.id === id ? { ...item, ...partial } : item,
+        ),
+      }));
+    },
+
+    clearAll: () => {
+      set({ mediaItems: [] });
+    },
+
+    hydrateMedia: () => {
+      // Auto-migration middleware handles this now, but keep as no-op for backwards compat
+    },
+  }))
 );
 
 // ─────────────────────────────────────────────────────────────
 // Utility exports
 // ─────────────────────────────────────────────────────────────
 
-export { formatFileSize };
+export { formatFileSize, formatMaxSize, ACCEPT_STRING };

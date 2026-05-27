@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useMemo } from 'react';import {
+import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';import {
   DndContext,
   closestCenter,
   PointerSensor,
@@ -17,7 +17,6 @@ import { CSS } from '@dnd-kit/utilities';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { useProjectsStore } from '@/lib/projects-store';
-import { useSettingsStore } from '@/lib/settings-store';
 import {
   Download,
   Save,
@@ -203,10 +202,10 @@ function ImageUrlField({
           </Button>
         </div>
         {value && (
-          <div className="mt-2 flex items-center gap-2 p-2 bg-gray-100 rounded-lg border border-gray-300">
-            <img src={value} alt="Preview" className="h-16 w-auto max-w-full object-contain rounded cursor-pointer"
+          <div className="mt-2 flex items-center gap-2 p-2 bg-gray-200 rounded-lg border border-gray-400">
+            <img src={value} alt="Preview" className="h-10 w-auto object-contain rounded"
               onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-            <span className="text-xs text-gray-500 shrink-0">Vista previa</span>
+            <span className="text-xs text-gray-500">Vista previa</span>
           </div>
         )}
       </FormField>
@@ -1787,6 +1786,13 @@ function SectionsTab() {
   const sections = config.sections || [];
   const sectionIds = sections.map((_, i) => i);
 
+  // Auto-select first section when sections exist and none is selected
+  useEffect(() => {
+    if (sections.length > 0 && (activeSectionIndex === null || activeSectionIndex >= sections.length)) {
+      setActiveSectionIndex(0);
+    }
+  }, [sections.length, activeSectionIndex, setActiveSectionIndex]);
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -1814,15 +1820,17 @@ function SectionsTab() {
 
   return (
     <div className="flex flex-col lg:flex-row gap-4 h-full">
-      {/* LEFT — Section List */}
-      <div className="w-full lg:w-80 shrink-0 space-y-3">
+      {/* LEFT — Section List (narrow sidebar) */}
+      <div className="w-full lg:w-64 shrink-0">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-bold text-gray-800 flex items-center gap-2">
+            <Layers className="h-4 w-4 text-emerald-600" />
+            Secciones
+            <Badge variant="secondary" className="text-xs font-medium">{sections.length}</Badge>
+          </h3>
+        </div>
         <Card className="border-gray-400 bg-white overflow-hidden">
-          <CardHeader className="pb-3 px-4 pt-4">
-            <CardTitle className="text-sm font-semibold text-gray-700">
-              Secciones ({sections.length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="px-2 pb-2">
+          <CardContent className="p-2">
             <DndContext
               sensors={sensors}
               collisionDetection={closestCenter}
@@ -1832,7 +1840,7 @@ function SectionsTab() {
                 items={sectionIds}
                 strategy={verticalListSortingStrategy}
               >
-                <div className="space-y-1 max-h-[60vh] overflow-y-auto">
+                <div className="space-y-1 max-h-[65vh] overflow-y-auto pr-1">
                   {sections.map((section, i) => (
                     <SortableSectionItem
                       key={i}
@@ -1848,13 +1856,13 @@ function SectionsTab() {
               </SortableContext>
             </DndContext>
 
-            <Separator className="my-3" />
+            <Separator className="my-2" />
 
-            <div className="px-2 pb-1">
+            <div className="px-1 pb-1">
               <Select onValueChange={(v) => addSection(v as ThemeSection['type'])}>
-                <SelectTrigger className="h-8 text-sm border-dashed border-gray-400">
-                  <Plus className="h-3.5 w-3.5 mr-1" />
-                  <SelectValue placeholder="Agregar sección..." />
+                <SelectTrigger className="h-8 text-xs border-dashed border-gray-400 bg-emerald-50 hover:bg-emerald-100 transition-colors">
+                  <Plus className="h-3 w-3 mr-1 text-emerald-600" />
+                  <SelectValue placeholder="+ Agregar sección..." />
                 </SelectTrigger>
                 <SelectContent>
                   {SECTION_TYPES.map((type) => (
@@ -1872,7 +1880,7 @@ function SectionsTab() {
         </Card>
       </div>
 
-      {/* RIGHT — Section Config */}
+      {/* RIGHT — Section Config (main content, always visible) */}
       <div className="flex-1 min-w-0">
         <AnimatePresence mode="wait">
           {selectedSection && activeSectionIndex !== null ? (
@@ -1881,18 +1889,33 @@ function SectionsTab() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: 0.15 }}
             >
-              <Card className="border-gray-400 bg-white">
-                <CardHeader className="pb-4">
-                  <div className="flex items-center gap-2">
-                    <div className="text-emerald-600">{SECTION_TYPE_ICON[selectedSection.type]}</div>
-                    <CardTitle className="text-lg">
-                      Configurar: {SECTION_TYPE_LABEL[selectedSection.type] || selectedSection.type}
-                    </CardTitle>
+              <Card className="border-gray-400 bg-white shadow-sm">
+                <CardHeader className="pb-4 border-b border-gray-200">
+                  <div className="flex items-center gap-3">
+                    <div className="rounded-lg bg-emerald-50 p-2">
+                      <div className="text-emerald-600">
+                        {(() => {
+                          const Icon = SECTION_TYPE_ICON[selectedSection.type];
+                          return typeof Icon === 'string' ? null : Icon;
+                        })()}
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <CardTitle className="text-lg leading-tight">
+                        {SECTION_TYPE_LABEL[selectedSection.type] || selectedSection.type}
+                      </CardTitle>
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        Sección {activeSectionIndex + 1} de {sections.length} — Arrastra en la lista para reordenar
+                      </p>
+                    </div>
+                    <Badge variant="outline" className="text-xs border-emerald-300 text-emerald-700 bg-emerald-50">
+                      Editando
+                    </Badge>
                   </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pt-4">
                   <SectionConfigPanel section={selectedSection} sectionIndex={activeSectionIndex} />
                 </CardContent>
               </Card>
@@ -2877,11 +2900,10 @@ export default function ThemeEditor() {
   const handleGenerate = useCallback(async () => {
     setIsGenerating(true);
     try {
-      const settings = useSettingsStore.getState();
       const res = await fetch('/api/generate-theme', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...config, _exportSettings: { includeScreenshot: settings.includeScreenshot, minifyCSS: settings.minifyCSS, includeREADME: settings.includeREADME } }),
+        body: JSON.stringify(config),
       });
 
       if (!res.ok) {
@@ -2899,9 +2921,6 @@ export default function ThemeEditor() {
       URL.revokeObjectURL(url);
 
       toast.success('¡Theme ZIP generado exitosamente!');
-
-      // Auto-save project to DB after successful export
-      saveProject(config.name || 'Sin Nombre', 'theme', config as Record<string, unknown>).catch(() => {});
     } catch (err) {
       toast.error(`Error al generar el theme: ${err instanceof Error ? err.message : 'Error desconocido'}`);
     } finally {
