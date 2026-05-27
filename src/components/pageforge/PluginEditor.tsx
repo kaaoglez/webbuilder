@@ -1306,6 +1306,26 @@ function GenerateTab() {
         entries.push(`Botón: ${opts.buttonColor}`);
         entries.push(`Fondo: ${opts.backgroundColor}`);
         break;
+      case 'shortcodes':
+        entries.push(`Shortcodes: ${((opts.shortcodes as string[]) || []).length} definidos`);
+        break;
+      case 'related-posts':
+        entries.push(`Título: ${opts.title || 'Posts Relacionados'}`);
+        entries.push(`Cantidad: ${opts.count || 3}`);
+        entries.push(`Miniaturas: ${opts.showThumbnail ? 'Sí' : 'No'}`);
+        break;
+      case 'breadcrumbs':
+        entries.push(`Separador: ${opts.separator || '›'}`);
+        entries.push(`Mostrar Inicio: ${opts.showHome ? 'Sí' : 'No'}`);
+        break;
+      case 'testimonials':
+        entries.push(`Diseño: ${opts.layout || 'grid'}`);
+        entries.push(`Columnas: ${opts.columns || 3}`);
+        break;
+      case 'seo':
+        entries.push(`Meta Descripción: ${opts.metaDescription ? 'Personalizada' : 'Auto'}`);
+        entries.push(`Sitemap: ${opts.sitemap ? 'Sí' : 'No'}`);
+        break;
       default:
         break;
     }
