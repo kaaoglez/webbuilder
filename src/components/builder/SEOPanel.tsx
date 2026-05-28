@@ -83,9 +83,9 @@ function GlobalSEOTab() {
   const seo = currentWebsite.seo;
 
   return (
-    <div className="space-y-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {/* ── Site Identity ─────────────────────────────────── */}
-      <Card>
+      <Card className="md:col-span-2">
         <CardHeader className="pb-4">
           <div className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100">
@@ -98,6 +98,7 @@ function GlobalSEOTab() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Site Name */}
           <div className="space-y-2">
             <Label htmlFor="siteName" className="text-sm font-medium">
@@ -126,6 +127,7 @@ function GlobalSEOTab() {
               placeholder="Título que aparece en las pestañas del navegador"
               maxLength={100}
             />
+          </div>
           </div>
 
           {/* Default Description */}
@@ -236,6 +238,7 @@ function GlobalSEOTab() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* OG Type */}
           <div className="space-y-2">
             <Label className="text-sm font-medium">Tipo OG</Label>
@@ -277,6 +280,7 @@ function GlobalSEOTab() {
               />
             </div>
           </div>
+          </div>
         </CardContent>
       </Card>
 
@@ -316,6 +320,7 @@ function GlobalSEOTab() {
 
           <Separator />
 
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Index Switch */}
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
@@ -353,6 +358,7 @@ function GlobalSEOTab() {
               }
             />
           </div>
+          </div>
         </CardContent>
       </Card>
 
@@ -370,6 +376,7 @@ function GlobalSEOTab() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Google Analytics */}
           <div className="space-y-2">
             <Label htmlFor="googleAnalytics" className="text-sm font-medium">
@@ -400,6 +407,7 @@ function GlobalSEOTab() {
             <p className="text-xs text-muted-foreground">
               ID del píxel de Meta (Facebook) para rastreo de conversiones.
             </p>
+          </div>
           </div>
         </CardContent>
       </Card>
@@ -532,6 +540,7 @@ function PerPageSEOTab() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Title */}
               <div className="space-y-2">
                 <div className="flex items-center">
@@ -580,7 +589,9 @@ function PerPageSEOTab() {
                   </p>
                 )}
               </div>
+              </div>
 
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Keywords */}
               <div className="space-y-2">
                 <Label htmlFor="pageKeywords" className="text-sm font-medium">
@@ -612,6 +623,7 @@ function PerPageSEOTab() {
                 <p className="text-xs text-muted-foreground">
                   Indica a los motores de búsqueda cuál es la URL principal de esta página.
                 </p>
+              </div>
               </div>
 
               <Separator />
@@ -750,7 +762,7 @@ function SEOHint({ ok, label }: { ok: boolean; label: string }) {
 
 export function SEOPanel() {
   return (
-    <div className="mx-auto w-full max-w-3xl">
+    <div className="w-full">
       <Tabs defaultValue="global" className="w-full">
         <TabsList className="mb-6 w-full">
           <TabsTrigger value="global" className="flex-1 gap-2">

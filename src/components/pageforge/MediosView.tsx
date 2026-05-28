@@ -83,7 +83,12 @@ function formatDate(iso: string): string {
 
 export function MediosView() {
   // Store
-  const { mediaItems, hydrated, addMedia, removeMedia, updateMedia } = useMediaLibraryStore();
+  const { mediaItems, hydrated, hydrate, addMedia, removeMedia, updateMedia } = useMediaLibraryStore();
+
+  // Hydrate from DB on mount
+  useEffect(() => {
+    hydrate();
+  }, [hydrate]);
 
   // UI state
   const [viewMode, setViewMode] = useState<ViewMode>('grid');

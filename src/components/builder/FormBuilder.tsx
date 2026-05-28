@@ -896,19 +896,6 @@ export function FormBuilder() {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {/* Submit text */}
-                  <div className="space-y-1.5">
-                    <Label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Texto del botón
-                    </Label>
-                    <Input
-                      value={selectedForm.submitText}
-                      onChange={(e) => updateForm(selectedForm.id, { submitText: e.target.value })}
-                      placeholder="Enviar"
-                      className="h-9"
-                    />
-                  </div>
-
                   {/* Success message */}
                   <div className="space-y-1.5">
                     <Label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -922,18 +909,33 @@ export function FormBuilder() {
                     />
                   </div>
 
-                  {/* Email to */}
-                  <div className="space-y-1.5">
-                    <Label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Email de destino
-                    </Label>
-                    <Input
-                      type="email"
-                      value={selectedForm.emailTo}
-                      onChange={(e) => updateForm(selectedForm.id, { emailTo: e.target.value })}
-                      placeholder="contacto@miweb.com"
-                      className="h-9"
-                    />
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    {/* Submit text */}
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Texto del botón
+                      </Label>
+                      <Input
+                        value={selectedForm.submitText}
+                        onChange={(e) => updateForm(selectedForm.id, { submitText: e.target.value })}
+                        placeholder="Enviar"
+                        className="h-9"
+                      />
+                    </div>
+
+                    {/* Email to */}
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Email de destino
+                      </Label>
+                      <Input
+                        type="email"
+                        value={selectedForm.emailTo}
+                        onChange={(e) => updateForm(selectedForm.id, { emailTo: e.target.value })}
+                        placeholder="contacto@miweb.com"
+                        className="h-9"
+                      />
+                    </div>
                   </div>
 
                   <Separator />

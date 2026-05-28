@@ -3,6 +3,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import sharp from 'sharp';
+import { db } from '@/lib/db';
 
 // ─────────────────────────────────────────────────────────────
 // Configuration
@@ -27,6 +28,30 @@ const EXT_MAP: Record<string, string> = {
 };
 
 // ─────────────────────────────────────────────────────────────
+// Helpers
+// ─────────────────────────────────────────────────────────────
+
+function detectMediaType(mimeType: string): string {
+  if (mimeType.startsWith('image/')) return 'image';
+  if (mimeType.startsWith('video/')) return 'video';
+  if (mimeType.startsWith('audio/')) return 'audio';
+  if (
+    mimeType === 'application/pdf' ||
+    mimeType === 'application/msword' ||
+    mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+    mimeType === 'application/vnd.ms-excel' ||
+    mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+    mimeType === 'application/vnd.ms-powerpoint' ||
+    mimeType === 'application/vnd.openxmlformats-officedocument.presentationml.presentation' ||
+    mimeType === 'text/plain' ||
+    mimeType === 'text/csv'
+  ) {
+    return 'document';
+  }
+  return 'other';
+}
+
+// ─────────────────────────────────────────────────────────────
 // POST /api/upload — Upload one or more images
 // ─────────────────────────────────────────────────────────────
 
@@ -45,7 +70,16 @@ export async function POST(request: NextRequest) {
     // Ensure upload directory exists
     await fs.mkdir(UPLOAD_DIR, { recursive: true });
 
-    const results: Array<{ url: string; name: string; size: number }> = [];
+    const results: Array<{
+      url: string;
+      name: string;
+      size: number;
+      mimeType: string;
+      mediaType: string;
+      width: number;
+      height: number;
+      id: string;
+    }> = [];
     const errors: Array<{ name: string; error: string }> = [];
 
     for (const file of files) {
@@ -78,6 +112,12 @@ export async function POST(request: NextRequest) {
         const uniqueName = `${uuidv4()}${ext}`;
         const filePath = path.join(UPLOAD_DIR, uniqueName);
 
+        let finalUrl = `/uploads/${uniqueName}`;
+        let finalSize = buffer.length;
+        let finalMimeType = file.type;
+        let width = 0;
+        let height = 0;
+
         // ── Optimize raster images with sharp ───────────────
         if (file.type !== 'image/svg+xml') {
           let pipeline = sharp(buffer);
@@ -85,9 +125,19 @@ export async function POST(request: NextRequest) {
           // Convert to WebP for better compression (except GIFs which may be animated)
           if (file.type !== 'image/gif') {
             pipeline = pipeline.webp({ quality: 80 });
+            finalMimeType = 'image/webp';
           }
 
           const optimizedBuffer = await pipeline.toBuffer();
+
+          // Extract metadata (width/height) from the processed image
+          try {
+            const metadata = await sharp(optimizedBuffer).metadata();
+            width = metadata.width || 0;
+            height = metadata.height || 0;
+          } catch {
+            // Ignore metadata extraction errors — dimensions will remain 0
+          }
 
           // Use webp extension for optimized images (except GIF)
           const finalName =
@@ -98,20 +148,38 @@ export async function POST(request: NextRequest) {
 
           await fs.writeFile(finalPath, optimizedBuffer);
 
-          results.push({
-            url: `/uploads/${finalName}`,
-            name: file.name,
-            size: optimizedBuffer.length,
-          });
+          finalUrl = `/uploads/${finalName}`;
+          finalSize = optimizedBuffer.length;
         } else {
           // SVG — save as-is
           await fs.writeFile(filePath, buffer);
-          results.push({
-            url: `/uploads/${uniqueName}`,
-            name: file.name,
-            size: buffer.length,
-          });
         }
+
+        const mediaType = detectMediaType(finalMimeType);
+
+        // ── Create MediaItem in database ───────────────────
+        const mediaItem = await db.mediaItem.create({
+          data: {
+            name: file.name,
+            url: finalUrl,
+            size: finalSize,
+            mimeType: finalMimeType,
+            mediaType,
+            width,
+            height,
+          },
+        });
+
+        results.push({
+          url: finalUrl,
+          name: file.name,
+          size: finalSize,
+          mimeType: finalMimeType,
+          mediaType,
+          width,
+          height,
+          id: mediaItem.id,
+        });
       } catch (err) {
         errors.push({
           name: file.name,
@@ -137,6 +205,11 @@ export async function POST(request: NextRequest) {
         url: results[0].url,
         name: results[0].name,
         size: results[0].size,
+        id: results[0].id,
+        mimeType: results[0].mimeType,
+        mediaType: results[0].mediaType,
+        width: results[0].width,
+        height: results[0].height,
         ...(errors.length > 0 ? { warnings: errors } : {}),
       });
     }

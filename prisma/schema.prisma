@@ -37,6 +37,7 @@ model MediaItem {
   height     Int      @default(0)
   size       Int      @default(0)  // File size in bytes
   mimeType   String   @default("image/png")
+  mediaType  String   @default("image")  // "image" | "video" | "audio" | "document" | "other"
   uploadedAt DateTime @default(now())
   data       String?  // Base64 data URL for images stored in DB (for small images)
 }

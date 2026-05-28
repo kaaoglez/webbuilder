@@ -358,7 +358,7 @@ export function SEOSettings() {
       <Separator />
 
       {/* ── Title & Description ── */}
-      <div className="space-y-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <Label htmlFor="seo-title" className="text-sm font-medium">
@@ -470,6 +470,7 @@ export function SEOSettings() {
           <Globe className="h-4 w-4 text-emerald-600" />
           <Label className="text-sm font-semibold">Open Graph</Label>
         </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
         <div className="space-y-2">
           <Label htmlFor="og-image" className="text-sm font-medium">Imagen OG</Label>
@@ -540,60 +541,60 @@ export function SEOSettings() {
             </SelectContent>
           </Select>
         </div>
+        </div>
       </div>
 
       <Separator />
 
-      {/* ── Twitter Card ── */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-2">
-          <Sparkles className="h-4 w-4 text-emerald-600" />
-          <Label className="text-sm font-semibold">Twitter Card</Label>
+      {/* ── Twitter Card & Canonical URL ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-emerald-600" />
+            <Label className="text-sm font-semibold">Twitter Card</Label>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="twitter-card" className="text-sm font-medium">Tipo de Tarjeta</Label>
+            <Select
+              value={seo.twitterCard}
+              onValueChange={(v) => update({ twitterCard: v })}
+            >
+              <SelectTrigger id="twitter-card" className="w-full">
+                <SelectValue placeholder="Seleccionar tipo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="summary">Summary — Tarjeta compacta</SelectItem>
+                <SelectItem value="summary_large_image">Summary Large Image — Tarjeta con imagen grande</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              Define cómo se verá tu página cuando se comparta en Twitter/X.
+            </p>
+          </div>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="twitter-card" className="text-sm font-medium">Tipo de Tarjeta</Label>
-          <Select
-            value={seo.twitterCard}
-            onValueChange={(v) => update({ twitterCard: v })}
-          >
-            <SelectTrigger id="twitter-card" className="w-full">
-              <SelectValue placeholder="Seleccionar tipo" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="summary">Summary — Tarjeta compacta</SelectItem>
-              <SelectItem value="summary_large_image">Summary Large Image — Tarjeta con imagen grande</SelectItem>
-            </SelectContent>
-          </Select>
+          <Label htmlFor="canonical-url" className="text-sm font-medium flex items-center gap-1.5">
+            <Link className="h-3.5 w-3.5" />
+            URL Canónica
+          </Label>
+          <Input
+            id="canonical-url"
+            value={seo.canonicalUrl}
+            onChange={(e) => update({ canonicalUrl: e.target.value })}
+            placeholder="https://tu-sitio.com/pagina"
+            className={cn(
+              seo.canonicalUrl &&
+                seo.canonicalUrl.length > 0 &&
+                !/^https?:\/\/.+\..+/.test(seo.canonicalUrl) &&
+                'border-red-300 focus-visible:ring-red-400',
+            )}
+          />
           <p className="text-xs text-muted-foreground">
-            Define cómo se verá tu página cuando se comparta en Twitter/X.
+            Indica a los buscadores cuál es la URL preferida de esta página para evitar contenido duplicado.
           </p>
         </div>
-      </div>
-
-      <Separator />
-
-      {/* ── Canonical URL ── */}
-      <div className="space-y-2">
-        <Label htmlFor="canonical-url" className="text-sm font-medium flex items-center gap-1.5">
-          <Link className="h-3.5 w-3.5" />
-          URL Canónica
-        </Label>
-        <Input
-          id="canonical-url"
-          value={seo.canonicalUrl}
-          onChange={(e) => update({ canonicalUrl: e.target.value })}
-          placeholder="https://tu-sitio.com/pagina"
-          className={cn(
-            seo.canonicalUrl &&
-              seo.canonicalUrl.length > 0 &&
-              !/^https?:\/\/.+\..+/.test(seo.canonicalUrl) &&
-              'border-red-300 focus-visible:ring-red-400',
-          )}
-        />
-        <p className="text-xs text-muted-foreground">
-          Indica a los buscadores cuál es la URL preferida de esta página para evitar contenido duplicado.
-        </p>
       </div>
 
       <Separator />
@@ -605,7 +606,7 @@ export function SEOSettings() {
           <Label className="text-sm font-semibold">Robots</Label>
         </div>
 
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="flex items-center justify-between rounded-lg border border-gray-400 bg-white p-3">
             <div className="space-y-0.5">
               <Label htmlFor="robots-index" className="text-sm font-medium">Indexar</Label>
@@ -633,15 +634,15 @@ export function SEOSettings() {
               onCheckedChange={(checked) => update({ robotsFollow: checked })}
             />
           </div>
+        </div>
 
-          <div className="rounded-lg bg-muted/50 p-3">
-            <p className="text-xs text-muted-foreground">
-              Meta robots:{' '}
-              <code className="rounded bg-white px-1.5 py-0.5 text-xs font-mono border">
-                {seo.robotsIndex ? 'index' : 'noindex'}, {seo.robotsFollow ? 'follow' : 'nofollow'}
-              </code>
-            </p>
-          </div>
+        <div className="rounded-lg bg-muted/50 p-3">
+          <p className="text-xs text-muted-foreground">
+            Meta robots:{' '}
+            <code className="rounded bg-white px-1.5 py-0.5 text-xs font-mono border">
+              {seo.robotsIndex ? 'index' : 'noindex'}, {seo.robotsFollow ? 'follow' : 'nofollow'}
+            </code>
+          </p>
         </div>
       </div>
 

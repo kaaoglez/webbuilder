@@ -650,37 +650,39 @@ function AddItemForm({ onAdd, onClose }: AddItemFormProps) {
         </Button>
       </div>
 
-      {/* Label */}
-      <div className="space-y-1.5">
-        <Label className="text-xs text-gray-600">Nombre</Label>
-        <Input
-          value={label}
-          onChange={(e) => setLabel(e.target.value)}
-          placeholder="Ej: Inicio, Servicios, Blog..."
-          className="h-8 text-sm"
-          autoFocus
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') handleSubmit();
-            if (e.key === 'Escape') onClose();
-          }}
-        />
-      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {/* Label */}
+        <div className="space-y-1.5">
+          <Label className="text-xs text-gray-600">Nombre</Label>
+          <Input
+            value={label}
+            onChange={(e) => setLabel(e.target.value)}
+            placeholder="Ej: Inicio, Servicios, Blog..."
+            className="h-8 text-sm"
+            autoFocus
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') handleSubmit();
+              if (e.key === 'Escape') onClose();
+            }}
+          />
+        </div>
 
-      {/* Type selector */}
-      <div className="space-y-1.5">
-        <Label className="text-xs text-gray-600">Tipo</Label>
-        <Select value={type} onValueChange={(v) => setType(v as NavItem['type'])}>
-          <SelectTrigger className="h-8 text-sm">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {TYPE_OPTIONS.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>
-                {opt.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {/* Type selector */}
+        <div className="space-y-1.5">
+          <Label className="text-xs text-gray-600">Tipo</Label>
+          <Select value={type} onValueChange={(v) => setType(v as NavItem['type'])}>
+            <SelectTrigger className="h-8 text-sm">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {TYPE_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {/* Conditional fields based on type */}
@@ -900,7 +902,7 @@ export function NavigationBuilder() {
   );
 
   return (
-    <div className="mx-auto w-full max-w-3xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
+    <div className="w-full space-y-6 px-4 py-6 sm:px-6 lg:px-8">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold tracking-tight" style={{ color: '#1a2e1a' }}>
