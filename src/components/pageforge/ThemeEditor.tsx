@@ -2485,7 +2485,7 @@ function NavigationTab() {
                       return (
                         <a
                           key={i}
-                          href="#"
+                          href={item.url || '#'}
                           onClick={(e) => e.preventDefault()}
                           className="px-3 py-2 text-sm rounded-md transition-colors duration-200 no-underline"
                           style={{

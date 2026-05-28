@@ -1294,7 +1294,7 @@ function RenderSection({
   const renderer = renderers[section.type];
 
   return (
-    <div className={section.enabled ? '' : 'opacity-40'}>
+    <div className={section.enabled ? '' : 'opacity-40'} data-section-id={section.type}>
       <SectionLabel type={section.type} enabled={section.enabled} />
       {renderer ? renderer() : (
         <div className="text-center py-8 text-xs" style={{ color: `${textColor}40` }}>
@@ -1452,11 +1452,22 @@ export default function ThemeLivePreview() {
             {/* Nav items */}
             <nav className="hidden sm:flex items-center gap-1">
               {navItems.slice(0, 6).map((item, i) => (
-                <span
+                <a
                   key={i}
-                  className="text-xs font-medium px-3 py-1.5 rounded cursor-default transition-colors duration-150"
+                  href={item.url || '#'}
+                  className="text-xs font-medium px-3 py-1.5 rounded cursor-pointer transition-colors duration-150 no-underline"
                   style={{
                     color: i === 0 ? primaryColor : textColor,
+                  }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    const targetId = (item.url || '').replace('#', '');
+                    if (!targetId) return;
+                    const container = scrollContainerRef.current;
+                    const target = container?.querySelector(`[data-section-id="${targetId}"]`);
+                    if (container && target) {
+                      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
                   }}
                   onMouseEnter={(e) => {
                     if (i !== 0) {
@@ -1472,7 +1483,7 @@ export default function ThemeLivePreview() {
                   }}
                 >
                   {item.label || `Nav ${i + 1}`}
-                </span>
+                </a>
               ))}
             </nav>
 
