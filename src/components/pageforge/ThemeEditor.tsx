@@ -2345,7 +2345,7 @@ function NavigationTab() {
   const [hoveredNavIndex, setHoveredNavIndex] = useState<number | null>(null);
   const navCardOrder = (config.cardOrders as Record<string, string[]>)?.navigation || ['banner', 'preview', 'menu', 'behavior', 'quick-add'];
 
-  // Build link options from enabled sections + WordPress pages
+  // Build link options from enabled sections + WordPress pages + custom pages
   const sectionLinkOptions = useMemo(() => {
     const options: Array<{ value: string; label: string; group: string }> = [];
 
@@ -2359,6 +2359,16 @@ function NavigationTab() {
       });
     }
 
+    // Custom pages (from PagesManager)
+    const customPages = (config as any).pages || [];
+    if (customPages.length > 0) {
+      customPages.forEach((p: any) => {
+        if (p.slug) {
+          options.push({ value: `/${p.slug}`, label: p.name || p.slug, group: 'Páginas Personalizadas' });
+        }
+      });
+    }
+
     // WordPress standard pages
     options.push({ value: '/', label: 'Inicio', group: 'Páginas de WordPress' });
     options.push({ value: '/about', label: 'Sobre Nosotros', group: 'Páginas de WordPress' });
@@ -2369,7 +2379,7 @@ function NavigationTab() {
     options.push({ value: '/pricing', label: 'Precios', group: 'Páginas de WordPress' });
 
     return options;
-  }, [sections]);
+  }, [sections, config]);
 
   const groupedOptions = useMemo(() => {
     const groups: Record<string, typeof sectionLinkOptions> = {};

@@ -49,7 +49,7 @@ export interface ThemeConfig {
 }
 
 export interface ThemeSection {
-  type: 'hero' | 'about' | 'services' | 'testimonials' | 'pricing' | 'cta' | 'contact' | 'gallery' | 'faq' | 'stats' | 'team' | 'blog_posts' | 'features';
+  type: 'hero' | 'about' | 'services' | 'testimonials' | 'pricing' | 'cta' | 'contact' | 'gallery' | 'faq' | 'stats' | 'team' | 'blog_posts' | 'features' | 'custom';
   enabled: boolean;
   title: string;
   subtitle?: string;
@@ -718,6 +718,7 @@ function generateFrontPagePHP(config: ThemeConfig): string {
     stats: generateSectionStats,
     team: generateSectionTeam,
     blog_posts: generateSectionBlogPosts,
+    custom: generateSectionCustom,
   };
 
   const sectionsHTML = enabledSections.map(s => {
@@ -1162,6 +1163,106 @@ function generateSectionBlogPosts(s: ThemeSection): string {
             </div>
             <?php endif; ?>
         </div>
+    </section>`;
+}
+
+function generateSectionCustom(s: ThemeSection): string {
+  const d = s.data;
+  const rows: any[] = d.rows || [];
+
+  // If the user provided raw HTML code, use it directly
+  if (d.customHtml && d.customHtml.trim()) {
+    return `    <!-- Custom Section: ${esc(s.title || 'Custom')} -->
+    <section class="pf-section pf-custom" id="section-custom">
+        <div class="container">
+${d.customHtml}
+        </div>
+    </section>`;
+  }
+
+  // Otherwise, render the visual row/column/block structure as PHP
+  if (rows.length === 0) {
+    return `    <!-- Custom Section: ${esc(s.title || 'Custom')} -->
+    <section class="pf-section pf-custom" id="section-custom">
+        <div class="container">
+            <div class="pf-section-header">
+                <h2 class="pf-section-title"><?php echo esc_html( '${esc(s.title || '')}' ); ?></h2>
+            </div>
+        </div>
+    </section>`;
+  }
+
+  let rowsPHP = '';
+  for (let ri = 0; ri < rows.length; ri++) {
+    const row = rows[ri];
+    const colCount = (row.columns || []).length || 1;
+    const gap = row.gap || '24px';
+    const vAlign = row.verticalAlign || 'stretch';
+    const colClass = `pf-custom-row pf-custom-row-${colCount}`;
+    const colsHTML = (row.columns || []).map((col: any, ci: number) => {
+      const blocks = col.blocks || [];
+      const colWidth = col.width || '';
+      const colStyle = colWidth ? ` style="flex: 0 0 ${colWidth}; max-width: ${colWidth};"` : '';
+      let colContent = '';
+      for (const block of blocks) {
+        if (!block.enabled && block.enabled !== undefined) continue;
+        switch (block.type) {
+          case 'text':
+            colContent += `                <div class="pf-custom-block pf-custom-text-block">
+                    ${block.content || '<p></p>'}
+                </div>\n`;
+            break;
+          case 'heading':
+            const hTag = block.headingTag || 'h3';
+            colContent += `                <div class="pf-custom-block pf-custom-heading-block">
+                    <${hTag} class="${block.headingClass || ''}">${block.content || ''}</${hTag}>
+                </div>\n`;
+            break;
+          case 'image':
+            colContent += `                <div class="pf-custom-block pf-custom-image-block">
+                    <img src="${block.src || ''}" alt="${block.alt || ''}" class="${block.imageClass || 'pf-custom-img-responsive'}" />
+                </div>\n`;
+            break;
+          case 'video':
+            colContent += `                <div class="pf-custom-block pf-custom-video-block">
+                    <div class="pf-custom-video-wrapper">
+                        <iframe src="${block.src || ''}" frameborder="0" allowfullscreen loading="lazy"></iframe>
+                    </div>
+                </div>\n`;
+            break;
+          case 'spacer':
+            colContent += `                <div class="pf-custom-block pf-custom-spacer" style="height: ${block.height || '40px'};"></div>\n`;
+            break;
+          case 'button':
+            colContent += `                <div class="pf-custom-block pf-custom-button-block">
+                    <a href="${block.link || '#'}" class="pf-btn ${block.buttonStyle || 'pf-btn-primary'}">${block.content || 'Click'}</a>
+                </div>\n`;
+            break;
+          case 'html':
+            colContent += `                <div class="pf-custom-block pf-custom-html-block">
+                    ${block.content || ''}
+                </div>\n`;
+            break;
+          case 'divider':
+            colContent += `                <div class="pf-custom-block pf-custom-divider"><hr /></div>\n`;
+            break;
+          default:
+            colContent += `                <div class="pf-custom-block">${block.content || ''}</div>\n`;
+        }
+      }
+      return `            <div class="pf-custom-col"${colStyle}>
+${colContent}            </div>`;
+    }).join('\n');
+
+    rowsPHP += `        <div class="${colClass}" style="align-items: ${vAlign}; gap: ${gap};">
+${colsHTML}
+        </div>\n`;
+  }
+
+  return `    <!-- Custom Section: ${esc(s.title || 'Custom')} -->
+    <section class="pf-section pf-custom" id="section-custom">
+        <div class="container">
+${rowsPHP}        </div>
     </section>`;
 }
 
@@ -2190,6 +2291,63 @@ ul, ol { list-style: none; }
 }
 .pf-animate.visible { opacity: 1; transform: translateY(0); }
 
+/* ─── Custom Section ──────────────────────────────────── */
+.pf-custom { padding: 60px 0; }
+.pf-custom-row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+}
+.pf-custom-row:last-child { margin-bottom: 0; }
+.pf-custom-row-1 .pf-custom-col { flex: 0 0 100%; max-width: 100%; }
+.pf-custom-row-2 .pf-custom-col { flex: 1 1 0; min-width: 0; }
+.pf-custom-row-3 .pf-custom-col { flex: 1 1 0; min-width: 0; }
+.pf-custom-row-4 .pf-custom-col { flex: 1 1 0; min-width: 0; }
+.pf-custom-row-5 .pf-custom-col { flex: 1 1 0; min-width: 0; }
+.pf-custom-row-6 .pf-custom-col { flex: 1 1 0; min-width: 0; }
+.pf-custom-col {
+    padding: 12px;
+    box-sizing: border-box;
+}
+.pf-custom-block { margin-bottom: 16px; }
+.pf-custom-block:last-child { margin-bottom: 0; }
+.pf-custom-text-block p { margin-bottom: 12px; line-height: 1.7; }
+.pf-custom-text-block p:last-child { margin-bottom: 0; }
+.pf-custom-text-block ul, .pf-custom-text-block ol { padding-left: 24px; margin-bottom: 12px; }
+.pf-custom-text-block li { margin-bottom: 4px; }
+.pf-custom-heading-block h1, .pf-custom-heading-block h2,
+.pf-custom-heading-block h3, .pf-custom-heading-block h4,
+.pf-custom-heading-block h5, .pf-custom-heading-block h6 { margin-bottom: 8px; }
+.pf-custom-img-responsive { max-width: 100%; height: auto; border-radius: var(--pf-radius, 8px); }
+.pf-custom-image-block img { max-width: 100%; height: auto; display: block; }
+.pf-custom-video-wrapper {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+    border-radius: var(--pf-radius, 8px);
+}
+.pf-custom-video-wrapper iframe {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    border: 0;
+}
+.pf-custom-spacer { flex-shrink: 0; }
+.pf-custom-divider hr {
+    border: none;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    margin: 8px 0;
+}
+.pf-custom-button-block .pf-btn {
+    display: inline-block;
+    padding: 12px 28px;
+    border-radius: var(--pf-radius, 8px);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    transition: all 0.2s ease;
+}
+.pf-custom-html-block { overflow: hidden; }
+
 /* ─── Responsive: 1024px ───────────────────────────────── */
 @media (max-width: 1024px) {
     .pf-grid-4 { grid-template-columns: repeat(2, 1fr); }
@@ -2220,6 +2378,11 @@ ul, ol { list-style: none; }
     .single-title { font-size: 2rem; }
     .page-title { font-size: 2rem; }
     .post-navigation { flex-direction: column; }
+    .pf-custom-row-2 .pf-custom-col,
+    .pf-custom-row-3 .pf-custom-col,
+    .pf-custom-row-4 .pf-custom-col,
+    .pf-custom-row-5 .pf-custom-col,
+    .pf-custom-row-6 .pf-custom-col { flex: 0 0 100%; max-width: 100%; }
 }
 
 /* ─── Responsive: 480px ────────────────────────────────── */
@@ -2549,6 +2712,7 @@ function generateCustomTemplatePHP(config: ThemeConfig, tpl: PageTemplateConfig)
     stats: generateSectionStats,
     team: generateSectionTeam,
     blog_posts: generateSectionBlogPosts,
+    custom: generateSectionCustom,
   };
 
   const enabledSections = (tpl.sections || []).filter(s => s.enabled);

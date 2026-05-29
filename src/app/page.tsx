@@ -13,6 +13,7 @@ const DashboardCards = dynamic(() => import('@/components/pageforge/DashboardCar
 const StatsBar = dynamic(() => import('@/components/pageforge/StatsBar').then(m => ({ default: m.StatsBar })));
 const ThemeEditor = dynamic(() => import('@/components/pageforge/ThemeEditor'));
 const PluginEditor = dynamic(() => import('@/components/pageforge/PluginEditor'));
+const PagesManager = dynamic(() => import('@/components/pageforge/PagesManager'));
 const MyProjects = dynamic(() => import('@/components/pageforge/MyProjects'));
 const SettingsPanel = dynamic(() => import('@/components/pageforge/SettingsPanel'));
 import {
@@ -24,6 +25,7 @@ import {
   Settings,
   LayoutDashboard,
   Construction,
+  FileText,
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -53,6 +55,13 @@ function PlaceholderPanel({
       title: 'Crear WordPress Theme',
       description:
         'Motor visual de generacion de themes WordPress. Disena secciones, elige colores y fuentes, configura la jerarquia de templates de WordPress y exporta un ZIP listo para instalar.',
+      status: 'pronto',
+    },
+    'create-pages': {
+      icon: FileText,
+      title: 'Páginas',
+      description:
+        'Crea y gestiona páginas individuales para tu theme WordPress. Cada página tiene sus propias secciones.',
       status: 'pronto',
     },
     'create-plugin': {
@@ -152,6 +161,7 @@ export default function PageForgeApp() {
 
   const isDashboard = activeItem === 'dashboard';
   const isThemeEditor = activeItem === 'create-theme';
+  const isPages = activeItem === 'create-pages';
   const isPluginEditor = activeItem === 'create-plugin';
   const isTemplates = activeItem === 'templates';
   const isMyProjects = activeItem === 'my-projects';
@@ -177,8 +187,8 @@ export default function PageForgeApp() {
           <Topbar activeItem={activeItem} onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
 
           {/* Scrollable content */}
-          <main className={(isThemeEditor || isPluginEditor || isMedios) ? 'flex-1 overflow-hidden' : 'flex-1 overflow-y-auto'}>
-            <div className={(isThemeEditor || isPluginEditor || isMedios) ? 'h-full' : 'p-4 md:p-6 lg:p-8 max-w-7xl mx-auto'}>
+          <main className={(isThemeEditor || isPluginEditor || isMedios || isPages) ? 'flex-1 overflow-hidden' : 'flex-1 overflow-y-auto'}>
+            <div className={(isThemeEditor || isPluginEditor || isMedios || isPages) ? 'h-full' : 'p-4 md:p-6 lg:p-8 max-w-7xl mx-auto'}>
               {isDashboard ? (
                 <motion.div
                   initial={{ opacity: 0 }}
@@ -247,6 +257,8 @@ export default function PageForgeApp() {
                 </motion.div>
               ) : isThemeEditor ? (
                 <ThemeEditor />
+              ) : isPages ? (
+                <PagesManager />
               ) : isPluginEditor ? (
                 <PluginEditor />
               ) : isTemplates ? (

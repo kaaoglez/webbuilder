@@ -205,8 +205,23 @@ function generateTemplateId(): string {
   return `tpl_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
 }
 
+// ─────────────────────────────────────────────────────────────
+// Custom Pages
+// ─────────────────────────────────────────────────────────────
+
+export interface ThemePage {
+  id: string;
+  name: string;
+  slug: string; // e.g. 'about', 'services' — used for page-{slug}.php
+  sections: ThemeSection[];
+}
+
+function generatePageId(): string {
+  return `pg_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+}
+
 /** Partial shape matching ThemeConfig from wp-theme-generator.ts */
-interface ThemeEditorConfig {
+export interface ThemeEditorConfig {
   name: string;
   slug: string;
   description: string;
@@ -241,6 +256,9 @@ interface ThemeEditorConfig {
   pageTemplates: ThemeTemplate[];
   // Template editing state
   activeTemplateId: string | null;
+  // Custom Pages
+  pages: ThemePage[];
+  activePageId: string | null;
 }
 
 interface ThemeEditorState {
@@ -248,6 +266,8 @@ interface ThemeEditorState {
   activeTab: EditorTab;
   activeSectionIndex: number | null;
   isGenerating: boolean;
+  activePageId: string | null;
+  activePageSectionIndex: number | null;
 }
 
 interface ThemeEditorActions {
@@ -292,6 +312,18 @@ interface ThemeEditorActions {
   reorderSectionDataArray: (sectionIndex: number, dataKey: string, fromIndex: number, toIndex: number) => void;
   // Card reorder per tab
   reorderCards: (tab: string, fromIndex: number, toIndex: number) => void;
+  // ─── Custom Pages CRUD ────────────────────────────
+  addPage: (name: string, slug: string) => void;
+  removePage: (id: string) => void;
+  updatePage: (id: string, partial: Partial<ThemePage>) => void;
+  setActivePageId: (id: string | null) => void;
+  setActivePageSectionIndex: (index: number | null) => void;
+  addPageSection: (pageId: string, type: SectionType) => void;
+  removePageSection: (pageId: string, index: number) => void;
+  movePageSection: (pageId: string, fromIndex: number, toIndex: number) => void;
+  updatePageSection: (pageId: string, index: number, partial: Partial<ThemeSection>) => void;
+  togglePageSection: (pageId: string, index: number) => void;
+  updatePageSectionData: (pageId: string, index: number, dataPartial: Record<string, unknown>) => void;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -317,7 +349,7 @@ export const FONT_OPTIONS = [
 // Default Section Data by Type
 // ─────────────────────────────────────────────────────────────
 
-const SECTION_DEFAULT_DATA: Record<SectionType, Record<string, unknown>> = {
+export const SECTION_DEFAULT_DATA: Record<SectionType, Record<string, unknown>> = {
   hero: {
     title: 'Hero Section',
     subtitle: '',
@@ -393,13 +425,19 @@ const SECTION_DEFAULT_DATA: Record<SectionType, Record<string, unknown>> = {
     title: 'Latest Posts',
     subtitle: '',
   },
+  custom: {
+    mode: 'visual',
+    rows: [],
+    customHtml: '',
+    customCss: '',
+  },
 };
 
 // ─────────────────────────────────────────────────────────────
 // Section title map (human-readable names)
 // ─────────────────────────────────────────────────────────────
 
-const SECTION_TITLES: Record<SectionType, string> = {
+export const SECTION_TITLES: Record<SectionType, string> = {
   hero: 'Hero Section',
   about: 'About Us',
   services: 'Our Services',
@@ -413,13 +451,14 @@ const SECTION_TITLES: Record<SectionType, string> = {
   stats: 'Stats',
   team: 'Our Team',
   blog_posts: 'Latest Posts',
+  custom: 'Sección Personalizada',
 };
 
 // ─────────────────────────────────────────────────────────────
 // Template-specific default sections
 // ─────────────────────────────────────────────────────────────
 
-const TEMPLATE_SECTIONS: Record<string, SectionType[]> = {
+export const TEMPLATE_SECTIONS: Record<string, SectionType[]> = {
   landing: ['hero', 'features', 'about', 'testimonials', 'cta'],
   portfolio: ['hero', 'about', 'gallery', 'testimonials', 'cta'],
   restaurant: ['hero', 'features', 'about', 'gallery', 'testimonials', 'contact'],
@@ -473,10 +512,10 @@ const INITIAL_CONFIG: Partial<ThemeEditorConfig> = {
   borderRadius: 8,
   sections: getDefaultSections('landing'),
   navItems: [
-    { label: 'Home', url: '/' },
-    { label: 'About', url: '/about' },
-    { label: 'Services', url: '/services' },
-    { label: 'Contact', url: '/contact' },
+    { label: 'Inicio', url: '/' },
+    { label: 'Características', url: '#section-features' },
+    { label: 'Sobre Nosotros', url: '#section-about' },
+    { label: 'Testimonios', url: '#section-testimonials' },
   ],
   footerColumns: [
     { title: 'About', links: [{ label: 'Our Story', url: '/about' }] },
@@ -501,6 +540,8 @@ const INITIAL_CONFIG: Partial<ThemeEditorConfig> = {
   },
   pageTemplates: JSON.parse(JSON.stringify(DEFAULT_PREDESIGNED_TEMPLATES)),
   activeTemplateId: null,
+  pages: [] as ThemePage[],
+  activePageId: null,
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -515,11 +556,15 @@ export const useThemeEditorStore = create<ThemeEditorState & ThemeEditorActions>
   activeTab: 'info',
   activeSectionIndex: null,
   isGenerating: false,
+  activePageId: null,
+  activePageSectionIndex: null,
 
   // Simple setters
   setActiveTab: (tab) => set({ activeTab: tab }),
   setActiveSectionIndex: (index) => set({ activeSectionIndex: index }),
   setIsGenerating: (val) => set({ isGenerating: val }),
+  setActivePageId: (id) => set({ activePageId: id }),
+  setActivePageSectionIndex: (index) => set({ activePageSectionIndex: index }),
 
   // Merge partial config
   updateConfig: (partial) =>
@@ -914,6 +959,117 @@ export const useThemeEditorStore = create<ThemeEditorState & ThemeEditorActions>
       order.splice(toIndex, 0, moved);
       cardOrders[tab] = order;
       return { config: { ...state.config, cardOrders } };
+    }),
+
+  // ─── Custom Pages CRUD ──────────────────────────────
+  addPage: (name, slug) =>
+    set((state) => {
+      const newPage: ThemePage = {
+        id: generatePageId(),
+        name,
+        slug: slug.replace(/^\//, '').replace(/\/$/, '').toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-|-$/g, '') || name.toLowerCase().replace(/\s+/g, '-'),
+        sections: [],
+      };
+      return {
+        config: {
+          ...state.config,
+          pages: [...(state.config.pages || []), newPage],
+        },
+        activePageId: newPage.id,
+        activePageSectionIndex: null,
+      };
+    }),
+
+  removePage: (id) =>
+    set((state) => {
+      const pages = (state.config.pages || []).filter((p) => p.id !== id);
+      return {
+        config: { ...state.config, pages },
+        activePageId: state.activePageId === id ? null : state.activePageId,
+        activePageSectionIndex: null,
+      };
+    }),
+
+  updatePage: (id, partial) =>
+    set((state) => {
+      const pages = (state.config.pages || []).map((p) =>
+        p.id === id ? { ...p, ...partial } : p,
+      );
+      return { config: { ...state.config, pages } };
+    }),
+
+  addPageSection: (pageId, type) =>
+    set((state) => {
+      const newSection = createDefaultSection(type);
+      const pages = (state.config.pages || []).map((p) =>
+        p.id === pageId
+          ? { ...p, sections: [...(p.sections || []), newSection] }
+          : p,
+      );
+      return { config: { ...state.config, pages } };
+    }),
+
+  removePageSection: (pageId, index) =>
+    set((state) => {
+      const pages = (state.config.pages || []).map((p) => {
+        if (p.id !== pageId) return p;
+        const sections = [...(p.sections || [])];
+        sections.splice(index, 1);
+        return { ...p, sections };
+      });
+      return { config: { ...state.config, pages }, activePageSectionIndex: null };
+    }),
+
+  movePageSection: (pageId, fromIndex, toIndex) =>
+    set((state) => {
+      const pages = (state.config.pages || []).map((p) => {
+        if (p.id !== pageId) return p;
+        const sections = [...(p.sections || [])];
+        const [moved] = sections.splice(fromIndex, 1);
+        sections.splice(toIndex, 0, moved);
+        return { ...p, sections };
+      });
+      return { config: { ...state.config, pages }, activePageSectionIndex: toIndex };
+    }),
+
+  updatePageSection: (pageId, index, partial) =>
+    set((state) => {
+      const pages = (state.config.pages || []).map((p) => {
+        if (p.id !== pageId) return p;
+        const sections = [...(p.sections || [])];
+        if (sections[index]) sections[index] = { ...sections[index], ...partial };
+        return { ...p, sections };
+      });
+      return { config: { ...state.config, pages } };
+    }),
+
+  togglePageSection: (pageId, index) =>
+    set((state) => {
+      const pages = (state.config.pages || []).map((p) => {
+        if (p.id !== pageId) return p;
+        const sections = [...(p.sections || [])];
+        if (sections[index]) {
+          sections[index] = { ...sections[index], enabled: !sections[index].enabled };
+        }
+        return { ...p, sections };
+      });
+      return { config: { ...state.config, pages } };
+    }),
+
+  updatePageSectionData: (pageId, index, dataPartial) =>
+    set((state) => {
+      const pages = (state.config.pages || []).map((p) => {
+        if (p.id !== pageId) return p;
+        const sections = [...(p.sections || [])];
+        if (sections[index]) {
+          sections[index] = {
+            ...sections[index],
+            data: { ...sections[index].data, ...dataPartial },
+          };
+        }
+        return { ...p, sections };
+      });
+      return { config: { ...state.config, pages } };
     }),
   }),
   {

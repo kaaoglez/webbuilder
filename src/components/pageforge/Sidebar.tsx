@@ -12,13 +12,15 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   X,
+  FileText,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 
-export type NavItem = 'dashboard' | 'create-theme' | 'create-plugin' | 'my-projects' | 'templates' | 'medios' | 'settings';
+export type NavItem = 'dashboard' | 'create-theme' | 'create-pages' | 'create-plugin' | 'my-projects' | 'templates' | 'medios' | 'settings';
 
 interface SidebarProps {
   activeItem: NavItem;
@@ -29,9 +31,19 @@ interface SidebarProps {
   onToggleCollapse: () => void;
 }
 
-const navItems: { id: NavItem; label: string; icon: React.ElementType; description: string; group: string }[] = [
+interface NavItemDef {
+  id: NavItem;
+  label: string;
+  icon: React.ElementType;
+  description: string;
+  group: string;
+  parent?: NavItem;
+}
+
+const navItems: NavItemDef[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, description: 'Vista general', group: 'Principal' },
   { id: 'create-theme', label: 'Crear Theme', icon: Palette, description: 'Generador de themes WP', group: 'Crear' },
+  { id: 'create-pages', label: 'Páginas', icon: FileText, description: 'Gestión de páginas', group: 'Crear', parent: 'create-theme' },
   { id: 'create-plugin', label: 'Crear Plugin', icon: Puzzle, description: 'Generador de plugins WP', group: 'Crear' },
   { id: 'my-projects', label: 'Mis Proyectos', icon: FolderOpen, description: 'Proyectos guardados', group: 'Gestión' },
   { id: 'templates', label: 'Template Library', icon: BookOpen, description: 'Templates preconstruidos', group: 'Gestión' },
@@ -44,6 +56,7 @@ export const BREADCRUMBS: Record<NavItem, { title: string; subtitle: string }> =
   dashboard: { title: 'Dashboard', subtitle: 'Vista general' },
   'create-theme': { title: 'Crear WordPress Theme', subtitle: 'Editor visual de temas' },
   'create-plugin': { title: 'Crear WordPress Plugin', subtitle: 'Generador de plugins' },
+  'create-pages': { title: 'Páginas', subtitle: 'Gestión de páginas del theme' },
   'my-projects': { title: 'Mis Proyectos', subtitle: 'Proyectos guardados' },
   templates: { title: 'Template Library', subtitle: 'Templates preconstruidos' },
   medios: { title: 'Biblioteca de Medios', subtitle: 'Gestión de imágenes y archivos' },
@@ -51,14 +64,41 @@ export const BREADCRUMBS: Record<NavItem, { title: string; subtitle: string }> =
 };
 
 export function Sidebar({ activeItem, onNavigate, isOpen, onClose, collapsed, onToggleCollapse }: SidebarProps) {
+  const [expandedParent, setExpandedParent] = React.useState<string | null>(
+    activeItem === 'create-pages' ? 'create-theme' : null
+  );
+
+  React.useEffect(() => {
+    // Auto-expand parent when child is active
+    const childItem = navItems.find(n => n.id === activeItem && n.parent);
+    if (childItem?.parent) setExpandedParent(childItem.parent);
+  }, [activeItem]);
+
   const groups = React.useMemo(() => {
     const map: Record<string, typeof navItems> = {};
     for (const item of navItems) {
+      if (item.parent) continue; // skip children, they render under parent
       if (!map[item.group]) map[item.group] = [];
       map[item.group].push(item);
     }
     return Object.entries(map);
   }, []);
+
+  const childrenOf = React.useCallback((parentId: NavItem) => {
+    return navItems.filter(n => n.parent === parentId);
+  }, []);
+
+  const toggleParent = (id: NavItem) => {
+    setExpandedParent(prev => prev === id ? null : id);
+  };
+
+  const isParentExpanded = (id: NavItem) => {
+    return expandedParent === id;
+  };
+
+  const isChildActive = (parentId: NavItem) => {
+    return navItems.some(n => n.parent === parentId && n.id === activeItem);
+  };
 
   return (
     <>
@@ -137,19 +177,130 @@ export function Sidebar({ activeItem, onNavigate, isOpen, onClose, collapsed, on
               <div className="space-y-0.5">
                 {items.map((item) => {
                   const isActive = activeItem === item.id;
+                  const children = childrenOf(item.id);
+                  const hasChildren = children.length > 0;
+                  const expanded = isParentExpanded(item.id);
+                  const childActive = isChildActive(item.id);
                   const Icon = item.icon;
+
+                  if (hasChildren && !collapsed) {
+                    return (
+                      <div key={item.id}>
+                        <button
+                          onClick={() => {
+                            // If clicking the parent itself, navigate to it
+                            onNavigate(item.id);
+                            onClose();
+                          }}
+                          className="w-full flex items-center gap-3 rounded-lg text-sm font-medium transition-all duration-200 group px-3 py-2"
+                          style={{
+                            backgroundColor: (isActive || childActive) ? 'rgba(255,255,255,0.15)' : 'transparent',
+                            color: (isActive || childActive) ? '#FFFFFF' : 'rgba(255,255,255,0.7)',
+                          }}
+                          onMouseEnter={(e) => {
+                            if (!isActive && !childActive) {
+                              e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.08)';
+                              e.currentTarget.style.color = '#FFFFFF';
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (!isActive && !childActive) {
+                              e.currentTarget.style.backgroundColor = 'transparent';
+                              e.currentTarget.style.color = 'rgba(255,255,255,0.7)';
+                            }
+                          }}
+                        >
+                          <Icon className="h-[18px] w-[18px] flex-shrink-0 transition-colors duration-200"
+                            style={{ color: (isActive || childActive) ? '#34D399' : 'rgba(255,255,255,0.5)' }}
+                          />
+                          <span className="flex-1 text-left">{item.label}</span>
+                          <span
+                            role="button"
+                            tabIndex={-1}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleParent(item.id);
+                            }}
+                            className="p-0.5 rounded hover:bg-white/10 transition-colors cursor-pointer"
+                          >
+                            <ChevronDown
+                              className="h-3.5 w-3.5 transition-transform duration-200"
+                              style={{
+                                transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                                color: (isActive || childActive) ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.4)',
+                              }}
+                            />
+                          </span>
+                        </button>
+                        <AnimatePresence>
+                          {expanded && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.2 }}
+                              className="overflow-hidden"
+                            >
+                              <div className="ml-6 mt-1 space-y-0.5 border-l border-white/10 pl-3">
+                                {children.map((child) => {
+                                  const childIsActive = activeItem === child.id;
+                                  const ChildIcon = child.icon;
+                                  return (
+                                    <button
+                                      key={child.id}
+                                      onClick={() => {
+                                        onNavigate(child.id);
+                                        onClose();
+                                      }}
+                                      className={cn(
+                                        'w-full flex items-center gap-3 rounded-lg text-sm font-medium transition-all duration-200 group',
+                                        'px-3 py-1.5',
+                                        childIsActive
+                                          ? 'bg-white/15 text-white shadow-sm'
+                                          : 'text-white/60 hover:bg-white/8 hover:text-white'
+                                      )}
+                                    >
+                                      <ChildIcon
+                                        className={cn(
+                                          'h-4 w-4 flex-shrink-0 transition-colors duration-200',
+                                          childIsActive ? 'text-emerald-400' : 'text-white/40 group-hover:text-white/80'
+                                        )}
+                                      />
+                                      <span className="flex-1 text-left text-[13px]">{child.label}</span>
+                                      {childIsActive && (
+                                        <motion.div
+                                          layoutId="activeIndicator"
+                                          className="w-1.5 h-1.5 rounded-full bg-emerald-400"
+                                          transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                                        />
+                                      )}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    );
+                  }
+
                   return (
                     <button
                       key={item.id}
                       onClick={() => {
-                        onNavigate(item.id);
-                        onClose();
+                        if (hasChildren && collapsed) {
+                          toggleParent(item.id);
+                        } else {
+                          onNavigate(item.id);
+                          onClose();
+                        }
                       }}
                       title={collapsed ? item.label : undefined}
                       className={cn(
                         'w-full flex items-center gap-3 rounded-lg text-sm font-medium transition-all duration-200 group',
                         collapsed ? 'px-0 py-2 justify-center' : 'px-3 py-2',
-                        isActive
+                        isActive || (childActive && collapsed)
                           ? 'bg-white/15 text-white shadow-sm'
                           : 'text-white/70 hover:bg-white/8 hover:text-white'
                       )}
@@ -157,7 +308,7 @@ export function Sidebar({ activeItem, onNavigate, isOpen, onClose, collapsed, on
                       <Icon
                         className={cn(
                           'h-[18px] w-[18px] flex-shrink-0 transition-colors duration-200',
-                          isActive ? 'text-emerald-400' : 'text-white/50 group-hover:text-white/80'
+                          isActive || (childActive && collapsed) ? 'text-emerald-400' : 'text-white/50 group-hover:text-white/80'
                         )}
                       />
                       {!collapsed && <span className="flex-1 text-left">{item.label}</span>}

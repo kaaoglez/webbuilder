@@ -1229,6 +1229,168 @@ function BlogPostsSection({
 }
 
 // ─────────────────────────────────────────────────────────────
+// Custom Section Preview (visual rows/columns/blocks)
+// ─────────────────────────────────────────────────────────────
+
+function CustomSectionPreview({
+  section,
+  colors,
+  borderRadius,
+  textColor,
+}: {
+  section: ThemeSection;
+  colors: { primary: string; secondary: string; accent: string };
+  borderRadius: number;
+  headingFont: string;
+  textColor: string;
+  backgroundColor: string;
+}) {
+  const d = section.data || {};
+
+  // If code mode with raw HTML
+  if (d.customHtml && d.customHtml.trim()) {
+    return (
+      <section className="py-10 px-4" data-section-id="custom" style={{ minHeight: 80 }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div
+            dangerouslySetInnerHTML={{ __html: d.customHtml }}
+            style={{ fontSize: 14, lineHeight: 1.7, color: textColor }}
+          />
+        </div>
+      </section>
+    );
+  }
+
+  const rows: any[] = d.rows || [];
+  if (rows.length === 0) {
+    return (
+      <section className="py-10 px-4" data-section-id="custom">
+        <div style={{ maxWidth: 1100, margin: '0 auto', textAlign: 'center' }}>
+          <p style={{ fontSize: 13, color: `${textColor}50`, fontStyle: 'italic' }}>
+            Sección personalizada — agrega filas y bloques en el editor
+          </p>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="py-10 px-4" data-section-id="custom">
+      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+        {rows.map((row: any, ri: number) => {
+          const cols: any[] = row.columns || [];
+          const gap = row.gap || '24px';
+          const vAlign = row.verticalAlign || 'stretch';
+          return (
+            <div
+              key={ri}
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap,
+                alignItems: vAlign,
+                marginBottom: ri < rows.length - 1 ? 24 : 0,
+              }}
+            >
+              {cols.map((col: any, ci: number) => {
+                const blocks: any[] = col.blocks || [];
+                const colWidth = col.width || `${Math.floor(100 / Math.max(cols.length, 1))}%`;
+                return (
+                  <div
+                    key={ci}
+                    style={{
+                      flex: col.width ? `0 0 ${colWidth}` : '1 1 0',
+                      maxWidth: col.width || undefined,
+                      minWidth: 0,
+                    }}
+                  >
+                    {blocks.map((block: any, bi: number) => {
+                      if (block.enabled === false) return null;
+                      return (
+                        <div key={bi} style={{ marginBottom: 16 }}>
+                          {renderCustomBlock(block, colors, borderRadius, textColor)}
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function renderCustomBlock(block: any, colors: any, borderRadius: number, textColor: string): React.ReactNode {
+  switch (block.type) {
+    case 'text':
+      return (
+        <p style={{ fontSize: 14, lineHeight: 1.7, color: textColor, margin: 0, whiteSpace: 'pre-wrap' }}>
+          {block.content || <span style={{ color: `${textColor}30`, fontStyle: 'italic' }}>Texto vacío</span>}
+        </p>
+      );
+    case 'heading': {
+      const Tag = (block.headingTag || 'h3') as keyof JSX.IntrinsicElements;
+      return (
+        <Tag style={{ fontSize: block.headingTag === 'h1' ? 28 : block.headingTag === 'h2' ? 22 : 18, fontWeight: 700, color: textColor, margin: 0, lineHeight: 1.3 }}>
+          {block.content || <span style={{ color: `${textColor}30`, fontStyle: 'italic' }}>Título</span>}
+        </Tag>
+      );
+    }
+    case 'image':
+      return block.src ? (
+        <img
+          src={block.src}
+          alt={block.alt || ''}
+          style={{ maxWidth: '100%', height: 'auto', borderRadius, display: 'block' }}
+        />
+      ) : (
+        <div style={{ width: '100%', height: 120, borderRadius, background: `${textColor}08`, border: `1px dashed ${textColor}20`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <span style={{ fontSize: 12, color: `${textColor}40` }}>Imagen</span>
+        </div>
+      );
+    case 'video':
+      return block.src ? (
+        <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden', borderRadius }}>
+          <iframe src={block.src} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 0 }} allowFullScreen />
+        </div>
+      ) : (
+        <div style={{ width: '100%', height: 120, borderRadius, background: `${textColor}08`, border: `1px dashed ${textColor}20`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <span style={{ fontSize: 12, color: `${textColor}40` }}>Video</span>
+        </div>
+      );
+    case 'spacer':
+      return <div style={{ height: block.height || '32px' }} />;
+    case 'button':
+      return (
+        <span
+          style={{
+            display: 'inline-block',
+            padding: '10px 24px',
+            background: colors.primary,
+            color: '#FFFFFF',
+            borderRadius,
+            fontWeight: 600,
+            fontSize: 14,
+          }}
+        >
+          {block.content || 'Botón'}
+        </span>
+      );
+    case 'divider':
+      return <hr style={{ border: 'none', borderTop: `1px solid ${textColor}15`, margin: '8px 0' }} />;
+    case 'html':
+      return (
+        <div dangerouslySetInnerHTML={{ __html: block.content || '' }} style={{ fontSize: 14, lineHeight: 1.7 }} />
+      );
+    default:
+      return <p style={{ fontSize: 14, color: `${textColor}40` }}>Bloque: {block.type}</p>;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
 // Section dispatcher
 // ─────────────────────────────────────────────────────────────
 
@@ -1289,6 +1451,9 @@ function RenderSection({
     blog_posts: () => (
       <BlogPostsSection {...shared} section={section} />
     ),
+    custom: () => (
+      <CustomSectionPreview {...shared} section={section} />
+    ),
   };
 
   const renderer = renderers[section.type];
@@ -1311,6 +1476,7 @@ function RenderSection({
 
 export default function ThemeLivePreview() {
   const config = useThemeEditorStore((s) => s.config);
+  const [activePreviewPage, setActivePreviewPage] = useState<string | null>(null);
 
   // Extract config values with safe defaults
   const siteTitle = (config.siteTitle as string) || DEFAULTS.siteTitle;
@@ -1324,13 +1490,37 @@ export default function ThemeLivePreview() {
   const headingFont = (config.headingFont as string) || DEFAULTS.headingFont;
   const bodyFont = (config.bodyFont as string) || DEFAULTS.bodyFont;
   const borderRadius = (config.borderRadius as number) ?? DEFAULTS.borderRadius;
-  const sections = (config.sections as ThemeSection[]) || DEFAULTS.sections;
+  const homeSections = (config.sections as ThemeSection[]) || DEFAULTS.sections;
   const navItems = (config.navItems as { label: string; url: string }[]) || DEFAULTS.navItems;
   const footerColumns = (config.footerColumns as { title: string; links: { label: string; url: string }[] }[]) || DEFAULTS.footerColumns;
   const copyrightText = (config.copyrightText as string) || DEFAULTS.copyrightText;
   const socialLinks = (config.socialLinks as { platform: string; url: string }[]) || DEFAULTS.socialLinks;
   const navbarBehavior = (config.navbarBehavior as 'sticky' | 'hide-on-scroll' | 'static') || 'sticky';
   const showScrollToTop = (config.showScrollToTop as boolean) || false;
+
+  // Custom pages from store
+  const customPages = (config as any).pages || [];
+
+  // Resolve which sections to show based on active preview page
+  const sections = useMemo(() => {
+    if (!activePreviewPage) return homeSections;
+    const page = customPages.find((p: any) => `/${p.slug}` === activePreviewPage || p.slug === activePreviewPage);
+    if (page && page.sections) return page.sections as ThemeSection[];
+    return homeSections;
+  }, [activePreviewPage, homeSections, customPages]);
+
+  const activePageName = useMemo(() => {
+    if (!activePreviewPage) return null;
+    const page = customPages.find((p: any) => `/${p.slug}` === activePreviewPage || p.slug === activePreviewPage);
+    return page?.name || null;
+  }, [activePreviewPage, customPages]);
+
+  // Check if a URL matches a custom page
+  const isCustomPageUrl = useCallback((url: string) => {
+    if (!url || url === '/' || url.startsWith('#')) return false;
+    const cleanUrl = url.startsWith('/') ? url : `/${url}`;
+    return customPages.some((p: any) => `/${p.slug}` === cleanUrl);
+  }, [customPages]);
 
   const colors = useMemo(
     () => ({ primary: primaryColor, secondary: secondaryColor, accent: accentColor }),
@@ -1461,8 +1651,21 @@ export default function ThemeLivePreview() {
                   }}
                   onClick={(e) => {
                     e.preventDefault();
-                    const targetId = (item.url || '').replace('#', '');
-                    if (!targetId) return;
+                    const raw = (item.url || '').replace('#', '');
+                    if (!raw || raw === '/') {
+                      // Home link — go back to home preview
+                      setActivePreviewPage(null);
+                      scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+                      return;
+                    }
+                    // Check if it's a custom page link (e.g. /servicios)
+                    if (isCustomPageUrl(item.url || '')) {
+                      setActivePreviewPage(item.url);
+                      scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'instant' });
+                      return;
+                    }
+                    // Support both formats: #features and #section-features
+                    const targetId = raw.startsWith('section-') ? raw.replace('section-', '') : raw;
                     const container = scrollContainerRef.current;
                     const target = container?.querySelector(`[data-section-id="${targetId}"]`);
                     if (container && target) {
@@ -1507,6 +1710,40 @@ export default function ThemeLivePreview() {
             fontFamily: bodyFont,
           }}
         >
+          {/* Custom page back button */}
+          {activePreviewPage && activePageName && (
+            <div style={{ backgroundColor, borderBottom: `1px solid ${textColor}15` }}>
+              <div style={{ maxWidth: 1100, margin: '0 auto', padding: '10px 20px' }}>
+                <button
+                  onClick={() => {
+                    setActivePreviewPage(null);
+                    scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'instant' });
+                  }}
+                  style={{
+                    background: 'none',
+                    border: `1px solid ${primaryColor}40`,
+                    borderRadius: 6,
+                    padding: '6px 14px',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: primaryColor,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                  }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M19 12H5M12 19l-7-7 7-7" />
+                  </svg>
+                  Volver al Home
+                </button>
+                <span style={{ marginLeft: 12, fontSize: 13, fontWeight: 600, color: textColor }}>
+                  {activePageName}
+                </span>
+              </div>
+            </div>
+          )}
           {sections.map((section, index) => (
             <RenderSection
               key={`${section.type}-${index}`}
