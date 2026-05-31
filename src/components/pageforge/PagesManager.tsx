@@ -42,6 +42,7 @@ import {
   Download,
   Loader2,
   LayoutList,
+  Check,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useProjectsStore } from '@/lib/projects-store';
@@ -51,6 +52,7 @@ import { cn } from '@/lib/utils';
 import { useThemeEditorStore, type ThemePage } from '@/lib/theme-editor-store';
 import type { ThemeSection } from '@/lib/wp-theme-generator';
 import { useMediaPicker } from '@/components/pageforge/MediaLibrary';
+import { EmojiPicker } from '@/components/pageforge/EmojiPicker';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -77,6 +79,16 @@ import {
   DialogFooter,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 // ─────────────────────────────────────────────────────────────
 // Local Section Type & Defaults (will be exported from store later)
@@ -286,6 +298,8 @@ function RepeatableCard({
   children: React.ReactNode;
   onRemove?: () => void;
 }) {
+  const [confirmRemove, setConfirmRemove] = useState(false);
+
   return (
     <Card className="border border-gray-300 bg-white">
       <CardHeader className="flex flex-row items-center justify-between py-3 px-4">
@@ -295,10 +309,19 @@ function RepeatableCard({
           <Button
             variant="ghost"
             size="icon"
-            className="h-7 w-7 text-gray-500 hover:text-red-500"
-            onClick={onRemove}
+            className={cn("h-7 w-7", confirmRemove ? "text-red-600" : "text-gray-500 hover:text-red-500")}
+            onClick={() => {
+              if (confirmRemove) {
+                onRemove();
+                setConfirmRemove(false);
+              } else {
+                setConfirmRemove(true);
+                setTimeout(() => setConfirmRemove(false), 3000);
+              }
+            }}
+            title={confirmRemove ? "Click para confirmar" : "Eliminar"}
           >
-            <X className="h-4 w-4" />
+            {confirmRemove ? <Check className="h-3.5 w-3.5" /> : <Trash2 className="h-3.5 w-3.5" />}
           </Button>
         )}
       </CardHeader>
@@ -344,14 +367,14 @@ function PageHeroConfig({ section, sectionIndex, pageId }: PageSectionConfigProp
         />
       </FormField>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormField label="Texto del CTA Principal">
+        <FormField label="Texto del botón principal">
           <Input
             value={(d.ctaText as string) || ''}
             onChange={(e) => updateData({ ctaText: e.target.value })}
             placeholder="Comenzar Ahora"
           />
         </FormField>
-        <FormField label="Enlace del CTA Principal">
+        <FormField label="Enlace del botón principal">
           <Input
             value={(d.ctaLink as string) || ''}
             onChange={(e) => updateData({ ctaLink: e.target.value })}
@@ -360,14 +383,14 @@ function PageHeroConfig({ section, sectionIndex, pageId }: PageSectionConfigProp
         </FormField>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormField label="Texto del CTA Secundario">
+        <FormField label="Texto del botón secundario">
           <Input
             value={(d.secondaryCtaText as string) || ''}
             onChange={(e) => updateData({ secondaryCtaText: e.target.value })}
             placeholder="Saber Más"
           />
         </FormField>
-        <FormField label="Enlace del CTA Secundario">
+        <FormField label="Enlace del botón secundario">
           <Input
             value={(d.secondaryCtaLink as string) || ''}
             onChange={(e) => updateData({ secondaryCtaLink: e.target.value })}
@@ -382,7 +405,7 @@ function PageHeroConfig({ section, sectionIndex, pageId }: PageSectionConfigProp
           placeholder="https://ejemplo.com/imagen.jpg"
         />
       </FormField>
-      <FormField label={`Opacidad de Superposición: ${((d.overlayOpacity as number) ?? 0.5).toFixed(2)}`}>
+      <FormField label={`Intensidad del fondo: ${((d.overlayOpacity as number) ?? 0.5).toFixed(2)}`}>
         <Slider
           value={[(d.overlayOpacity as number) ?? 0.5]}
           onValueChange={([v]) => updateData({ overlayOpacity: v })}
@@ -538,11 +561,10 @@ function PageServicesFeaturesConfig({ section, sectionIndex, pageId }: PageSecti
           {items.map((item, i) => (
             <RepeatableCard key={i} title={`Elemento ${i + 1}`} onRemove={() => removeItem(i)}>
               <FormField label="Icono (emoji)">
-                <Input
+                <EmojiPicker
                   value={item.icon}
-                  onChange={(e) => updateItem(i, 'icon', e.target.value)}
+                  onChange={(val) => updateItem(i, 'icon', val)}
                   placeholder="⚡"
-                  className="w-24"
                 />
               </FormField>
               <FormField label="Título">
@@ -765,7 +787,7 @@ function PagePricingConfig({ section, sectionIndex, pageId }: PageSectionConfigP
                     placeholder="/mes"
                   />
                 </FormField>
-                <FormField label="Texto del CTA">
+                <FormField label="Texto del botón">
                   <Input
                     value={plan.ctaText}
                     onChange={(e) => updatePlan(i, 'ctaText', e.target.value)}
@@ -847,14 +869,14 @@ function PageCTAConfig({ section, sectionIndex, pageId }: PageSectionConfigProps
         />
       </FormField>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormField label="Texto del CTA">
+        <FormField label="Texto del botón">
           <Input
             value={(d.ctaText as string) || ''}
             onChange={(e) => updateData({ ctaText: e.target.value })}
             placeholder="Comenzar Ahora"
           />
         </FormField>
-        <FormField label="Enlace del CTA">
+        <FormField label="Enlace del botón">
           <Input
             value={(d.ctaLink as string) || ''}
             onChange={(e) => updateData({ ctaLink: e.target.value })}
@@ -1135,11 +1157,10 @@ function PageStatsConfig({ section, sectionIndex, pageId }: PageSectionConfigPro
             <RepeatableCard key={i} title={`Estadística ${i + 1}`} onRemove={() => removeItem(i)}>
               <div className="grid grid-cols-3 gap-3">
                 <FormField label="Icono (emoji)">
-                  <Input
+                  <EmojiPicker
                     value={item.icon}
-                    onChange={(e) => updateItem(i, 'icon', e.target.value)}
+                    onChange={(val) => updateItem(i, 'icon', val)}
                     placeholder="📊"
-                    className="w-20"
                   />
                 </FormField>
                 <FormField label="Valor">
@@ -1498,12 +1519,13 @@ function ImagePickerField({
           placeholder="Descripción de la imagen"
         />
       </FormField>
-      <FormField label="Clase CSS">
+      <FormField label="Clase personalizada">
         <Input
           value={imageClass}
           onChange={(e) => onChangeClass(e.target.value)}
           placeholder="img-fluid rounded"
         />
+        <p className="text-xs text-gray-400">(avanzado)</p>
       </FormField>
       <MediaLibraryDialog />
     </>
@@ -1734,12 +1756,13 @@ function CustomSectionEditor({
                 placeholder="Título"
               />
             </FormField>
-            <FormField label="Clase CSS">
+            <FormField label="Clase personalizada">
               <Input
                 value={block.headingClass || ''}
                 onChange={(e) => updateBlock(ri, ci, bi, { headingClass: e.target.value })}
                 placeholder="clase-opcional"
               />
+              <p className="text-xs text-gray-400">(avanzado)</p>
             </FormField>
           </div>
         );
@@ -2230,6 +2253,7 @@ function PageSectionItem({
   onSelect: () => void;
 }) {
   const { togglePageSection, removePageSection, movePageSection } = useThemeEditorStore();
+  const [removeSectionConfirm, setRemoveSectionConfirm] = useState<number | null>(null);
 
   const handleMoveUp = useCallback(() => {
     if (index > 0) movePageSection(pageId, index, index - 1);
@@ -2320,7 +2344,7 @@ function PageSectionItem({
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              handleRemove();
+              setRemoveSectionConfirm(index);
             }}
             className="p-1 rounded hover:bg-red-100 transition-colors"
             title="Eliminar sección"
@@ -2360,6 +2384,21 @@ function PageSectionItem({
           </motion.div>
         )}
       </AnimatePresence>
+
+      <AlertDialog open={removeSectionConfirm !== null} onOpenChange={(open) => !open && setRemoveSectionConfirm(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar esta sección?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción no se puede deshacer. Se eliminará la sección y toda su configuración.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { if (removeSectionConfirm !== null) { removePageSection(pageId, removeSectionConfirm); setRemoveSectionConfirm(null); } }} className="bg-red-600 hover:bg-red-700">Eliminar</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
@@ -2416,7 +2455,7 @@ function PageListView() {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Crear Nueva Página</DialogTitle>
-              <DialogDescription>Ingresa el nombre y slug de la nueva página para tu theme.</DialogDescription>
+              <DialogDescription>Ingresa el nombre y la URL del archivo de la nueva página.</DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-2">
               <FormField label="Nombre de la página">
@@ -2427,7 +2466,7 @@ function PageListView() {
                   autoFocus
                 />
               </FormField>
-              <FormField label="Slug">
+              <FormField label="URL del archivo">
                 <Input
                   value={newPageSlug}
                   onChange={(e) => setNewPageSlug(toSlug(e.target.value))}
@@ -2435,7 +2474,7 @@ function PageListView() {
                   className="bg-gray-100 font-mono text-sm"
                 />
                 <p className="text-xs text-gray-400 mt-1">
-                  Usado para el nombre del archivo: page-{toSlug(newPageSlug || newPageName)}.php
+                  Se usa para generar el nombre del archivo de la página
                 </p>
               </FormField>
             </div>
@@ -2628,17 +2667,8 @@ function PageEditorView() {
 
   return (
     <div className="space-y-6">
-      {/* Back Button + Page Header */}
+      {/* Page Header */}
       <div className="space-y-4">
-        <Button
-          variant="ghost"
-          onClick={handleBack}
-          className="text-gray-600 hover:text-emerald-600 gap-2 -ml-2"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Volver a páginas
-        </Button>
-
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0">
             {editingName ? (
@@ -2781,7 +2811,7 @@ function PageEditorView() {
 // ─────────────────────────────────────────────────────────────
 
 export default function PagesManager() {
-  const { activePageId, config } = useThemeEditorStore();
+  const { activePageId, config, setActivePageId, setActivePageSectionIndex } = useThemeEditorStore();
   const saveProject = useProjectsStore((s) => s.saveProject);
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -2818,11 +2848,27 @@ export default function PagesManager() {
     }
   }, [config, saveProject]);
 
+  const handleBack = useCallback(() => {
+    setActivePageId(null);
+    setActivePageSectionIndex(null);
+  }, [setActivePageId, setActivePageSectionIndex]);
+
   return (
     <div className="flex h-full flex-col">
       {/* STICKY ACTION BAR — siempre visible */}
       <header className="flex items-center justify-between px-4 md:px-6 py-3 bg-[#1a1a1a] border-b border-gray-700 shrink-0">
         <div className="flex items-center gap-3">
+          {activePageId && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleBack}
+              className="text-gray-400 hover:text-white"
+              title="Volver a páginas"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+          )}
           <LayoutList className="h-5 w-5 text-emerald-400" />
           <h1 className="text-white font-semibold text-lg">Páginas del Theme</h1>
           {activePageId && (

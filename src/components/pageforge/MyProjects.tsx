@@ -250,7 +250,7 @@ export default function MyProjects({ onNavigate }: MyProjectsProps) {
                     <Card className="hover:shadow-md transition-shadow group">
                       <CardContent className="p-4 flex items-center gap-4">
                         {/* Drag Handle */}
-                        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="opacity-50 group-hover:opacity-100 transition-opacity">
                           <DragHandle />
                         </div>
 
@@ -294,8 +294,8 @@ export default function MyProjects({ onNavigate }: MyProjectsProps) {
                           </div>
                         </div>
 
-                        {/* Actions - always visible on mobile, hover on desktop */}
-                        <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                        {/* Actions - always visible, subtle when not hovering */}
+                        <div className="flex items-center gap-1 sm:opacity-60 sm:group-hover:opacity-100 transition-opacity">
                           <Button
                             variant="ghost"
                             size="sm"

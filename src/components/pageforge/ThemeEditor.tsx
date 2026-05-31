@@ -1,6 +1,18 @@
 'use client';
 
-import React, { useState, useCallback, useMemo, useEffect } from 'react';import {
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import { cn } from '@/lib/utils';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
   DndContext,
   closestCenter,
   PointerSensor,
@@ -62,6 +74,7 @@ import type { MediaItem } from '@/lib/media-library-store';
 import { ImageEditor } from '@/components/pageforge/ImageEditor';
 import { TemplatesTab } from '@/components/pageforge/TemplatesTab';
 import ThemeLivePreview from '@/components/pageforge/ThemeLivePreview';
+import { EmojiPicker } from '@/components/pageforge/EmojiPicker';
 
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -224,7 +237,10 @@ function RepeatableCard({
   children: React.ReactNode;
   onRemove?: () => void;
 }) {
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
   return (
+    <>
     <Card className="border border-gray-400 bg-white">
       <CardHeader className="flex flex-row items-center justify-between py-3 px-4">
         {title && <CardTitle className="text-sm font-medium text-gray-600">{title}</CardTitle>}
@@ -234,7 +250,7 @@ function RepeatableCard({
             variant="ghost"
             size="icon"
             className="h-7 w-7 text-gray-500 hover:text-red-500"
-            onClick={onRemove}
+            onClick={() => setConfirmOpen(true)}
           >
             <X className="h-4 w-4" />
           </Button>
@@ -242,6 +258,21 @@ function RepeatableCard({
       </CardHeader>
       <CardContent className="px-4 pb-4 pt-0 space-y-3">{children}</CardContent>
     </Card>
+    <AlertDialog open={confirmOpen} onOpenChange={(open) => { if (!open) setConfirmOpen(false); }}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>¿Eliminar este elemento?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Esta acción no se puede deshacer. Se eliminará el elemento y toda su configuración.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+          <AlertDialogAction onClick={() => { onRemove(); setConfirmOpen(false); }} className="bg-red-600 hover:bg-red-700">Eliminar</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
   );
 }
 
@@ -258,6 +289,8 @@ function SortableRepeatableCard({
   onRemove?: () => void;
   sortIndex: number;
 }) {
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
   const {
     attributes,
     listeners,
@@ -294,7 +327,7 @@ function SortableRepeatableCard({
               variant="ghost"
               size="icon"
               className="h-7 w-7 text-gray-500 hover:text-red-500 shrink-0"
-              onClick={onRemove}
+              onClick={() => setConfirmOpen(true)}
             >
               <X className="h-4 w-4" />
             </Button>
@@ -302,6 +335,20 @@ function SortableRepeatableCard({
         </CardHeader>
         <CardContent className="px-4 pb-4 pt-0 space-y-3">{children}</CardContent>
       </Card>
+      <AlertDialog open={confirmOpen} onOpenChange={(open) => { if (!open) setConfirmOpen(false); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar este elemento?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción no se puede deshacer. Se eliminará el elemento y toda su configuración.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { onRemove(); setConfirmOpen(false); }} className="bg-red-600 hover:bg-red-700">Eliminar</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
@@ -443,7 +490,7 @@ function InfoTab() {
               />
             </FormField>
           </div>
-          <FormField label="URI del Autor">
+          <FormField label="Sitio Web del Autor">
             <Input
               value={config.authorUri || ''}
               onChange={(e) => updateConfig({ authorUri: e.target.value })}
@@ -457,6 +504,7 @@ function InfoTab() {
               placeholder="mi-theme"
               className="bg-gray-200"
             />
+            <p className="text-xs text-gray-500 mt-1">(identificador para traducciones)</p>
           </FormField>
           <FormField label="Etiquetas (separadas por coma)">
             <Input
@@ -616,14 +664,14 @@ function HeroConfig({ section, sectionIndex }: { section: ThemeSection; sectionI
         />
       </FormField>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormField label="Texto del CTA Principal">
+        <FormField label="Texto del Botón Principal">
           <Input
             value={(d.ctaText as string) || ''}
             onChange={(e) => updateSectionData(sectionIndex, { ctaText: e.target.value })}
             placeholder="Comenzar Ahora"
           />
         </FormField>
-        <FormField label="Enlace del CTA Principal">
+        <FormField label="Enlace del Botón Principal">
           <Input
             value={(d.ctaLink as string) || ''}
             onChange={(e) => updateSectionData(sectionIndex, { ctaLink: e.target.value })}
@@ -632,14 +680,14 @@ function HeroConfig({ section, sectionIndex }: { section: ThemeSection; sectionI
         </FormField>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormField label="Texto del CTA Secundario">
+        <FormField label="Texto del Botón Secundario">
           <Input
             value={(d.secondaryCtaText as string) || ''}
             onChange={(e) => updateSectionData(sectionIndex, { secondaryCtaText: e.target.value })}
             placeholder="Saber Más"
           />
         </FormField>
-        <FormField label="Enlace del CTA Secundario">
+        <FormField label="Enlace del Botón Secundario">
           <Input
             value={(d.secondaryCtaLink as string) || ''}
             onChange={(e) => updateSectionData(sectionIndex, { secondaryCtaLink: e.target.value })}
@@ -652,7 +700,7 @@ function HeroConfig({ section, sectionIndex }: { section: ThemeSection; sectionI
         onChange={(url) => updateSectionData(sectionIndex, { backgroundImage: url })}
         label="URL de Imagen de Fondo"
       />
-      <FormField label={`Opacidad de Superposición: ${(d.overlayOpacity as number ?? 0.5).toFixed(2)}`}>
+      <FormField label={`Intensidad del fondo: ${Math.round((d.overlayOpacity as number ?? 0.5) * 100)}%`}>
         <Slider
           value={[d.overlayOpacity as number ?? 0.5]}
           onValueChange={([v]) => updateSectionData(sectionIndex, { overlayOpacity: v })}
@@ -820,11 +868,10 @@ function ServicesFeaturesConfig({
           {items.map((item, i) => (
             <SortableRepeatableCard key={i} sortIndex={i} title={`Elemento ${i + 1}`} onRemove={() => removeItem(i)}>
               <FormField label="Icono (emoji)">
-                <Input
+                <EmojiPicker
                   value={item.icon}
-                  onChange={(e) => updateItem(i, 'icon', e.target.value)}
+                  onChange={(val) => updateItem(i, 'icon', val)}
                   placeholder="⚡"
-                  className="w-24"
                 />
               </FormField>
               <FormField label="Título">
@@ -927,14 +974,26 @@ function TestimonialsConfig({ section, sectionIndex }: { section: ThemeSection; 
                   />
                 </FormField>
               </div>
-              <FormField label={`Puntuación: ${t.rating}/5`}>
-                <Slider
-                  value={[t.rating]}
-                  onValueChange={([v]) => updateTestimonial(i, 'rating', v)}
-                  min={1}
-                  max={5}
-                  step={1}
-                />
+              <FormField label="Puntuación">
+                <div className="flex gap-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => updateTestimonial(i, 'rating', star)}
+                      className="p-0.5 hover:scale-110 transition-transform"
+                    >
+                      <Star
+                        className={cn(
+                          'h-5 w-5 transition-colors',
+                          star <= (t.rating || 5)
+                            ? 'text-amber-400 fill-amber-400'
+                            : 'text-gray-300'
+                        )}
+                      />
+                    </button>
+                  ))}
+                </div>
               </FormField>
             </SortableRepeatableCard>
           ))}
@@ -1053,13 +1112,23 @@ function PricingConfig({ section, sectionIndex }: { section: ThemeSection; secti
             </div>
             <div className="grid grid-cols-2 gap-3">
               <FormField label="Período">
-                <Input
-                  value={plan.period}
-                  onChange={(e) => updatePlan(i, 'period', e.target.value)}
-                  placeholder="/mes"
-                />
+                <Select
+                  value={(plan.period as string) || '/mes'}
+                  onValueChange={(v) => updatePlan(i, 'period', v)}
+                >
+                  <SelectTrigger className="h-9">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="/mes">/ mes</SelectItem>
+                    <SelectItem value="/año">/ año</SelectItem>
+                    <SelectItem value="/semana">/ semana</SelectItem>
+                    <SelectItem value="único">Único</SelectItem>
+                    <SelectItem value="/día">/ día</SelectItem>
+                  </SelectContent>
+                </Select>
               </FormField>
-              <FormField label="Texto del CTA">
+              <FormField label="Texto del Botón">
                 <Input
                   value={plan.ctaText}
                   onChange={(e) => updatePlan(i, 'ctaText', e.target.value)}
@@ -1136,14 +1205,14 @@ function CTAConfig({ section, sectionIndex }: { section: ThemeSection; sectionIn
         />
       </FormField>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormField label="Texto del CTA">
+        <FormField label="Texto del Botón">
           <Input
             value={(d.ctaText as string) || ''}
             onChange={(e) => updateSectionData(sectionIndex, { ctaText: e.target.value })}
             placeholder="Comenzar Ahora"
           />
         </FormField>
-        <FormField label="Enlace del CTA">
+        <FormField label="Enlace del Botón">
           <Input
             value={(d.ctaLink as string) || ''}
             onChange={(e) => updateSectionData(sectionIndex, { ctaLink: e.target.value })}
@@ -1428,11 +1497,10 @@ function StatsConfig({ section, sectionIndex }: { section: ThemeSection; section
             <SortableRepeatableCard key={i} sortIndex={i} title={`Estadística ${i + 1}`} onRemove={() => removeItem(i)}>
               <div className="grid grid-cols-3 gap-3">
                 <FormField label="Icono (emoji)">
-                  <Input
+                  <EmojiPicker
                     value={item.icon}
-                    onChange={(e) => updateItem(i, 'icon', e.target.value)}
+                    onChange={(val) => updateItem(i, 'icon', val)}
                     placeholder="📊"
-                    className="w-20"
                   />
                 </FormField>
                 <FormField label="Valor">
@@ -1784,6 +1852,8 @@ function SectionsTab() {
     toggleSection,
   } = useThemeEditorStore();
 
+  const [removeConfirm, setRemoveConfirm] = useState<number | null>(null);
+
   const sections = config.sections || [];
   const sectionIds = sections.map((_, i) => i);
 
@@ -1820,6 +1890,7 @@ function SectionsTab() {
   );
 
   return (
+    <>
     <div className="flex flex-col lg:flex-row gap-4 h-full">
       {/* LEFT — Section List */}
       <div className="w-full lg:w-80 shrink-0 space-y-3">
@@ -1848,7 +1919,7 @@ function SectionsTab() {
                       isActive={activeSectionIndex === i}
                       onSelect={() => setActiveSectionIndex(i)}
                       onToggle={() => toggleSection(i)}
-                      onRemove={() => removeSection(i)}
+                      onRemove={() => setRemoveConfirm(i)}
                     />
                   ))}
                 </div>
@@ -1924,6 +1995,21 @@ function SectionsTab() {
         </AnimatePresence>
       </div>
     </div>
+    <AlertDialog open={removeConfirm !== null} onOpenChange={(open) => !open && setRemoveConfirm(null)}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>¿Eliminar esta sección?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Esta acción no se puede deshacer. Se eliminará la sección y toda su configuración.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+          <AlertDialogAction onClick={() => { if (removeConfirm !== null) { removeSection(removeConfirm); setRemoveConfirm(null); } }} className="bg-red-600 hover:bg-red-700">Eliminar</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
   );
 }
 
@@ -2940,7 +3026,7 @@ export default function ThemeEditor() {
             className={`bg-[#2a2a2a] border-gray-500 text-gray-500 hover:bg-[#3a3a3a] hover:text-white font-medium ${showPreview ? 'bg-emerald-700 border-emerald-500' : ''}`}
           >
             {showPreview ? (
-              <><EyeOff className="h-4 w-4 mr-2" />Ocultar Preview</>
+              <><EyeOff className="h-4 w-4 mr-2" />Ocultar Vista Previa</>
             ) : (
               <><Eye className="h-4 w-4 mr-2" />Vista Previa</>
             )}
@@ -2990,8 +3076,8 @@ export default function ThemeEditor() {
           onValueChange={(v) => setActiveTab(v as typeof activeTab)}
           className="flex flex-col flex-1 min-h-0"
         >
-          <div className="px-4 md:px-6 pt-4 bg-[#1a1a1a] shrink-0">
-            <TabsList className="bg-[#2a2a2a] h-10 p-1 w-fit">
+          <div className="px-4 md:px-6 pt-4 bg-[#1a1a1a] overflow-x-auto shrink-0">
+            <TabsList className="bg-[#2a2a2a] h-10 p-1 w-fit flex-nowrap">
               <TabsTrigger
                 value="info"
                 className="data-[state=active]:bg-white data-[state=active]:text-gray-900 text-gray-500 h-8 text-sm px-4"
