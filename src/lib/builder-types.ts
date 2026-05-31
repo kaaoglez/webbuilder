@@ -123,22 +123,22 @@ export interface PageData {
 // ═══════════════════════════════════════════════════════════════
 
 export const SECTION_META: Record<string, { label: string; icon: string; description: string; category: string }> = {
-  hero: { label: 'Hero', icon: 'Image', description: 'Encabezado principal con título, subtítulo y CTA', category: 'Principal' },
+  hero: { label: 'Encabezado', icon: 'Image', description: 'Encabezado principal con título, subtítulo y CTA', category: 'Principal' },
   features: { label: 'Características', icon: 'Grid3X3', description: 'Cuadrícula de funcionalidades con iconos', category: 'Contenido' },
   about: { label: 'Sobre Nosotros', icon: 'Info', description: 'Sección informativa con imagen y texto', category: 'Contenido' },
-  testimonials: { label: 'Testimonios', icon: 'Quote', description: 'Opiniones y reseñas de clientes', category: 'Social Proof' },
+  testimonials: { label: 'Testimonios', icon: 'Quote', description: 'Opiniones y reseñas de clientes', category: 'Prueba Social' },
   pricing: { label: 'Precios', icon: 'DollarSign', description: 'Tabla de planes y precios', category: 'Conversión' },
   cta: { label: 'Llamada a la Acción', icon: 'MousePointerClick', description: 'Sección de conversión con botón CTA', category: 'Conversión' },
   contact: { label: 'Contacto', icon: 'Mail', description: 'Información de contacto y formulario', category: 'Contenido' },
   gallery: { label: 'Galería', icon: 'Images', description: 'Galería de imágenes', category: 'Contenido' },
   faq: { label: 'Preguntas Frecuentes', icon: 'HelpCircle', description: 'Sección de preguntas y respuestas', category: 'Soporte' },
-  stats: { label: 'Estadísticas', icon: 'BarChart3', description: 'Números y métricas destacadas', category: 'Social Proof' },
+  stats: { label: 'Estadísticas', icon: 'BarChart3', description: 'Números y métricas destacadas', category: 'Prueba Social' },
   team: { label: 'Equipo', icon: 'Users', description: 'Presentación del equipo', category: 'Contenido' },
   footer: { label: 'Pie de Página', icon: 'PanelBottom', description: 'Footer con enlaces y redes sociales', category: 'Estructural' },
 };
 
 export const TEMPLATE_META: Record<PageTemplate, { label: string; description: string; icon: string; color: string; sections: SectionType[]; preview: string; tags: string[] }> = {
-  landing: { label: 'Landing Page', description: 'Página de aterrizaje moderna con hero impactante, secciones de características y testimonios. Perfecta para lanzamientos de producto.', icon: 'Rocket', color: '#0F766E', sections: ['hero', 'features', 'about', 'testimonials', 'cta', 'footer'], preview: '/templates/landing.png', tags: ['Marketing', 'Startup', 'Producto'] },
+  landing: { label: 'Página de Aterrizaje', description: 'Página de aterrizaje moderna con hero impactante, secciones de características y testimonios. Perfecta para lanzamientos de producto.', icon: 'Rocket', color: '#0F766E', sections: ['hero', 'features', 'about', 'testimonials', 'cta', 'footer'], preview: '/templates/landing.png', tags: ['Marketing', 'Startup', 'Producto'] },
   portfolio: { label: 'Portafolio', description: 'Muestra tu trabajo creativo con galerías elegantes, estadísticas y testimonios de clientes satisfechos.', icon: 'Briefcase', color: '#7C3AED', sections: ['hero', 'gallery', 'stats', 'testimonials', 'cta', 'footer'], preview: '/templates/portfolio.png', tags: ['Diseño', 'Fotografía', 'Arte'] },
   restaurant: { label: 'Restaurante', description: 'Sitio web completo para restaurantes con menú, galería de platos, reservas y sección de contacto.', icon: 'UtensilsCrossed', color: '#DC2626', sections: ['hero', 'features', 'about', 'testimonials', 'gallery', 'contact', 'footer'], preview: '/templates/restaurant.png', tags: ['Gastronomía', 'Local', 'Catering'] },
   saas: { label: 'SaaS', description: 'Página de producto SaaS con planes de precios, FAQ, testimonios y llamada a la acción.', icon: 'Cloud', color: '#2563EB', sections: ['hero', 'features', 'pricing', 'testimonials', 'faq', 'cta', 'footer'], preview: '/templates/saas.png', tags: ['Software', 'Tech', 'Startup'] },

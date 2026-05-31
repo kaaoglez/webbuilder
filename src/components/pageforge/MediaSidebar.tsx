@@ -36,6 +36,16 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 // ─────────────────────────────────────────────────────────────
 // Constants
@@ -343,6 +353,7 @@ interface MediaSidebarProps {
 export function MediaSidebar({ isOpen, onToggle }: MediaSidebarProps) {
   const { mediaItems, addMedia, removeMedia, updateMedia } = useMediaLibraryStore();
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
   const selectedItem = useMemo(
@@ -374,9 +385,17 @@ export function MediaSidebar({ isOpen, onToggle }: MediaSidebarProps) {
 
   const handleDelete = useCallback(
     (id: string) => {
+      setDeleteConfirmId(id);
+    },
+    [],
+  );
+
+  const confirmDelete = useCallback(
+    (id: string) => {
       const item = mediaItems.find((m) => m.id === id);
       removeMedia(id);
       if (selectedId === id) setSelectedId(null);
+      setDeleteConfirmId(null);
       toast.success(`"${item?.name || 'Imagen'}" eliminada`);
     },
     [removeMedia, selectedId, mediaItems],
@@ -486,6 +505,20 @@ export function MediaSidebar({ isOpen, onToggle }: MediaSidebarProps) {
           </motion.aside>
         )}
       </AnimatePresence>
+      <AlertDialog open={deleteConfirmId !== null} onOpenChange={(open) => { if (!open) setDeleteConfirmId(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar esta imagen?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción no se puede deshacer. La imagen se eliminará permanentemente de la biblioteca.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { if (deleteConfirmId) confirmDelete(deleteConfirmId); }} className="bg-red-600 hover:bg-red-700">Eliminar</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </TooltipProvider>
   );
 }

@@ -436,7 +436,7 @@ export function IntegrationsPanel() {
         <CollapsibleCard
           icon={<Mail className="h-5 w-5 text-white" />}
           iconBg="bg-violet-600"
-          title="Email & Newsletter"
+          title="Correo y Boletín"
           description="Servicio de correo y listas de suscripción"
           badge={
             integrations.email.service
@@ -549,7 +549,7 @@ export function IntegrationsPanel() {
             </div>
 
             <SensitiveInput
-              label="Google Maps API Key"
+              label="Clave API de Google Maps"
               value={integrations.maps.googleMapsKey}
               onChange={(v) => update('maps', { googleMapsKey: v })}
               placeholder="AIzaSy..."
@@ -667,14 +667,14 @@ export function IntegrationsPanel() {
             {integrations.payments.enabled && (
               <>
                 <SensitiveInput
-                  label="Stripe Public Key"
+                  label="Clave Pública de Stripe"
                   value={integrations.payments.stripeKey}
                   onChange={(v) => update('payments', { stripeKey: v })}
                   placeholder="pk_live_..."
                 />
 
                 <SensitiveInput
-                  label="PayPal Client ID"
+                  label="ID de Cliente de PayPal"
                   value={integrations.payments.paypalClientId}
                   onChange={(v) => update('payments', { paypalClientId: v })}
                   placeholder="Axxxxxxxxxxxxxxxxxxxxxxxxx"

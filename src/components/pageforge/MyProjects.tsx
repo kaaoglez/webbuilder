@@ -294,8 +294,8 @@ export default function MyProjects({ onNavigate }: MyProjectsProps) {
                           </div>
                         </div>
 
-                        {/* Actions - always visible, subtle when not hovering */}
-                        <div className="flex items-center gap-1 sm:opacity-60 sm:group-hover:opacity-100 transition-opacity">
+                        {/* Actions - always visible, subtle colors become prominent on hover */}
+                        <div className="flex items-center gap-1">
                           <Button
                             variant="ghost"
                             size="sm"

@@ -586,7 +586,7 @@ function ArticleEditorPanel({
             {/* Slug */}
             <div className="space-y-1.5">
               <Label htmlFor="post-slug" className="text-sm font-medium text-gray-700">
-                Slug <span className="text-red-500">*</span>
+                URL Amigable <span className="text-red-500">*</span>
               </Label>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-gray-500 whitespace-nowrap">/blog/</span>

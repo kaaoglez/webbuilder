@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import {
   AlertDialog,
@@ -115,7 +115,7 @@ const SECTION_TYPE_ICON: Record<string, React.ReactNode> = {
 };
 
 const SECTION_TYPE_LABEL: Record<string, string> = {
-  hero: 'Hero',
+  hero: 'Encabezado',
   about: 'Sobre Nosotros',
   services: 'Servicios',
   features: 'Características',
@@ -458,7 +458,7 @@ function InfoTab() {
               placeholder="Mi Theme WordPress"
             />
           </FormField>
-          <FormField label="Slug">
+          <FormField label="URL Amigable">
             <Input
               value={config.slug || ''}
               onChange={(e) => updateConfig({ slug: e.target.value })}
@@ -497,7 +497,7 @@ function InfoTab() {
               placeholder="https://tu-sitio.com"
             />
           </FormField>
-          <FormField label="Dominio de Texto">
+          <FormField label="Dominio de Traducción">
             <Input
               value={config.textDomain || ''}
               onChange={(e) => updateConfig({ textDomain: e.target.value })}
@@ -653,14 +653,14 @@ function HeroConfig({ section, sectionIndex }: { section: ThemeSection; sectionI
         <Input
           value={section.title || ''}
           onChange={(e) => updateSection(sectionIndex, { title: e.target.value })}
-          placeholder="Título principal del hero"
+          placeholder="Título principal del encabezado"
         />
       </FormField>
       <FormField label="Subtítulo">
         <Input
           value={(d.subtitle as string) || ''}
           onChange={(e) => updateSectionData(sectionIndex, { subtitle: e.target.value })}
-          placeholder="Subtítulo del hero"
+          placeholder="Subtítulo del encabezado"
         />
       </FormField>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -2971,6 +2971,44 @@ export default function ThemeEditor() {
   const { activeTab, setActiveTab, config, isGenerating, setIsGenerating } = useThemeEditorStore();
   const saveProject = useProjectsStore((s) => s.saveProject);
   const [showPreview, setShowPreview] = useState(false);
+  const tabsScrollRef = useRef<HTMLDivElement>(null);
+  const [shadowState, setShadowState] = useState({ left: false, right: false });
+
+  // Update scroll shadows on scroll
+  const updateScrollShadows = useCallback(() => {
+    const el = tabsScrollRef.current;
+    if (!el) return;
+    setShadowState({
+      left: el.scrollLeft > 2,
+      right: el.scrollLeft + el.clientWidth < el.scrollWidth - 2,
+    });
+  }, []);
+
+  // Auto-scroll active tab into view + update shadows when tab changes
+  useEffect(() => {
+    const el = tabsScrollRef.current;
+    if (!el) return;
+    const trigger = el.querySelector(`[data-state="active"]`);
+    if (trigger) {
+      trigger.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+    // Update shadows after scroll settles
+    const timeout = setTimeout(updateScrollShadows, 300);
+    return () => clearTimeout(timeout);
+  }, [activeTab, updateScrollShadows]);
+
+  // Also update shadows on resize
+  useEffect(() => {
+    const el = tabsScrollRef.current;
+    if (!el) return;
+    updateScrollShadows();
+    el.addEventListener('scroll', updateScrollShadows, { passive: true });
+    window.addEventListener('resize', updateScrollShadows);
+    return () => {
+      el.removeEventListener('scroll', updateScrollShadows);
+      window.removeEventListener('resize', updateScrollShadows);
+    };
+  }, [updateScrollShadows]);
 
   const handleSave = () => {
     saveProject(config.name || 'Sin Nombre', 'theme', config as Record<string, unknown>);
@@ -3076,8 +3114,16 @@ export default function ThemeEditor() {
           onValueChange={(v) => setActiveTab(v as typeof activeTab)}
           className="flex flex-col flex-1 min-h-0"
         >
-          <div className="px-4 md:px-6 pt-4 bg-[#1a1a1a] overflow-x-auto shrink-0">
-            <TabsList className="bg-[#2a2a2a] h-10 p-1 w-fit flex-nowrap">
+          <div
+            ref={tabsScrollRef}
+            className={cn(
+              'px-4 md:px-6 pt-4 pb-2 bg-[#1a1a1a] overflow-x-auto scrollbar-hide scroll-smooth shrink-0 scroll-shadow-x',
+              shadowState.left && 'scroll-shadow-left',
+              shadowState.right && 'scroll-shadow-right',
+            )}
+            onScroll={updateScrollShadows}
+          >
+            <TabsList className="bg-[#2a2a2a] h-10 p-1 w-fit flex-nowrap gap-0.5">
               <TabsTrigger
                 value="info"
                 className="data-[state=active]:bg-white data-[state=active]:text-gray-900 text-gray-500 h-8 text-sm px-4"

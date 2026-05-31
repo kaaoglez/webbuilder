@@ -183,7 +183,7 @@ function HeroSection({
   headingFont: string;
 }) {
   const d = section.data;
-  const title = (section.title || 'Hero Section') as string;
+  const title = (section.title || 'Encabezado') as string;
   const subtitle = (d.subtitle as string) || '';
   const ctaText = (d.ctaText as string) || '';
   const secondaryCtaText = (d.secondaryCtaText as string) || '';
@@ -639,7 +639,7 @@ function CTASection({
   textColor: string;
 }) {
   const d = section.data;
-  const title = (section.title || 'Call to Action') as string;
+  const title = (section.title || 'Llamada a la Acción') as string;
   const subtitle = (d.subtitle as string) || '';
   const ctaText = (d.ctaText as string) || 'Get Started';
 
@@ -1759,7 +1759,7 @@ export default function ThemeLivePreview() {
           {sections.length === 0 && (
             <div className="flex items-center justify-center py-24">
               <p className="text-sm" style={{ color: `${textColor}40` }}>
-                No sections yet. Add sections in the editor to see a live preview.
+                Aún no hay secciones. Añade secciones en el editor para ver la vista previa en vivo.
               </p>
             </div>
           )}

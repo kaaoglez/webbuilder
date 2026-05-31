@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { useProjectsStore } from '@/lib/projects-store';
@@ -41,6 +41,16 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 // ─────────────────────────────────────────────────────────────
 // Helper: slug generation
@@ -129,7 +139,10 @@ function RepeatableCard({
   onRemove?: () => void;
   children: React.ReactNode;
 }) {
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
   return (
+    <>
     <Card className="border border-gray-400 bg-white">
       <CardHeader className="flex flex-row items-center justify-between py-3 px-4">
         {title && <CardTitle className="text-sm font-medium text-gray-600">{title}</CardTitle>}
@@ -139,7 +152,7 @@ function RepeatableCard({
             variant="ghost"
             size="icon"
             className="h-7 w-7 text-gray-500 hover:text-red-500"
-            onClick={onRemove}
+            onClick={() => setConfirmOpen(true)}
           >
             <X className="h-4 w-4" />
           </Button>
@@ -147,6 +160,21 @@ function RepeatableCard({
       </CardHeader>
       <CardContent className="px-4 pb-4 pt-0 space-y-3">{children}</CardContent>
     </Card>
+    <AlertDialog open={confirmOpen} onOpenChange={(open) => { if (!open) setConfirmOpen(false); }}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>¿Eliminar este elemento?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Esta acción no se puede deshacer. Se eliminará el elemento y toda su configuración.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+          <AlertDialogAction onClick={() => { onRemove?.(); setConfirmOpen(false); }} className="bg-red-600 hover:bg-red-700">Eliminar</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
   );
 }
 
@@ -245,7 +273,7 @@ function InfoTab() {
           </FormField>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField label="Slug">
+            <FormField label="URL Amigable">
               <Input
                 value={config.slug || ''}
                 onChange={(e) => updateConfig({ slug: e.target.value })}
@@ -288,7 +316,7 @@ function InfoTab() {
             </FormField>
           </div>
 
-          <FormField label="Dominio de Texto">
+          <FormField label="Dominio de Traducción">
             <Input
               value={config.textDomain || ''}
               onChange={(e) => updateConfig({ textDomain: e.target.value })}
@@ -627,7 +655,7 @@ function OptionsRenderer({
                 placeholder="Products"
               />
             </FormField>
-            <FormField label="Slug">
+            <FormField label="URL Amigable">
               <Input
                 value={(options.postTypeSlug as string) || ''}
                 onChange={(e) => update('postTypeSlug', e.target.value)}
@@ -696,7 +724,7 @@ function OptionsRenderer({
               <Input
                 value={(options.title as string) || ''}
                 onChange={(e) => update('title', e.target.value)}
-                placeholder="Posts Recientes"
+                placeholder="Artículos Recientes"
               />
             </FormField>
             <FormField label="Número de Posts">
@@ -1267,7 +1295,7 @@ function OptionsRenderer({
               <Input
                 value={(options.title as string) || ''}
                 onChange={(e) => update('title', e.target.value)}
-                placeholder="Posts Relacionados"
+                placeholder="Artículos Relacionados"
               />
             </FormField>
             <FormField label="Cantidad">
@@ -1406,7 +1434,7 @@ function GenerateTab() {
         entries.push(`Shortcodes: ${((opts.shortcodes as string[]) || []).length} definidos`);
         break;
       case 'related-posts':
-        entries.push(`Título: ${opts.title || 'Posts Relacionados'}`);
+        entries.push(`Título: ${opts.title || 'Artículos Relacionados'}`);
         entries.push(`Cantidad: ${opts.count || 3}`);
         entries.push(`Miniaturas: ${opts.showThumbnail ? 'Sí' : 'No'}`);
         break;

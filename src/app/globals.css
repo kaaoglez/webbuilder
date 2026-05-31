@@ -121,6 +121,46 @@
   }
 }
 
+/* Hide scrollbar but keep scroll functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Scroll shadow indicators for horizontal scroll */
+.scroll-shadow-x {
+  position: relative;
+}
+.scroll-shadow-x::before,
+.scroll-shadow-x::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 24px;
+  z-index: 10;
+  pointer-events: none;
+  transition: opacity 150ms ease;
+  opacity: 0;
+}
+.scroll-shadow-x::before {
+  left: 0;
+  background: linear-gradient(to right, #1a1a1a, transparent);
+}
+.scroll-shadow-x::after {
+  right: 0;
+  background: linear-gradient(to left, #1a1a1a, transparent);
+}
+.scroll-shadow-x.scroll-shadow-left::before {
+  opacity: 1;
+}
+.scroll-shadow-x.scroll-shadow-right::after {
+  opacity: 1;
+}
+
 /* Checkerboard pattern for image transparency */
 .checkerboard {
   background-image:

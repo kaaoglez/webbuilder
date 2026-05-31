@@ -63,7 +63,7 @@ export default function SettingsPanel() {
       updateSettings(partial);
       if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
       toastTimerRef.current = setTimeout(() => {
-        toast.success('Configuración guardada');
+        toast.success('Cambios guardados exitosamente');
       }, 600);
     },
     [updateSettings],
@@ -154,7 +154,7 @@ export default function SettingsPanel() {
       {/* ── Theme Defaults ── */}
       <SettingsSection
         icon={<Palette className="h-5 w-5 text-emerald-600" />}
-        title="Valores por Defecto — Themes"
+        title="Valores por Defecto — Temas"
         description="Colores y fuentes iniciales al crear un nuevo theme"
       >
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

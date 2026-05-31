@@ -115,7 +115,7 @@ const SECTION_TYPES: SectionType[] = [
 
 const SECTION_DEFAULT_DATA: Record<SectionType, Record<string, unknown>> = {
   hero: {
-    title: 'Hero Section',
+    title: 'Encabezado',
     subtitle: '',
     ctaText: '',
     ctaLink: '#',
@@ -125,41 +125,41 @@ const SECTION_DEFAULT_DATA: Record<SectionType, Record<string, unknown>> = {
     overlayOpacity: 0.5,
   },
   about: {
-    title: 'About Us',
+    title: 'Sobre Nosotros',
     subtitle: '',
     image: '',
     stats: [],
   },
   services: {
-    title: 'Our Services',
+    title: 'Servicios',
     subtitle: '',
     items: [{ icon: '⚡', title: 'Service 1', description: '' }],
     columns: 3,
   },
   features: {
-    title: 'Features',
+    title: 'Características',
     subtitle: '',
     items: [{ icon: '✦', title: 'Feature 1', description: '' }],
     columns: 3,
   },
   testimonials: {
-    title: 'Testimonials',
+    title: 'Testimonios',
     subtitle: '',
     testimonials: [{ quote: '', name: '', role: '', rating: 5 }],
   },
   pricing: {
-    title: 'Pricing',
+    title: 'Precios',
     subtitle: '',
-    plans: [{ name: 'Basic', price: '$0', period: '/month', features: [], highlighted: false, ctaText: 'Comenzar' }],
+    plans: [{ name: 'Básico', price: '$0', period: '/mes', features: [], highlighted: false, ctaText: 'Comenzar' }],
   },
   cta: {
-    title: 'Call to Action',
+    title: 'Llamada a la Acción',
     subtitle: '',
-    ctaText: 'Get Started',
-    ctaLink: '#',
+    ctaText: 'Comenzar',
+    ctaLink: '#contacto',
   },
   contact: {
-    title: 'Contact Us',
+    title: 'Contacto',
     subtitle: '',
     email: '',
     phone: '',
@@ -167,26 +167,26 @@ const SECTION_DEFAULT_DATA: Record<SectionType, Record<string, unknown>> = {
     showForm: false,
   },
   gallery: {
-    title: 'Gallery',
+    title: 'Galería',
     subtitle: '',
     images: [],
     columns: 3,
   },
   faq: {
-    title: 'FAQ',
+    title: 'Preguntas Frecuentes',
     subtitle: '',
     items: [{ question: '', answer: '' }],
   },
   stats: {
-    title: 'Stats',
+    title: 'Estadísticas',
     items: [{ icon: '📊', value: '0', label: '' }],
   },
   team: {
-    title: 'Our Team',
+    title: 'Equipo',
     members: [{ name: '', role: '', bio: '', avatar: '', socials: [] }],
   },
   blog_posts: {
-    title: 'Latest Posts',
+    title: 'Últimos Artículos',
     subtitle: '',
   },
   custom: {
@@ -198,19 +198,19 @@ const SECTION_DEFAULT_DATA: Record<SectionType, Record<string, unknown>> = {
 };
 
 const SECTION_TITLES: Record<SectionType, string> = {
-  hero: 'Hero Section',
-  about: 'About Us',
-  services: 'Our Services',
-  features: 'Features',
-  testimonials: 'Testimonials',
-  pricing: 'Pricing',
-  cta: 'Call to Action',
-  contact: 'Contact Us',
-  gallery: 'Gallery',
-  faq: 'FAQ',
-  stats: 'Stats',
-  team: 'Our Team',
-  blog_posts: 'Latest Posts',
+  hero: 'Encabezado',
+  about: 'Sobre Nosotros',
+  services: 'Servicios',
+  features: 'Características',
+  testimonials: 'Testimonios',
+  pricing: 'Precios',
+  cta: 'Llamada a la Acción',
+  contact: 'Contacto',
+  gallery: 'Galería',
+  faq: 'Preguntas Frecuentes',
+  stats: 'Estadísticas',
+  team: 'Equipo',
+  blog_posts: 'Últimos Artículos',
   custom: 'Sección Personalizada',
 };
 
@@ -232,7 +232,7 @@ const SECTION_TYPE_ICON: Record<string, React.ReactNode> = {
 };
 
 const SECTION_TYPE_LABEL: Record<string, string> = {
-  hero: 'Hero',
+  hero: 'Encabezado',
   about: 'Sobre Nosotros',
   services: 'Servicios',
   features: 'Características',
@@ -356,14 +356,14 @@ function PageHeroConfig({ section, sectionIndex, pageId }: PageSectionConfigProp
         <Input
           value={section.title || ''}
           onChange={(e) => updateSection({ title: e.target.value })}
-          placeholder="Título principal del hero"
+          placeholder="Título principal del encabezado"
         />
       </FormField>
       <FormField label="Subtítulo">
         <Input
           value={(d.subtitle as string) || ''}
           onChange={(e) => updateData({ subtitle: e.target.value })}
-          placeholder="Subtítulo del hero"
+          placeholder="Subtítulo del encabezado"
         />
       </FormField>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -663,14 +663,26 @@ function PageTestimonialsConfig({ section, sectionIndex, pageId }: PageSectionCo
                   />
                 </FormField>
               </div>
-              <FormField label={`Puntuación: ${t.rating}/5`}>
-                <Slider
-                  value={[t.rating]}
-                  onValueChange={([v]) => updateTestimonial(i, 'rating', v)}
-                  min={1}
-                  max={5}
-                  step={1}
-                />
+              <FormField label="Puntuación">
+                <div className="flex gap-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => updateTestimonial(i, 'rating', star)}
+                      className="p-0.5 hover:scale-110 transition-transform"
+                    >
+                      <Star
+                        className={cn(
+                          'h-5 w-5 transition-colors',
+                          star <= (t.rating || 5)
+                            ? 'text-amber-400 fill-amber-400'
+                            : 'text-gray-300'
+                        )}
+                      />
+                    </button>
+                  ))}
+                </div>
               </FormField>
             </RepeatableCard>
           ))}
@@ -781,11 +793,22 @@ function PagePricingConfig({ section, sectionIndex, pageId }: PageSectionConfigP
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <FormField label="Período">
-                  <Input
-                    value={plan.period}
-                    onChange={(e) => updatePlan(i, 'period', e.target.value)}
-                    placeholder="/mes"
-                  />
+                  <Select
+                    value={(plan.period as string) || '/mes'}
+                    onValueChange={(v) => updatePlan(i, 'period', v)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="/mes">/mes</SelectItem>
+                      <SelectItem value="/año">/año</SelectItem>
+                      <SelectItem value="/semana">/semana</SelectItem>
+                      <SelectItem value="/día">/día</SelectItem>
+                      <SelectItem value="/único">/único</SelectItem>
+                      <SelectItem value="">Sin período</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </FormField>
                 <FormField label="Texto del botón">
                   <Input
@@ -2414,6 +2437,7 @@ function PageListView() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newPageName, setNewPageName] = useState('');
   const [newPageSlug, setNewPageSlug] = useState('');
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   const handleCreate = useCallback(() => {
     const name = newPageName.trim();
@@ -2557,7 +2581,7 @@ function PageListView() {
                       className="h-8 w-8 text-gray-500 hover:text-red-500"
                       onClick={(e) => {
                         e.stopPropagation();
-                        removePage(page.id);
+                        setDeleteConfirmId(page.id);
                       }}
                       title="Eliminar"
                     >
@@ -2592,6 +2616,20 @@ function PageListView() {
           ))}
         </div>
       )}
+      <AlertDialog open={deleteConfirmId !== null} onOpenChange={(open) => { if (!open) setDeleteConfirmId(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar esta página?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción no se puede deshacer. Se eliminará la página y todas sus secciones.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { if (deleteConfirmId) { removePage(deleteConfirmId); setDeleteConfirmId(null); } }} className="bg-red-600 hover:bg-red-700">Eliminar</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
@@ -2670,6 +2708,16 @@ function PageEditorView() {
       {/* Page Header */}
       <div className="space-y-4">
         <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start gap-3 flex-1 min-w-0">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleBack}
+              className="shrink-0 border-emerald-400 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800 gap-1.5 mt-0.5"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Volver
+            </Button>
           <div className="flex-1 min-w-0">
             {editingName ? (
               <div className="flex items-center gap-2">
@@ -2706,6 +2754,7 @@ function PageEditorView() {
             <p className="text-sm text-gray-400 font-mono mt-0.5">
               page-{activePage.slug}.php
             </p>
+          </div>
           </div>
 
           <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>

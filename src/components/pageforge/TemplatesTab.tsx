@@ -89,7 +89,7 @@ const SECTION_TYPE_ICON: Record<string, React.ReactNode> = {
 };
 
 const SECTION_TYPE_LABEL: Record<string, string> = {
-  hero: 'Hero',
+  hero: 'Encabezado',
   about: 'Sobre Nosotros',
   services: 'Servicios',
   features: 'Características',
@@ -135,7 +135,7 @@ const OPTION_LABEL_MAP: Record<string, string> = {
   showDate: 'Fecha de publicación',
   showReadMore: 'Botón "Leer más"',
   postsPerRow: 'Posts por fila',
-  showHeroBanner: 'Banner Hero',
+  showHeroBanner: 'Banner del Encabezado',
   showTitle: 'Título de la página',
   showSidebar: 'Mostrar sidebar',
   showSearchBox: 'Caja de búsqueda',
@@ -143,7 +143,7 @@ const OPTION_LABEL_MAP: Record<string, string> = {
   showBackToHome: 'Botón "Volver al inicio"',
   showHighlight: 'Resaltar resultados',
   showSearchWidget: 'Widget de Búsqueda',
-  showRecentPostsWidget: 'Widget de Posts Recientes',
+  showRecentPostsWidget: 'Widget de Artículos Recientes',
   showCategoriesWidget: 'Widget de Categorías',
   showTagsWidget: 'Widget de Etiquetas',
   showArchivesWidget: 'Widget de Archivos',

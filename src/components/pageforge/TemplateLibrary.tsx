@@ -52,13 +52,13 @@ interface TemplateLibraryProps {
 // ─────────────────────────────────────────────────────────────
 
 const SECTION_LABELS: Record<string, string> = {
-  hero: 'Hero',
+  hero: 'Encabezado',
   about: 'About',
   services: 'Services',
   features: 'Features',
   testimonials: 'Testimonials',
   pricing: 'Pricing',
-  cta: 'CTA',
+  cta: 'Llamada a la Acción',
   contact: 'Contact',
   gallery: 'Gallery',
   faq: 'FAQ',
@@ -146,7 +146,7 @@ export default function TemplateLibrary({ onNavigate }: TemplateLibraryProps) {
               Template Library
             </h1>
             <p className="text-sm text-muted-foreground">
-              {templates.length} templates preconstruidos — Elige uno y personalízalo en el editor
+              {templates.length} plantillas preconstruidas — Elige uno y personalízalo en el editor
             </p>
           </div>
         </div>

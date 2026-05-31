@@ -153,7 +153,7 @@ export async function GET() {
       version:     { type: 'string', required: false, label: 'Versión',               description: 'Versión semántica', default: '1.0.0' },
       author:      { type: 'string', required: false, label: 'Autor',                 description: 'Nombre del autor', default: 'PageForge' },
       authorUri:   { type: 'string', required: false, label: 'URI del Autor',         description: 'Sitio web del autor' },
-      textDomain:  { type: 'string', required: false, label: 'Text Domain',           description: 'Dominio de traducción (por defecto coincide con el slug)' },
+      textDomain:  { type: 'string', required: false, label: 'Dominio de Traducción',           description: 'Dominio de traducción (por defecto coincide con el slug)' },
 
       // --- Tipo de Plugin ---
       pluginType:  { type: 'string', required: true,  label: 'Tipo de Plugin',        description: 'El tipo de plugin a generar' },

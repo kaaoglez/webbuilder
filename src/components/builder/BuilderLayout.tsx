@@ -71,7 +71,7 @@ function SidebarContent({ activePage, currentPage, onNavigate, onPreview, onLogo
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 space-y-1" aria-label="Main navigation">
+      <nav className="flex-1 px-3 py-4 space-y-1" aria-label="Navegación principal">
         {NAV_ITEMS.map((item) => {
           // Hide items that require a current page if none is selected
           if (item.requiresCurrentPage && !currentPage) return null;
@@ -176,13 +176,13 @@ function TopBar({ activePage, currentPage, onToggleSidebar }: TopBarProps) {
           size="icon"
           className="lg:hidden text-white/70 hover:text-white hover:bg-white/10"
           onClick={onToggleSidebar}
-          aria-label="Toggle sidebar"
+          aria-label="Alternar barra lateral"
         >
           <Menu className="size-5" />
         </Button>
 
         {/* Breadcrumb */}
-        <nav className="flex items-center gap-1.5 text-sm" aria-label="Breadcrumb">
+        <nav className="flex items-center gap-1.5 text-sm" aria-label="Ruta de navegación">
           <button
             onClick={() => useBuilderStore.getState().setActivePage('dashboard')}
             className="flex items-center gap-1.5 text-white/50 hover:text-white/80 transition-colors"
@@ -207,7 +207,7 @@ function TopBar({ activePage, currentPage, onToggleSidebar }: TopBarProps) {
           onClick={() => useBuilderStore.getState().setShowPreview(true)}
         >
           <Eye className="size-4" />
-          <span>Preview</span>
+          <span>Vista Previa</span>
         </Button>
 
         {/* User avatar */}
