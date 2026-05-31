@@ -92,6 +92,7 @@ export function SortableCardWrapper({ id, children, className, style }: Sortable
 
 // ─────────────────────────────────────────────────────────────
 // SortableCardWrapperInner — uses dnd-kit useSortable
+// Provides HandleContext to children so DragHandle works
 // ONLY rendered when inside a SortableCardsProvider
 // ─────────────────────────────────────────────────────────────
 
@@ -120,9 +121,11 @@ function SortableCardWrapperInner({
 
   return (
     <div ref={setNodeRef} style={wrapperStyle} className={className} data-sortable-id={String(id)}>
-      <div className={isDragging ? 'rounded-lg shadow-lg ring-2 ring-emerald-300 opacity-90' : 'rounded-lg'}>
-        {children}
-      </div>
+      <HandleContext.Provider value={{ attributes, listeners }}>
+        <div className={isDragging ? 'rounded-lg shadow-lg ring-2 ring-emerald-300 opacity-90' : 'rounded-lg'}>
+          {children}
+        </div>
+      </HandleContext.Provider>
     </div>
   );
 }
@@ -130,6 +133,7 @@ function SortableCardWrapperInner({
 // ─────────────────────────────────────────────────────────────
 // SortableCardsProvider
 // Wraps children in dnd-kit DndContext + SortableContext.
+// Provides a stub HandleContext so children know DnD is active.
 // ─────────────────────────────────────────────────────────────
 
 interface SortableCardsProviderProps {
@@ -164,12 +168,14 @@ export function SortableCardsProvider({
       collisionDetection={closestCenter}
       onDragEnd={handleDragEnd}
     >
-      <SortableContext
-        items={safeItems}
-        strategy={verticalListSortingStrategy}
-      >
-        {children}
-      </SortableContext>
+      <HandleContext.Provider value={{ attributes: {}, listeners: undefined }}>
+        <SortableContext
+          items={safeItems}
+          strategy={verticalListSortingStrategy}
+        >
+          {children}
+        </SortableContext>
+      </HandleContext.Provider>
     </DndContext>
   );
 }
