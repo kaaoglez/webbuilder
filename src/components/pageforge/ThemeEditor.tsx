@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useMemo } from 'react';import {
+import React, { useState, useCallback, useMemo, useEffect } from 'react';import {
   DndContext,
   closestCenter,
   PointerSensor,
@@ -1786,6 +1786,13 @@ function SectionsTab() {
 
   const sections = config.sections || [];
   const sectionIds = sections.map((_, i) => i);
+
+  // Auto-select first section when none is selected
+  useEffect(() => {
+    if (activeSectionIndex === null && sections.length > 0) {
+      setActiveSectionIndex(0);
+    }
+  }, [activeSectionIndex, sections.length, setActiveSectionIndex]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {

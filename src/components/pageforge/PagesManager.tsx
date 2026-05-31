@@ -38,7 +38,14 @@ import {
   MousePointerClick,
   FileCode,
   Minus,
+  Save,
+  Download,
+  Loader2,
+  LayoutList,
 } from 'lucide-react';
+import { toast } from 'sonner';
+import { useProjectsStore } from '@/lib/projects-store';
+import { useSettingsStore } from '@/lib/settings-store';
 
 import { cn } from '@/lib/utils';
 import { useThemeEditorStore, type ThemePage } from '@/lib/theme-editor-store';
@@ -2774,33 +2781,107 @@ function PageEditorView() {
 // ─────────────────────────────────────────────────────────────
 
 export default function PagesManager() {
-  const { activePageId } = useThemeEditorStore();
+  const { activePageId, config } = useThemeEditorStore();
+  const saveProject = useProjectsStore((s) => s.saveProject);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const handleSave = useCallback(() => {
+    saveProject(config.name || 'Sin Nombre', 'theme', config as Record<string, unknown>);
+    toast.success('Proyecto guardado en Mis Proyectos');
+  }, [config, saveProject]);
+
+  const handleGenerate = useCallback(async () => {
+    setIsGenerating(true);
+    try {
+      const settings = useSettingsStore.getState();
+      const res = await fetch('/api/generate-theme', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...config, _exportSettings: { includeScreenshot: settings.includeScreenshot, minifyCSS: settings.minifyCSS, includeREADME: settings.includeREADME } }),
+      });
+      if (!res.ok) throw new Error(`Error del servidor: ${res.status}`);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${(config.slug || 'theme')}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success('Theme ZIP generado exitosamente');
+      saveProject(config.name || 'Sin Nombre', 'theme', config as Record<string, unknown>).catch(() => {});
+    } catch (err) {
+      toast.error(`Error al generar: ${err instanceof Error ? err.message : 'Error desconocido'}`);
+    } finally {
+      setIsGenerating(false);
+    }
+  }, [config, saveProject]);
 
   return (
-    <div className="w-full">
-      <AnimatePresence mode="wait">
-        {activePageId ? (
-          <motion.div
-            key="editor"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.2 }}
+    <div className="flex h-full flex-col">
+      {/* STICKY ACTION BAR — siempre visible */}
+      <header className="flex items-center justify-between px-4 md:px-6 py-3 bg-[#1a1a1a] border-b border-gray-700 shrink-0">
+        <div className="flex items-center gap-3">
+          <LayoutList className="h-5 w-5 text-emerald-400" />
+          <h1 className="text-white font-semibold text-lg">Páginas del Theme</h1>
+          {activePageId && (
+            <span className="text-xs text-gray-400 hidden sm:inline">
+              Editando página
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={handleSave}
+            variant="outline"
+            className="bg-[#2a2a2a] border-gray-500 text-gray-400 hover:bg-[#3a3a3a] hover:text-white font-medium"
           >
-            <PageEditorView />
-          </motion.div>
-        ) : (
-          <motion.div
-            key="list"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            transition={{ duration: 0.2 }}
+            <Save className="h-4 w-4 mr-2" />
+            <span className="hidden sm:inline">Guardar</span>
+          </Button>
+          <Button
+            onClick={handleGenerate}
+            disabled={isGenerating}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium"
           >
-            <PageListView />
-          </motion.div>
-        )}
-      </AnimatePresence>
+            {isGenerating ? (
+              <><Loader2 className="h-4 w-4 mr-2 animate-spin" /><span className="hidden sm:inline">Generando...</span></>
+            ) : (
+              <><Download className="h-4 w-4 mr-2" /><span className="hidden sm:inline">Generar ZIP</span></>
+            )}
+          </Button>
+        </div>
+      </header>
+
+      {/* SCROLLABLE CONTENT */}
+      <div className="flex-1 overflow-y-auto bg-[#f0f0eb]">
+        <div className="p-4 md:p-6">
+          <AnimatePresence mode="wait">
+            {activePageId ? (
+              <motion.div
+                key="editor"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.2 }}
+              >
+                <PageEditorView />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="list"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.2 }}
+              >
+                <PageListView />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
     </div>
   );
 }

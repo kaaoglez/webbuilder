@@ -244,14 +244,23 @@ function InfoTab() {
             />
           </FormField>
 
-          <FormField label="Slug">
-            <Input
-              value={config.slug || ''}
-              onChange={(e) => updateConfig({ slug: e.target.value })}
-              placeholder="mi-plugin-wordpress"
-              className="bg-gray-200"
-            />
-          </FormField>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField label="Slug">
+              <Input
+                value={config.slug || ''}
+                onChange={(e) => updateConfig({ slug: e.target.value })}
+                placeholder="mi-plugin-wordpress"
+                className="bg-gray-200"
+              />
+            </FormField>
+            <FormField label="Versión">
+              <Input
+                value={config.version || ''}
+                onChange={(e) => updateConfig({ version: e.target.value })}
+                placeholder="1.0.0"
+              />
+            </FormField>
+          </div>
 
           <FormField label="Descripción">
             <Textarea
@@ -263,14 +272,6 @@ function InfoTab() {
           </FormField>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField label="Versión">
-              <Input
-                value={config.version || ''}
-                onChange={(e) => updateConfig({ version: e.target.value })}
-                placeholder="1.0.0"
-              />
-            </FormField>
-
             <FormField label="Autor">
               <Input
                 value={config.author || ''}
@@ -278,15 +279,14 @@ function InfoTab() {
                 placeholder="Nombre del autor"
               />
             </FormField>
+            <FormField label="URI del Autor">
+              <Input
+                value={config.authorUri || ''}
+                onChange={(e) => updateConfig({ authorUri: e.target.value })}
+                placeholder="https://tu-sitio.com"
+              />
+            </FormField>
           </div>
-
-          <FormField label="URI del Autor">
-            <Input
-              value={config.authorUri || ''}
-              onChange={(e) => updateConfig({ authorUri: e.target.value })}
-              placeholder="https://tu-sitio.com"
-            />
-          </FormField>
 
           <FormField label="Dominio de Texto">
             <Input
@@ -517,38 +517,42 @@ function OptionsRenderer({
     case 'contact-form':
       return (
         <>
-          <FormField label="Email Destinatario">
-            <Input
-              type="email"
-              value={(options.recipientEmail as string) || ''}
-              onChange={(e) => update('recipientEmail', e.target.value)}
-              placeholder="admin@example.com"
-            />
-          </FormField>
-          <FormField label="Asunto del Email">
-            <Input
-              value={(options.subject as string) || ''}
-              onChange={(e) => update('subject', e.target.value)}
-              placeholder="Nuevo mensaje de contacto"
-            />
-          </FormField>
-          <FormField label="Mensaje de Éxito">
-            <Input
-              value={(options.successMessage as string) || ''}
-              onChange={(e) => update('successMessage', e.target.value)}
-              placeholder="Mensaje enviado correctamente"
-            />
-          </FormField>
-          <FormField label="Texto del Botón">
-            <Input
-              value={(options.buttonLabel as string) || ''}
-              onChange={(e) => update('buttonLabel', e.target.value)}
-              placeholder="Enviar"
-            />
-          </FormField>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField label="Email Destinatario">
+              <Input
+                type="email"
+                value={(options.recipientEmail as string) || ''}
+                onChange={(e) => update('recipientEmail', e.target.value)}
+                placeholder="admin@example.com"
+              />
+            </FormField>
+            <FormField label="Asunto del Email">
+              <Input
+                value={(options.subject as string) || ''}
+                onChange={(e) => update('subject', e.target.value)}
+                placeholder="Nuevo mensaje de contacto"
+              />
+            </FormField>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField label="Mensaje de Éxito">
+              <Input
+                value={(options.successMessage as string) || ''}
+                onChange={(e) => update('successMessage', e.target.value)}
+                placeholder="Mensaje enviado correctamente"
+              />
+            </FormField>
+            <FormField label="Texto del Botón">
+              <Input
+                value={(options.buttonLabel as string) || ''}
+                onChange={(e) => update('buttonLabel', e.target.value)}
+                placeholder="Enviar"
+              />
+            </FormField>
+          </div>
           <Separator />
           <Label className="text-sm font-medium text-gray-700">Campos del Formulario</Label>
-          <div className="space-y-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {(['name', 'email', 'subject', 'message'] as const).map((field) => (
               <SwitchField
                 key={field}
@@ -570,27 +574,41 @@ function OptionsRenderer({
     case 'slider':
       return (
         <>
-          <SwitchField label="Autoplay" checked={options.autoplay as boolean || false} onChange={(v) => update('autoplay', v)} />
-          <FormField label={`Velocidad de Autoplay: ${(options.autoplaySpeed as number) || 5000}ms`}>
-            <Input
-              type="number"
-              min={1000}
-              max={20000}
-              step={500}
-              value={(options.autoplaySpeed as number) || 5000}
-              onChange={(e) => update('autoplaySpeed', Number(e.target.value))}
-            />
-          </FormField>
-          <SwitchField label="Flechas de Navegación" checked={options.arrows as boolean || false} onChange={(v) => update('arrows', v)} />
-          <SwitchField label="Puntos de Indicador" checked={options.dots as boolean || false} onChange={(v) => update('dots', v)} />
-          <SwitchField label="Loop Infinito" checked={options.infinite as boolean || false} onChange={(v) => update('infinite', v)} />
-          <FormField label="Altura Máxima">
-            <Input
-              value={(options.maxHeight as string) || '500px'}
-              onChange={(e) => update('maxHeight', e.target.value)}
-              placeholder="500px"
-            />
-          </FormField>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center gap-2">
+              <SwitchField label="Autoplay" checked={options.autoplay as boolean || false} onChange={(v) => update('autoplay', v)} />
+            </div>
+            <FormField label={`Velocidad de Autoplay: ${(options.autoplaySpeed as number) || 5000}ms`}>
+              <Input
+                type="number"
+                min={1000}
+                max={20000}
+                step={500}
+                value={(options.autoplaySpeed as number) || 5000}
+                onChange={(e) => update('autoplaySpeed', Number(e.target.value))}
+              />
+            </FormField>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center gap-2">
+              <SwitchField label="Flechas de Navegación" checked={options.arrows as boolean || false} onChange={(v) => update('arrows', v)} />
+            </div>
+            <div className="flex items-center gap-2">
+              <SwitchField label="Puntos de Indicador" checked={options.dots as boolean || false} onChange={(v) => update('dots', v)} />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center gap-2">
+              <SwitchField label="Loop Infinito" checked={options.infinite as boolean || false} onChange={(v) => update('infinite', v)} />
+            </div>
+            <FormField label="Altura Máxima">
+              <Input
+                value={(options.maxHeight as string) || '500px'}
+                onChange={(e) => update('maxHeight', e.target.value)}
+                placeholder="500px"
+              />
+            </FormField>
+          </div>
         </>
       );
 
@@ -601,24 +619,26 @@ function OptionsRenderer({
       const currentSupports = (options.supports as string[]) || [];
       return (
         <>
-          <FormField label="Nombre del Post Type">
-            <Input
-              value={(options.postTypeName as string) || ''}
-              onChange={(e) => handleNameChange(e.target.value)}
-              placeholder="Products"
-            />
-          </FormField>
-          <FormField label="Slug">
-            <Input
-              value={(options.postTypeSlug as string) || ''}
-              onChange={(e) => update('postTypeSlug', e.target.value)}
-              placeholder="products"
-              className="bg-gray-200"
-            />
-          </FormField>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField label="Nombre del Post Type">
+              <Input
+                value={(options.postTypeName as string) || ''}
+                onChange={(e) => handleNameChange(e.target.value)}
+                placeholder="Products"
+              />
+            </FormField>
+            <FormField label="Slug">
+              <Input
+                value={(options.postTypeSlug as string) || ''}
+                onChange={(e) => update('postTypeSlug', e.target.value)}
+                placeholder="products"
+                className="bg-gray-200"
+              />
+            </FormField>
+          </div>
           <Separator />
           <Label className="text-sm font-medium text-gray-700">Soportes</Label>
-          <div className="space-y-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {(['title', 'editor', 'thumbnail', 'excerpt', 'custom-fields'] as const).map((s) => (
               <SwitchField
                 key={s}
@@ -634,8 +654,14 @@ function OptionsRenderer({
             ))}
           </div>
           <Separator />
-          <SwitchField label="Público" checked={options.public as boolean || false} onChange={(v) => update('public', v)} />
-          <SwitchField label="Tiene Archivo" checked={options.hasArchive as boolean || false} onChange={(v) => update('hasArchive', v)} />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center gap-2">
+              <SwitchField label="Público" checked={options.public as boolean || false} onChange={(v) => update('public', v)} />
+            </div>
+            <div className="flex items-center gap-2">
+              <SwitchField label="Tiene Archivo" checked={options.hasArchive as boolean || false} onChange={(v) => update('hasArchive', v)} />
+            </div>
+          </div>
           <SwitchField label="Mostrar en REST API" checked={options.showInRest as boolean || false} onChange={(v) => update('showInRest', v)} />
         </>
       );
@@ -643,46 +669,68 @@ function OptionsRenderer({
 
     case 'shortcodes':
       return (
-        <div className="space-y-2">
-          <SwitchField label="Botón [pf_button]" checked={options.enableButton as boolean || false} onChange={(v) => update('enableButton', v)} />
-          <SwitchField label="Caja [pf_box]" checked={options.enableBox as boolean || false} onChange={(v) => update('enableBox', v)} />
-          <SwitchField label="Alerta [pf_alert]" checked={options.enableAlert as boolean || false} onChange={(v) => update('enableAlert', v)} />
-          <SwitchField label="Separador [pf_divider]" checked={options.enableDivider as boolean || false} onChange={(v) => update('enableDivider', v)} />
-          <SwitchField label="Cuenta Regresiva [pf_countdown]" checked={options.enableCountdown as boolean || false} onChange={(v) => update('enableCountdown', v)} />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="flex items-center gap-2">
+            <SwitchField label="Botón [pf_button]" checked={options.enableButton as boolean || false} onChange={(v) => update('enableButton', v)} />
+          </div>
+          <div className="flex items-center gap-2">
+            <SwitchField label="Caja [pf_box]" checked={options.enableBox as boolean || false} onChange={(v) => update('enableBox', v)} />
+          </div>
+          <div className="flex items-center gap-2">
+            <SwitchField label="Alerta [pf_alert]" checked={options.enableAlert as boolean || false} onChange={(v) => update('enableAlert', v)} />
+          </div>
+          <div className="flex items-center gap-2">
+            <SwitchField label="Separador [pf_divider]" checked={options.enableDivider as boolean || false} onChange={(v) => update('enableDivider', v)} />
+          </div>
+          <div className="flex items-center gap-2">
+            <SwitchField label="Cuenta Regresiva [pf_countdown]" checked={options.enableCountdown as boolean || false} onChange={(v) => update('enableCountdown', v)} />
+          </div>
         </div>
       );
 
     case 'widget':
       return (
         <>
-          <FormField label="Título del Widget">
-            <Input
-              value={(options.title as string) || ''}
-              onChange={(e) => update('title', e.target.value)}
-              placeholder="Posts Recientes"
-            />
-          </FormField>
-          <FormField label="Número de Posts">
-            <Input
-              type="number"
-              min={1}
-              max={20}
-              value={(options.postCount as number) || 5}
-              onChange={(e) => update('postCount', Number(e.target.value))}
-            />
-          </FormField>
-          <SwitchField label="Mostrar Miniatura" checked={options.showThumbnail as boolean || false} onChange={(v) => update('showThumbnail', v)} />
-          <SwitchField label="Mostrar Fecha" checked={options.showDate as boolean || false} onChange={(v) => update('showDate', v)} />
-          <SwitchField label="Mostrar Extracto" checked={options.showExcerpt as boolean || false} onChange={(v) => update('showExcerpt', v)} />
-          <FormField label="Longitud del Extracto">
-            <Input
-              type="number"
-              min={10}
-              max={200}
-              value={(options.excerptLength as number) || 50}
-              onChange={(e) => update('excerptLength', Number(e.target.value))}
-            />
-          </FormField>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField label="Título del Widget">
+              <Input
+                value={(options.title as string) || ''}
+                onChange={(e) => update('title', e.target.value)}
+                placeholder="Posts Recientes"
+              />
+            </FormField>
+            <FormField label="Número de Posts">
+              <Input
+                type="number"
+                min={1}
+                max={20}
+                value={(options.postCount as number) || 5}
+                onChange={(e) => update('postCount', Number(e.target.value))}
+              />
+            </FormField>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center gap-2">
+              <SwitchField label="Mostrar Miniatura" checked={options.showThumbnail as boolean || false} onChange={(v) => update('showThumbnail', v)} />
+            </div>
+            <div className="flex items-center gap-2">
+              <SwitchField label="Mostrar Fecha" checked={options.showDate as boolean || false} onChange={(v) => update('showDate', v)} />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center gap-2">
+              <SwitchField label="Mostrar Extracto" checked={options.showExcerpt as boolean || false} onChange={(v) => update('showExcerpt', v)} />
+            </div>
+            <FormField label="Longitud del Extracto">
+              <Input
+                type="number"
+                min={10}
+                max={200}
+                value={(options.excerptLength as number) || 50}
+                onChange={(e) => update('excerptLength', Number(e.target.value))}
+              />
+            </FormField>
+          </div>
         </>
       );
 
@@ -690,9 +738,8 @@ function OptionsRenderer({
       const currentPlatforms = (options.platforms as string[]) || [];
       return (
         <>
-          <Separator />
           <Label className="text-sm font-medium text-gray-700">Plataformas</Label>
-          <div className="space-y-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {(['facebook', 'twitter', 'linkedin', 'whatsapp', 'pinterest'] as const).map((p) => (
               <SwitchField
                 key={p}
@@ -708,22 +755,26 @@ function OptionsRenderer({
             ))}
           </div>
           <Separator />
-          <FormField label="Posición">
-            <Select
-              value={(options.position as string) || 'bottom'}
-              onValueChange={(v) => update('position', v)}
-            >
-              <SelectTrigger className="w-40">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="bottom">Abajo</SelectItem>
-                <SelectItem value="top">Arriba</SelectItem>
-                <SelectItem value="both">Ambos</SelectItem>
-              </SelectContent>
-            </Select>
-          </FormField>
-          <SwitchField label="Mostrar Contador" checked={options.showCount as boolean || false} onChange={(v) => update('showCount', v)} />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField label="Posición">
+              <Select
+                value={(options.position as string) || 'bottom'}
+                onValueChange={(v) => update('position', v)}
+              >
+                <SelectTrigger className="w-40">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="bottom">Abajo</SelectItem>
+                  <SelectItem value="top">Arriba</SelectItem>
+                  <SelectItem value="both">Ambos</SelectItem>
+                </SelectContent>
+              </Select>
+            </FormField>
+            <div className="flex items-center gap-2">
+              <SwitchField label="Mostrar Contador" checked={options.showCount as boolean || false} onChange={(v) => update('showCount', v)} />
+            </div>
+          </div>
           <SwitchField label="Barra Flotante Lateral" checked={options.floatingSidebar as boolean || false} onChange={(v) => update('floatingSidebar', v)} />
         </>
       );
@@ -732,8 +783,14 @@ function OptionsRenderer({
     case 'seo':
       return (
         <>
-          <SwitchField label="Habilitar Open Graph" checked={options.enableOpenGraph as boolean || false} onChange={(v) => update('enableOpenGraph', v)} />
-          <SwitchField label="Habilitar Sitemap" checked={options.enableSitemap as boolean || false} onChange={(v) => update('enableSitemap', v)} />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center gap-2">
+              <SwitchField label="Habilitar Open Graph" checked={options.enableOpenGraph as boolean || false} onChange={(v) => update('enableOpenGraph', v)} />
+            </div>
+            <div className="flex items-center gap-2">
+              <SwitchField label="Habilitar Sitemap" checked={options.enableSitemap as boolean || false} onChange={(v) => update('enableSitemap', v)} />
+            </div>
+          </div>
           <FormField label="Intervalo del Sitemap">
             <Select
               value={(options.sitemapInterval as string) || 'daily'}
@@ -764,23 +821,25 @@ function OptionsRenderer({
               placeholder="AIza..."
             />
           </FormField>
-          <FormField label="Dirección">
-            <Input
-              value={(options.address as string) || ''}
-              onChange={(e) => update('address', e.target.value)}
-              placeholder="Calle Principal 123, Ciudad"
-            />
-          </FormField>
-          <FormField label={`Zoom: ${options.zoom as number || 15}`}>
-            <Slider
-              value={[options.zoom as number || 15]}
-              onValueChange={([v]) => update('zoom', v)}
-              min={1}
-              max={20}
-              step={1}
-            />
-          </FormField>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField label="Dirección">
+              <Input
+                value={(options.address as string) || ''}
+                onChange={(e) => update('address', e.target.value)}
+                placeholder="Calle Principal 123, Ciudad"
+              />
+            </FormField>
+            <FormField label={`Zoom: ${options.zoom as number || 15}`}>
+              <Slider
+                value={[options.zoom as number || 15]}
+                onValueChange={([v]) => update('zoom', v)}
+                min={1}
+                max={20}
+                step={1}
+              />
+            </FormField>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField label="Ancho">
               <Input
                 value={(options.width as string) || '100%'}
@@ -818,27 +877,37 @@ function OptionsRenderer({
     case 'countdown':
       return (
         <>
-          <FormField label="Fecha del Evento">
-            <Input
-              type="datetime-local"
-              value={(options.date as string) || ''}
-              onChange={(e) => update('date', e.target.value)}
-            />
-          </FormField>
-          <FormField label="Título">
-            <Input
-              value={(options.title as string) || ''}
-              onChange={(e) => update('title', e.target.value)}
-              placeholder="Cuenta Regresiva"
-            />
-          </FormField>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField label="Fecha del Evento">
+              <Input
+                type="datetime-local"
+                value={(options.date as string) || ''}
+                onChange={(e) => update('date', e.target.value)}
+              />
+            </FormField>
+            <FormField label="Título">
+              <Input
+                value={(options.title as string) || ''}
+                onChange={(e) => update('title', e.target.value)}
+                placeholder="Cuenta Regresiva"
+              />
+            </FormField>
+          </div>
           <Separator />
           <Label className="text-sm font-medium text-gray-700">Mostrar Unidades</Label>
-          <div className="space-y-2">
-            <SwitchField label="Días" checked={options.showDays as boolean || false} onChange={(v) => update('showDays', v)} />
-            <SwitchField label="Horas" checked={options.showHours as boolean || false} onChange={(v) => update('showHours', v)} />
-            <SwitchField label="Minutos" checked={options.showMinutes as boolean || false} onChange={(v) => update('showMinutes', v)} />
-            <SwitchField label="Segundos" checked={options.showSeconds as boolean || false} onChange={(v) => update('showSeconds', v)} />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center gap-2">
+              <SwitchField label="Días" checked={options.showDays as boolean || false} onChange={(v) => update('showDays', v)} />
+            </div>
+            <div className="flex items-center gap-2">
+              <SwitchField label="Horas" checked={options.showHours as boolean || false} onChange={(v) => update('showHours', v)} />
+            </div>
+            <div className="flex items-center gap-2">
+              <SwitchField label="Minutos" checked={options.showMinutes as boolean || false} onChange={(v) => update('showMinutes', v)} />
+            </div>
+            <div className="flex items-center gap-2">
+              <SwitchField label="Segundos" checked={options.showSeconds as boolean || false} onChange={(v) => update('showSeconds', v)} />
+            </div>
           </div>
           <FormField label="Tema">
             <Select
@@ -1029,30 +1098,38 @@ function OptionsRenderer({
     case 'testimonials':
       return (
         <>
-          <FormField label="Título">
-            <Input
-              value={(options.title as string) || ''}
-              onChange={(e) => update('title', e.target.value)}
-              placeholder="Lo que dicen nuestros clientes"
-            />
-          </FormField>
-          <FormField label="Columnas">
-            <Select
-              value={String(options.columns || 3)}
-              onValueChange={(v) => update('columns', Number(v))}
-            >
-              <SelectTrigger className="w-32">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="2">2 Columnas</SelectItem>
-                <SelectItem value="3">3 Columnas</SelectItem>
-                <SelectItem value="4">4 Columnas</SelectItem>
-              </SelectContent>
-            </Select>
-          </FormField>
-          <SwitchField label="Mostrar Estrellas" checked={options.showStars as boolean || false} onChange={(v) => update('showStars', v)} />
-          <SwitchField label="Mostrar Rol" checked={options.showRole as boolean || false} onChange={(v) => update('showRole', v)} />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField label="Título">
+              <Input
+                value={(options.title as string) || ''}
+                onChange={(e) => update('title', e.target.value)}
+                placeholder="Lo que dicen nuestros clientes"
+              />
+            </FormField>
+            <FormField label="Columnas">
+              <Select
+                value={String(options.columns || 3)}
+                onValueChange={(v) => update('columns', Number(v))}
+              >
+                <SelectTrigger className="w-32">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="2">2 Columnas</SelectItem>
+                  <SelectItem value="3">3 Columnas</SelectItem>
+                  <SelectItem value="4">4 Columnas</SelectItem>
+                </SelectContent>
+              </Select>
+            </FormField>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center gap-2">
+              <SwitchField label="Mostrar Estrellas" checked={options.showStars as boolean || false} onChange={(v) => update('showStars', v)} />
+            </div>
+            <div className="flex items-center gap-2">
+              <SwitchField label="Mostrar Rol" checked={options.showRole as boolean || false} onChange={(v) => update('showRole', v)} />
+            </div>
+          </div>
           <FormField label="Máximo de Testimonios">
             <Input
               type="number"
@@ -1146,22 +1223,30 @@ function OptionsRenderer({
     case 'breadcrumbs':
       return (
         <>
-          <FormField label="Separador">
-            <Input
-              value={(options.separator as string) || ''}
-              onChange={(e) => update('separator', e.target.value)}
-              placeholder="›"
-            />
-          </FormField>
-          <SwitchField label="Mostrar Inicio" checked={options.showHome as boolean || false} onChange={(v) => update('showHome', v)} />
-          <FormField label="Etiqueta de Inicio">
-            <Input
-              value={(options.homeLabel as string) || ''}
-              onChange={(e) => update('homeLabel', e.target.value)}
-              placeholder="Inicio"
-            />
-          </FormField>
-          <SwitchField label="Mostrar Página Actual" checked={options.showCurrent as boolean || false} onChange={(v) => update('showCurrent', v)} />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField label="Separador">
+              <Input
+                value={(options.separator as string) || ''}
+                onChange={(e) => update('separator', e.target.value)}
+                placeholder="›"
+              />
+            </FormField>
+            <FormField label="Etiqueta de Inicio">
+              <Input
+                value={(options.homeLabel as string) || ''}
+                onChange={(e) => update('homeLabel', e.target.value)}
+                placeholder="Inicio"
+              />
+            </FormField>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center gap-2">
+              <SwitchField label="Mostrar Inicio" checked={options.showHome as boolean || false} onChange={(v) => update('showHome', v)} />
+            </div>
+            <div className="flex items-center gap-2">
+              <SwitchField label="Mostrar Página Actual" checked={options.showCurrent as boolean || false} onChange={(v) => update('showCurrent', v)} />
+            </div>
+          </div>
           <FormField label="Profundidad Máxima">
             <Input
               type="number"
@@ -1177,48 +1262,58 @@ function OptionsRenderer({
     case 'related-posts':
       return (
         <>
-          <FormField label="Título">
-            <Input
-              value={(options.title as string) || ''}
-              onChange={(e) => update('title', e.target.value)}
-              placeholder="Posts Relacionados"
-            />
-          </FormField>
-          <FormField label="Cantidad">
-            <Input
-              type="number"
-              min={1}
-              max={10}
-              value={(options.count as number) || 3}
-              onChange={(e) => update('count', Number(e.target.value))}
-            />
-          </FormField>
-          <SwitchField label="Mostrar Miniatura" checked={options.showThumbnail as boolean || false} onChange={(v) => update('showThumbnail', v)} />
-          <SwitchField label="Mostrar Extracto" checked={options.showExcerpt as boolean || false} onChange={(v) => update('showExcerpt', v)} />
-          <FormField label="Longitud del Extracto">
-            <Input
-              type="number"
-              min={10}
-              max={300}
-              value={(options.excerptLength as number) || 100}
-              onChange={(e) => update('excerptLength', Number(e.target.value))}
-            />
-          </FormField>
-          <FormField label="Relacionar por">
-            <Select
-              value={(options.matchBy as string) || 'category'}
-              onValueChange={(v) => update('matchBy', v)}
-            >
-              <SelectTrigger className="w-40">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="category">Categoría</SelectItem>
-                <SelectItem value="tag">Etiqueta</SelectItem>
-                <SelectItem value="both">Ambos</SelectItem>
-              </SelectContent>
-            </Select>
-          </FormField>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField label="Título">
+              <Input
+                value={(options.title as string) || ''}
+                onChange={(e) => update('title', e.target.value)}
+                placeholder="Posts Relacionados"
+              />
+            </FormField>
+            <FormField label="Cantidad">
+              <Input
+                type="number"
+                min={1}
+                max={10}
+                value={(options.count as number) || 3}
+                onChange={(e) => update('count', Number(e.target.value))}
+              />
+            </FormField>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center gap-2">
+              <SwitchField label="Mostrar Miniatura" checked={options.showThumbnail as boolean || false} onChange={(v) => update('showThumbnail', v)} />
+            </div>
+            <div className="flex items-center gap-2">
+              <SwitchField label="Mostrar Extracto" checked={options.showExcerpt as boolean || false} onChange={(v) => update('showExcerpt', v)} />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField label="Longitud del Extracto">
+              <Input
+                type="number"
+                min={10}
+                max={300}
+                value={(options.excerptLength as number) || 100}
+                onChange={(e) => update('excerptLength', Number(e.target.value))}
+              />
+            </FormField>
+            <FormField label="Relacionar por">
+              <Select
+                value={(options.matchBy as string) || 'category'}
+                onValueChange={(v) => update('matchBy', v)}
+              >
+                <SelectTrigger className="w-40">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="category">Categoría</SelectItem>
+                  <SelectItem value="tag">Etiqueta</SelectItem>
+                  <SelectItem value="both">Ambos</SelectItem>
+                </SelectContent>
+              </Select>
+            </FormField>
+          </div>
         </>
       );
 
