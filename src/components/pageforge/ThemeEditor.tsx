@@ -648,22 +648,24 @@ function HeroConfig({ section, sectionIndex }: { section: ThemeSection; sectionI
   const d = section.data;
 
   return (
-    <div className="space-y-4">
-      <FormField label="Título">
-        <Input
-          value={section.title || ''}
-          onChange={(e) => updateSection(sectionIndex, { title: e.target.value })}
-          placeholder="Título principal del encabezado"
-        />
-      </FormField>
-      <FormField label="Subtítulo">
-        <Input
-          value={(d.subtitle as string) || ''}
-          onChange={(e) => updateSectionData(sectionIndex, { subtitle: e.target.value })}
-          placeholder="Subtítulo del encabezado"
-        />
-      </FormField>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="space-y-3">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <FormField label="Título">
+          <Input
+            value={section.title || ''}
+            onChange={(e) => updateSection(sectionIndex, { title: e.target.value })}
+            placeholder="Título principal del encabezado"
+          />
+        </FormField>
+        <FormField label="Subtítulo">
+          <Input
+            value={(d.subtitle as string) || ''}
+            onChange={(e) => updateSectionData(sectionIndex, { subtitle: e.target.value })}
+            placeholder="Subtítulo del encabezado"
+          />
+        </FormField>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
         <FormField label="Texto del Botón Principal">
           <Input
             value={(d.ctaText as string) || ''}
@@ -679,7 +681,7 @@ function HeroConfig({ section, sectionIndex }: { section: ThemeSection; sectionI
           />
         </FormField>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-3">
         <FormField label="Texto del Botón Secundario">
           <Input
             value={(d.secondaryCtaText as string) || ''}
@@ -695,20 +697,22 @@ function HeroConfig({ section, sectionIndex }: { section: ThemeSection; sectionI
           />
         </FormField>
       </div>
-      <ImageUrlField
-        value={(d.backgroundImage as string) || ''}
-        onChange={(url) => updateSectionData(sectionIndex, { backgroundImage: url })}
-        label="URL de Imagen de Fondo"
-      />
-      <FormField label={`Intensidad del fondo: ${Math.round((d.overlayOpacity as number ?? 0.5) * 100)}%`}>
-        <Slider
-          value={[d.overlayOpacity as number ?? 0.5]}
-          onValueChange={([v]) => updateSectionData(sectionIndex, { overlayOpacity: v })}
-          min={0}
-          max={1}
-          step={0.05}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <ImageUrlField
+          value={(d.backgroundImage as string) || ''}
+          onChange={(url) => updateSectionData(sectionIndex, { backgroundImage: url })}
+          label="Imagen de Fondo"
         />
-      </FormField>
+        <FormField label={`Intensidad del fondo: ${Math.round((d.overlayOpacity as number ?? 0.5) * 100)}%`}>
+          <Slider
+            value={[d.overlayOpacity as number ?? 0.5]}
+            onValueChange={([v]) => updateSectionData(sectionIndex, { overlayOpacity: v })}
+            min={0}
+            max={1}
+            step={0.05}
+          />
+        </FormField>
+      </div>
     </div>
   );
 }
@@ -736,21 +740,23 @@ function AboutConfig({ section, sectionIndex }: { section: ThemeSection; section
   };
 
   return (
-    <div className="space-y-4">
-      <FormField label="Título">
-        <Input
-          value={section.title || ''}
-          onChange={(e) => updateSection(sectionIndex, { title: e.target.value })}
-          placeholder="Sobre Nosotros"
-        />
-      </FormField>
-      <FormField label="Subtítulo">
-        <Input
-          value={(d.subtitle as string) || ''}
-          onChange={(e) => updateSectionData(sectionIndex, { subtitle: e.target.value })}
-          placeholder="Subtítulo"
-        />
-      </FormField>
+    <div className="space-y-3">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <FormField label="Título">
+          <Input
+            value={section.title || ''}
+            onChange={(e) => updateSection(sectionIndex, { title: e.target.value })}
+            placeholder="Sobre Nosotros"
+          />
+        </FormField>
+        <FormField label="Subtítulo">
+          <Input
+            value={(d.subtitle as string) || ''}
+            onChange={(e) => updateSectionData(sectionIndex, { subtitle: e.target.value })}
+            placeholder="Subtítulo"
+          />
+        </FormField>
+      </div>
       <ImageUrlField
         value={(d.image as string) || ''}
         onChange={(url) => updateSectionData(sectionIndex, { image: url })}
@@ -825,21 +831,23 @@ function ServicesFeaturesConfig({
   };
 
   return (
-    <div className="space-y-4">
-      <FormField label="Título">
-        <Input
-          value={section.title || ''}
-          onChange={(e) => updateSection(sectionIndex, { title: e.target.value })}
-          placeholder="Servicios"
-        />
-      </FormField>
-      <FormField label="Subtítulo">
-        <Input
-          value={(d.subtitle as string) || ''}
-          onChange={(e) => updateSectionData(sectionIndex, { subtitle: e.target.value })}
-          placeholder="Subtítulo"
-        />
-      </FormField>
+    <div className="space-y-3">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <FormField label="Título">
+          <Input
+            value={section.title || ''}
+            onChange={(e) => updateSection(sectionIndex, { title: e.target.value })}
+            placeholder="Servicios"
+          />
+        </FormField>
+        <FormField label="Subtítulo">
+          <Input
+            value={(d.subtitle as string) || ''}
+            onChange={(e) => updateSectionData(sectionIndex, { subtitle: e.target.value })}
+            placeholder="Subtítulo"
+          />
+        </FormField>
+      </div>
       <FormField label="Columnas">
         <Select value={String(columns)} onValueChange={(v) => updateSectionData(sectionIndex, { columns: Number(v) })}>
           <SelectTrigger className="w-32">
@@ -920,21 +928,23 @@ function TestimonialsConfig({ section, sectionIndex }: { section: ThemeSection; 
   };
 
   return (
-    <div className="space-y-4">
-      <FormField label="Título">
-        <Input
-          value={section.title || ''}
-          onChange={(e) => updateSection(sectionIndex, { title: e.target.value })}
-          placeholder="Testimonios"
-        />
-      </FormField>
-      <FormField label="Subtítulo">
-        <Input
-          value={(d.subtitle as string) || ''}
-          onChange={(e) => updateSectionData(sectionIndex, { subtitle: e.target.value })}
-          placeholder="Lo que dicen nuestros clientes"
-        />
-      </FormField>
+    <div className="space-y-3">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <FormField label="Título">
+          <Input
+            value={section.title || ''}
+            onChange={(e) => updateSection(sectionIndex, { title: e.target.value })}
+            placeholder="Testimonios"
+          />
+        </FormField>
+        <FormField label="Subtítulo">
+          <Input
+            value={(d.subtitle as string) || ''}
+            onChange={(e) => updateSectionData(sectionIndex, { subtitle: e.target.value })}
+            placeholder="Lo que dicen nuestros clientes"
+          />
+        </FormField>
+      </div>
 
       <Separator />
       <div className="space-y-3">
@@ -1059,21 +1069,23 @@ function PricingConfig({ section, sectionIndex }: { section: ThemeSection; secti
   };
 
   return (
-    <div className="space-y-4">
-      <FormField label="Título">
-        <Input
-          value={section.title || ''}
-          onChange={(e) => updateSection(sectionIndex, { title: e.target.value })}
-          placeholder="Precios"
-        />
-      </FormField>
-      <FormField label="Subtítulo">
-        <Input
-          value={(d.subtitle as string) || ''}
-          onChange={(e) => updateSectionData(sectionIndex, { subtitle: e.target.value })}
-          placeholder="Elige tu plan ideal"
-        />
-      </FormField>
+    <div className="space-y-3">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <FormField label="Título">
+          <Input
+            value={section.title || ''}
+            onChange={(e) => updateSection(sectionIndex, { title: e.target.value })}
+            placeholder="Precios"
+          />
+        </FormField>
+        <FormField label="Subtítulo">
+          <Input
+            value={(d.subtitle as string) || ''}
+            onChange={(e) => updateSectionData(sectionIndex, { subtitle: e.target.value })}
+            placeholder="Elige tu plan ideal"
+          />
+        </FormField>
+      </div>
 
       <Separator />
       <div className="space-y-3">
@@ -1189,21 +1201,23 @@ function CTAConfig({ section, sectionIndex }: { section: ThemeSection; sectionIn
   const d = section.data;
 
   return (
-    <div className="space-y-4">
-      <FormField label="Título">
-        <Input
-          value={section.title || ''}
-          onChange={(e) => updateSection(sectionIndex, { title: e.target.value })}
-          placeholder="Llamada a la Acción"
-        />
-      </FormField>
-      <FormField label="Subtítulo">
-        <Input
-          value={(d.subtitle as string) || ''}
-          onChange={(e) => updateSectionData(sectionIndex, { subtitle: e.target.value })}
-          placeholder="Subtítulo"
-        />
-      </FormField>
+    <div className="space-y-3">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <FormField label="Título">
+          <Input
+            value={section.title || ''}
+            onChange={(e) => updateSection(sectionIndex, { title: e.target.value })}
+            placeholder="Llamada a la Acción"
+          />
+        </FormField>
+        <FormField label="Subtítulo">
+          <Input
+            value={(d.subtitle as string) || ''}
+            onChange={(e) => updateSectionData(sectionIndex, { subtitle: e.target.value })}
+            placeholder="Subtítulo"
+          />
+        </FormField>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FormField label="Texto del Botón">
           <Input
@@ -1229,21 +1243,23 @@ function ContactConfig({ section, sectionIndex }: { section: ThemeSection; secti
   const d = section.data;
 
   return (
-    <div className="space-y-4">
-      <FormField label="Título">
-        <Input
-          value={section.title || ''}
-          onChange={(e) => updateSection(sectionIndex, { title: e.target.value })}
-          placeholder="Contáctanos"
-        />
-      </FormField>
-      <FormField label="Subtítulo">
-        <Input
-          value={(d.subtitle as string) || ''}
-          onChange={(e) => updateSectionData(sectionIndex, { subtitle: e.target.value })}
-          placeholder="Estamos para ayudarte"
-        />
-      </FormField>
+    <div className="space-y-3">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <FormField label="Título">
+          <Input
+            value={section.title || ''}
+            onChange={(e) => updateSection(sectionIndex, { title: e.target.value })}
+            placeholder="Contáctanos"
+          />
+        </FormField>
+        <FormField label="Subtítulo">
+          <Input
+            value={(d.subtitle as string) || ''}
+            onChange={(e) => updateSectionData(sectionIndex, { subtitle: e.target.value })}
+            placeholder="Estamos para ayudarte"
+          />
+        </FormField>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FormField label="Email">
           <Input
@@ -1302,21 +1318,23 @@ function GalleryConfig({ section, sectionIndex }: { section: ThemeSection; secti
   };
 
   return (
-    <div className="space-y-4">
-      <FormField label="Título">
-        <Input
-          value={section.title || ''}
-          onChange={(e) => updateSection(sectionIndex, { title: e.target.value })}
-          placeholder="Galería"
-        />
-      </FormField>
-      <FormField label="Subtítulo">
-        <Input
-          value={(d.subtitle as string) || ''}
-          onChange={(e) => updateSectionData(sectionIndex, { subtitle: e.target.value })}
-          placeholder="Nuestro trabajo"
-        />
-      </FormField>
+    <div className="space-y-3">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <FormField label="Título">
+          <Input
+            value={section.title || ''}
+            onChange={(e) => updateSection(sectionIndex, { title: e.target.value })}
+            placeholder="Galería"
+          />
+        </FormField>
+        <FormField label="Subtítulo">
+          <Input
+            value={(d.subtitle as string) || ''}
+            onChange={(e) => updateSectionData(sectionIndex, { subtitle: e.target.value })}
+            placeholder="Nuestro trabajo"
+          />
+        </FormField>
+      </div>
       <FormField label="Columnas">
         <Select value={String(columns)} onValueChange={(v) => updateSectionData(sectionIndex, { columns: Number(v) })}>
           <SelectTrigger className="w-32">
@@ -1396,21 +1414,23 @@ function FAQConfig({ section, sectionIndex }: { section: ThemeSection; sectionIn
   };
 
   return (
-    <div className="space-y-4">
-      <FormField label="Título">
-        <Input
-          value={section.title || ''}
-          onChange={(e) => updateSection(sectionIndex, { title: e.target.value })}
-          placeholder="Preguntas Frecuentes"
-        />
-      </FormField>
-      <FormField label="Subtítulo">
-        <Input
-          value={(d.subtitle as string) || ''}
-          onChange={(e) => updateSectionData(sectionIndex, { subtitle: e.target.value })}
-          placeholder="Todo lo que necesitas saber"
-        />
-      </FormField>
+    <div className="space-y-3">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <FormField label="Título">
+          <Input
+            value={section.title || ''}
+            onChange={(e) => updateSection(sectionIndex, { title: e.target.value })}
+            placeholder="Preguntas Frecuentes"
+          />
+        </FormField>
+        <FormField label="Subtítulo">
+          <Input
+            value={(d.subtitle as string) || ''}
+            onChange={(e) => updateSectionData(sectionIndex, { subtitle: e.target.value })}
+            placeholder="Todo lo que necesitas saber"
+          />
+        </FormField>
+      </div>
 
       <Separator />
       <div className="space-y-3">
@@ -1472,7 +1492,7 @@ function StatsConfig({ section, sectionIndex }: { section: ThemeSection; section
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <FormField label="Título">
         <Input
           value={section.title || ''}
@@ -1580,7 +1600,7 @@ function TeamConfig({ section, sectionIndex }: { section: ThemeSection; sectionI
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <FormField label="Título">
         <Input
           value={section.title || ''}
@@ -1693,21 +1713,23 @@ function BlogPostsConfig({ section, sectionIndex }: { section: ThemeSection; sec
   const d = section.data;
 
   return (
-    <div className="space-y-4">
-      <FormField label="Título">
-        <Input
-          value={section.title || ''}
-          onChange={(e) => updateSection(sectionIndex, { title: e.target.value })}
-          placeholder="Últimas Publicaciones"
-        />
-      </FormField>
-      <FormField label="Subtítulo">
-        <Input
-          value={(d.subtitle as string) || ''}
-          onChange={(e) => updateSectionData(sectionIndex, { subtitle: e.target.value })}
-          placeholder="Nuestro blog"
-        />
-      </FormField>
+    <div className="space-y-3">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <FormField label="Título">
+          <Input
+            value={section.title || ''}
+            onChange={(e) => updateSection(sectionIndex, { title: e.target.value })}
+            placeholder="Últimas Publicaciones"
+          />
+        </FormField>
+        <FormField label="Subtítulo">
+          <Input
+            value={(d.subtitle as string) || ''}
+            onChange={(e) => updateSectionData(sectionIndex, { subtitle: e.target.value })}
+            placeholder="Nuestro blog"
+          />
+        </FormField>
+      </div>
       <p className="text-sm text-gray-500">
         Las publicaciones del blog se mostrarán automáticamente desde WordPress. No se requiere configuración adicional.
       </p>
@@ -1814,9 +1836,14 @@ function SortableSectionItem({
       </button>
 
       <div className="text-gray-500 shrink-0">{SECTION_TYPE_ICON[section.type]}</div>
-      <span className="text-sm font-medium flex-1 truncate">
-        {SECTION_TYPE_LABEL[section.type] || section.type}
-      </span>
+      <div className="flex-1 min-w-0 truncate">
+        <span className="text-sm font-medium block truncate">
+          {section.title || SECTION_TYPE_LABEL[section.type] || section.type}
+        </span>
+        <span className="text-xs text-gray-400 truncate block">
+          {SECTION_TYPE_LABEL[section.type] || section.type}
+        </span>
+      </div>
       <Switch
         checked={section.enabled}
         onCheckedChange={onToggle}
@@ -1962,15 +1989,15 @@ function SectionsTab() {
               transition={{ duration: 0.2 }}
             >
               <Card className="border-gray-400 bg-white">
-                <CardHeader className="pb-4">
+                <CardHeader className="pb-3">
                   <div className="flex items-center gap-2">
                     <div className="text-emerald-600">{SECTION_TYPE_ICON[selectedSection.type]}</div>
-                    <CardTitle className="text-lg">
-                      Configurar: {SECTION_TYPE_LABEL[selectedSection.type] || selectedSection.type}
+                    <CardTitle className="text-base">
+                      {SECTION_TYPE_LABEL[selectedSection.type] || selectedSection.type}
                     </CardTitle>
                   </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="max-h-[70vh] overflow-y-auto">
                   <SectionConfigPanel section={selectedSection} sectionIndex={activeSectionIndex} />
                 </CardContent>
               </Card>
@@ -3165,7 +3192,7 @@ export default function ThemeEditor() {
 
           {/* CONTENT */}
           <div className="flex-1 overflow-y-auto bg-[#f0f0eb] p-4 md:p-6">
-            <div className="max-w-3xl mx-auto">
+            <div className="max-w-6xl mx-auto">
             <TabsContent value="info" className="mt-0">
               <InfoTab />
             </TabsContent>

@@ -68,7 +68,7 @@ const DEFAULT_WIDGETS: SidebarWidget[] = [
 const DEFAULT_PREDESIGNED_TEMPLATES: ThemeTemplate[] = [
   {
     id: 'single-post',
-    name: 'Single Post',
+    name: 'Artículo Individual',
     description: 'Plantilla para artículos individuales del blog',
     type: 'predesigned',
     slug: 'single',
@@ -88,7 +88,7 @@ const DEFAULT_PREDESIGNED_TEMPLATES: ThemeTemplate[] = [
   },
   {
     id: 'blog-archive',
-    name: 'Blog / Archive',
+    name: 'Blog / Archivo',
     description: 'Listado de posts por categoría, tag, fecha o autor',
     type: 'predesigned',
     slug: 'archive',
@@ -142,7 +142,7 @@ const DEFAULT_PREDESIGNED_TEMPLATES: ThemeTemplate[] = [
   },
   {
     id: 'search-results',
-    name: 'Search Results',
+    name: 'Resultados de Búsqueda',
     description: 'Resultados de búsqueda del sitio',
     type: 'predesigned',
     slug: 'search',
@@ -181,7 +181,7 @@ const DEFAULT_PREDESIGNED_TEMPLATES: ThemeTemplate[] = [
   },
   {
     id: 'site-header',
-    name: 'Header',
+    name: 'Encabezado',
     description: 'Encabezado del sitio con logo, navegación y menú móvil',
     type: 'predesigned',
     slug: 'header',
