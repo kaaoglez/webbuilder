@@ -345,7 +345,7 @@ export function Dashboard() {
   // Quick actions
   const quickActions = [
     {
-      title: 'Crear Página',
+      title: 'Create Page',
       description: 'Comienza una nueva página con una plantilla',
       icon: <Plus className="h-5 w-5" />,
       bgColor: '#ecfdf5',
@@ -353,7 +353,7 @@ export function Dashboard() {
       action: () => createNewPage('Mi Página', 'landing'),
     },
     {
-      title: 'Explorar Plantillas',
+      title: 'Browse Templates',
       description: 'Encuentra el diseño perfecto para tu proyecto',
       icon: <LayoutTemplate className="h-5 w-5" />,
       bgColor: '#fff7ed',
@@ -378,7 +378,7 @@ export function Dashboard() {
       <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight" style={{ color: '#1a2e1a' }}>
-            Panel de Control
+            Dashboard
           </h1>
           <p className="mt-1 text-sm" style={{ color: '#6b7280' }}>
             Bienvenido a PageForge — crea, edita y publica tus páginas web.
@@ -389,21 +389,21 @@ export function Dashboard() {
       {/* ── Stats Row ─────────────────────────────────────── */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
         <StatCard
-          title="Total de Páginas"
+          title="Total Pages"
           value={stats.total}
           icon={<FileText className="h-6 w-6" />}
           bgColor="#ecfdf5"
           iconColor="#059669"
         />
         <StatCard
-          title="Publicadas"
+          title="Published"
           value={stats.published}
           icon={<Globe className="h-6 w-6" />}
           bgColor="#eff6ff"
           iconColor="#2563eb"
         />
         <StatCard
-          title="Borradores"
+          title="Drafts"
           value={stats.drafts}
           icon={<Layers className="h-6 w-6" />}
           bgColor="#faf5ff"
@@ -417,7 +417,7 @@ export function Dashboard() {
           className="mb-4 text-lg font-semibold"
           style={{ color: '#1a2e1a' }}
         >
-          Acciones Rápidas
+          Quick Actions
         </h2>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {quickActions.map((action) => (
@@ -433,7 +433,7 @@ export function Dashboard() {
             className="text-lg font-semibold"
             style={{ color: '#1a2e1a' }}
           >
-            Páginas Recientes
+            Recent Pages
           </h2>
           {pages.length > 0 && (
             <Button

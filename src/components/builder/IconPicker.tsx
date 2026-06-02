@@ -311,7 +311,7 @@ export function IconPicker({
                 className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
               />
               <Input
-                placeholder="Buscar iconos..."
+                placeholder="Search icons…"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="h-8 pl-8 text-sm"

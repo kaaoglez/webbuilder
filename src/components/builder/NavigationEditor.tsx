@@ -559,11 +559,11 @@ export function NavigationEditor() {
 
       {/* ── CTA Button Section ── */}
       <div className="space-y-4">
-        <Label className="text-sm font-semibold">Botón de Acción</Label>
+        <Label className="text-sm font-semibold">Botón CTA</Label>
 
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
-            <Label htmlFor="cta-text" className="text-sm font-medium">Texto del Botón</Label>
+            <Label htmlFor="cta-text" className="text-sm font-medium">Texto del CTA</Label>
             <Input
               id="cta-text"
               value={nav.ctaText}
@@ -573,7 +573,7 @@ export function NavigationEditor() {
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="cta-link" className="text-sm font-medium">Enlace del Botón</Label>
+            <Label htmlFor="cta-link" className="text-sm font-medium">Enlace del CTA</Label>
             <Input
               id="cta-link"
               value={nav.ctaLink}

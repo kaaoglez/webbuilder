@@ -325,6 +325,8 @@ interface ThemeEditorActions {
   updatePageSection: (pageId: string, index: number, partial: Partial<ThemeSection>) => void;
   togglePageSection: (pageId: string, index: number) => void;
   updatePageSectionData: (pageId: string, index: number, dataPartial: Record<string, unknown>) => void;
+  // ─── Config Replace ───────────────────────────────
+  replaceConfig: (newConfig: ThemeEditorConfig) => void;
 }
 
 // ─────────────────────────────────────────────────────────────

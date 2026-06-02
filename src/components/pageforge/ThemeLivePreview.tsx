@@ -83,7 +83,9 @@ function ImageWithFallback({
   style?: React.CSSProperties;
   seed?: string;
 }) {
-  if (!src) {
+  const [imgError, setImgError] = useState(false);
+
+  if (!src || imgError) {
     return (
       <div
         className={className}
@@ -97,17 +99,7 @@ function ImageWithFallback({
       alt={alt || ''}
       className={className}
       style={style}
-      onError={(e) => {
-        const el = e.currentTarget;
-        el.style.display = 'none';
-        const parent = el.parentElement;
-        if (parent) {
-          const fallback = document.createElement('div');
-          fallback.className = el.className || '';
-          Object.assign(fallback.style, placeholderGradient(seed), style || {});
-          parent.appendChild(fallback);
-        }
-      }}
+      onError={() => setImgError(true)}
     />
   );
 }

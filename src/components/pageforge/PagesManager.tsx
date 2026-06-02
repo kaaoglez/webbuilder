@@ -1527,7 +1527,7 @@ function ImagePickerField({
           <div className="mt-2 flex items-center gap-2 p-2 bg-gray-100 rounded-lg border border-gray-300">
             <img
               src={value}
-              alt="Preview"
+              alt="Vista previa del logo"
               className="h-16 w-auto max-w-full object-contain rounded cursor-pointer"
               onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
             />

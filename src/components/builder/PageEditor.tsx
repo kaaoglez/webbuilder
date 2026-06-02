@@ -178,7 +178,7 @@ function SectionIcon({ name, className }: { name: string; className?: string }) 
 const CATEGORY_COLORS: Record<string, string> = {
   'Principal': 'bg-emerald-100 text-emerald-700',
   'Contenido': 'bg-sky-100 text-sky-700',
-  'Prueba Social': 'bg-amber-100 text-amber-700',
+  'Social Proof': 'bg-amber-100 text-amber-700',
   'Conversión': 'bg-rose-100 text-rose-700',
   'Soporte': 'bg-violet-100 text-violet-700',
   'Estructural': 'bg-stone-100 text-stone-700',
@@ -400,14 +400,14 @@ function HeroEditor({ section, onUpdate }: { section: HeroSection; onUpdate: (da
       <Separator />
 
       <div className="grid grid-cols-2 gap-4">
-        <FieldGroup label="Texto del Botón Principal">
+        <FieldGroup label="Texto CTA Principal">
           <Input
             value={d.ctaText}
             onChange={(e) => onUpdate({ data: { ...d, ctaText: e.target.value } })}
             placeholder="Comenzar Gratis"
           />
         </FieldGroup>
-        <FieldGroup label="Enlace del Botón Principal">
+        <FieldGroup label="Enlace CTA Principal">
           <Input
             value={d.ctaLink}
             onChange={(e) => onUpdate({ data: { ...d, ctaLink: e.target.value } })}
@@ -417,14 +417,14 @@ function HeroEditor({ section, onUpdate }: { section: HeroSection; onUpdate: (da
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <FieldGroup label="Texto del Botón Secundario">
+        <FieldGroup label="Texto CTA Secundario">
           <Input
             value={d.secondaryCtaText}
             onChange={(e) => onUpdate({ data: { ...d, secondaryCtaText: e.target.value } })}
             placeholder="Ver Demo"
           />
         </FieldGroup>
-        <FieldGroup label="Enlace del Botón Secundario">
+        <FieldGroup label="Enlace CTA Secundario">
           <Input
             value={d.secondaryCtaLink}
             onChange={(e) => onUpdate({ data: { ...d, secondaryCtaLink: e.target.value } })}
@@ -892,7 +892,7 @@ function PricingEditor({ section, onUpdate }: { section: PricingSection; onUpdat
                 <Input value={plan.description} onChange={(e) => updatePlan(index, 'description', e.target.value)} className="text-sm" />
               </FieldGroup>
 
-              <FieldGroup label="Texto del Botón">
+              <FieldGroup label="Texto CTA">
                 <Input value={plan.ctaText} onChange={(e) => updatePlan(index, 'ctaText', e.target.value)} className="text-sm" />
               </FieldGroup>
 
@@ -936,7 +936,7 @@ function CTAEditor({ section, onUpdate }: { section: CTASection; onUpdate: (data
 
   return (
     <div className="space-y-5">
-      <SectionHeader title="Editor de Botón" description="Configura la sección de llamada a la acción" />
+      <SectionHeader title="Editor CTA" description="Configura la sección de llamada a la acción" />
 
       <FieldGroup label="Título">
         <Input value={d.title} onChange={(e) => onUpdate({ data: { ...d, title: e.target.value } })} />

@@ -181,7 +181,7 @@ function createGallery(overrides?: Partial<GallerySection['data']>): GallerySect
       columns: 3,
       images: [
         { id: uid(), src: '', alt: 'Proyecto 1', caption: 'Diseño Web' },
-        { id: uid(), src: '', alt: 'Proyecto 2', caption: 'Branding' },
+        { id: uid(), src: '', alt: 'Proyecto 2', caption: 'Marca Corporativa' },
         { id: uid(), src: '', alt: 'Proyecto 3', caption: 'App Móvil' },
         { id: uid(), src: '', alt: 'Proyecto 4', caption: 'E-Commerce' },
         { id: uid(), src: '', alt: 'Proyecto 5', caption: 'Marketing Digital' },
@@ -221,7 +221,7 @@ function createStats(overrides?: Partial<StatsSection['data']>): StatsSection {
       items: [
         { value: '10K+', label: 'Usuarios Activos', icon: 'Users' },
         { value: '50M+', label: 'Datos Procesados', icon: 'Database' },
-        { value: '99.9%', label: 'Uptime', icon: 'Activity' },
+        { value: '99.9%', label: 'Tiempo Activo', icon: 'Activity' },
         { value: '24/7', label: 'Soporte', icon: 'Headphones' },
       ],
       ...overrides,
@@ -501,7 +501,7 @@ function createSaasFooter(): FooterSection {
     columns: [
       { title: 'Producto', links: [{ label: 'Características', url: '#' }, { label: 'Integraciones', url: '#' }, { label: 'API', url: '#' }, { label: 'Changelog', url: '#' }] },
       { title: 'Empresa', links: [{ label: 'Sobre Nosotros', url: '#' }, { label: 'Blog', url: '#' }, { label: 'Carreras', url: '#' }, { label: 'Contacto', url: '#' }] },
-      { title: 'Recursos', links: [{ label: 'Documentación', url: '#' }, { label: 'Centro de Ayuda', url: '#' }, { label: 'Webinars', url: '#' }, { label: 'Status', url: '#' }] },
+      { title: 'Recursos', links: [{ label: 'Documentación', url: '#' }, { label: 'Centro de Ayuda', url: '#' }, { label: 'Seminarios Web', url: '#' }, { label: 'Estado del Servicio', url: '#' }] },
     ],
     socialLinks: [
       { platform: 'twitter', url: '#' },
@@ -537,7 +537,7 @@ function createPortfolioGallery(): GallerySection {
     subtitle: 'Una selección de nuestros trabajos más recientes',
     columns: 3,
     images: [
-      { id: uid(), src: IMG.designWork, alt: 'Branding Corp — Identidad visual completa', caption: 'Branding Corp' },
+      { id: uid(), src: IMG.designWork, alt: 'Marca Corp — Identidad visual completa', caption: 'Marca Corp' },
       { id: uid(), src: IMG.workspace, alt: 'App Finance — Diseño de app bancaria', caption: 'App Finance' },
       { id: uid(), src: IMG.designWork, alt: 'Web E-commerce — Tienda online premium', caption: 'Web E-commerce' },
       { id: uid(), src: IMG.workspace, alt: 'Identidad Visual — Rebranding completo', caption: 'Identidad Visual' },
@@ -587,7 +587,7 @@ function createPortfolioFooter(): FooterSection {
     brandName: 'Studio Creativo',
     brandDescription: 'Estudio de diseño multidisciplinar especializado en branding, UI/UX y packaging para marcas con personalidad.',
     columns: [
-      { title: 'Servicios', links: [{ label: 'Branding', url: '#' }, { label: 'Diseño UI/UX', url: '#' }, { label: 'Packaging', url: '#' }, { label: 'Diseño Web', url: '#' }] },
+      { title: 'Servicios', links: [{ label: 'Marca Corporativa', url: '#' }, { label: 'Diseño UI/UX', url: '#' }, { label: 'Empaques', url: '#' }, { label: 'Diseño Web', url: '#' }] },
       { title: 'Estudio', links: [{ label: 'Sobre Nosotros', url: '#' }, { label: 'Proceso', url: '#' }, { label: 'Blog', url: '#' }, { label: 'Contacto', url: '#' }] },
     ],
     socialLinks: [
@@ -640,12 +640,12 @@ function createAgencyFeatures(): FeaturesSection {
     subtitle: 'Estrategia, creatividad y tecnología bajo un mismo techo',
     columns: 3,
     features: [
-      { id: uid(), icon: 'Palette', title: 'Branding', description: 'Construcción de marcas desde la estrategia hasta la identidad visual. Naming, logo, guidelines y posicionamiento de marca completo.' },
+      { id: uid(), icon: 'Palette', title: 'Marca Corporativa', description: 'Construcción de marcas desde la estrategia hasta la identidad visual. Naming, logo, guidelines y posicionamiento de marca completo.' },
       { id: uid(), icon: 'Monitor', title: 'Diseño Web', description: 'Sitios web y aplicaciones web de alto rendimiento con diseño responsive, animaciones y optimización SEO integrada.' },
       { id: uid(), icon: 'Megaphone', title: 'Marketing Digital', description: 'Campañas de performance en Google Ads, Meta Ads y LinkedIn Ads con ROAS optimizado y reportes en tiempo real.' },
       { id: uid(), icon: 'Search', title: 'SEO & SEM', description: 'Posicionamiento orgánico y de pago con estrategia de contenidos, link building técnico y auditorías SEO completas.' },
-      { id: uid(), icon: 'FileText', title: 'Content Strategy', description: 'Creación de contenido estratégico: blogs, videos, podcasts y materiales descargables que atraen y convierten.' },
-      { id: uid(), icon: 'Share2', title: 'Social Media', description: 'Gestión profesional de redes sociales con calendarios editoriales, community management y social listening.' },
+      { id: uid(), icon: 'FileText', title: 'Estrategia de Contenido', description: 'Creación de contenido estratégico: blogs, videos, podcasts y materiales descargables que atraen y convierten.' },
+      { id: uid(), icon: 'Share2', title: 'Redes Sociales', description: 'Gestión profesional de redes sociales con calendarios editoriales, community management y social listening.' },
     ],
   });
 }
@@ -672,7 +672,7 @@ function createAgencyStats(): StatsSection {
     items: [
       { value: '200+', label: 'Proyectos Entregados', icon: 'Rocket' },
       { value: '50+', label: 'Marcas Potenciadas', icon: 'TrendingUp' },
-      { value: '€2M+', label: 'En Revenue Generado', icon: 'Euro' },
+      { value: '€2M+', label: 'Ingresos Generados', icon: 'Euro' },
       { value: '4.9/5', label: 'Satisfacción del Cliente', icon: 'Star' },
     ],
   });
@@ -707,7 +707,7 @@ function createAgencyFooter(): FooterSection {
     brandName: 'Nexus Digital',
     brandDescription: 'Agencia digital de 50+ profesionales especializada en branding, diseño web, marketing digital y tecnología. Presencia en 12 países.',
     columns: [
-      { title: 'Servicios', links: [{ label: 'Branding', url: '#' }, { label: 'Diseño Web', url: '#' }, { label: 'Marketing Digital', url: '#' }, { label: 'SEO & SEM', url: '#' }, { label: 'Content Strategy', url: '#' }, { label: 'Social Media', url: '#' }] },
+      { title: 'Servicios', links: [{ label: 'Marca Corporativa', url: '#' }, { label: 'Diseño Web', url: '#' }, { label: 'Marketing Digital', url: '#' }, { label: 'SEO & SEM', url: '#' }, { label: 'Estrategia de Contenido', url: '#' }, { label: 'Redes Sociales', url: '#' }] },
       { title: 'Agencia', links: [{ label: 'Sobre Nosotros', url: '#' }, { label: 'Equipo', url: '#' }, { label: 'Casos de Éxito', url: '#' }, { label: 'Blog', url: '#' }, { label: 'Carreras', url: '#' }] },
       { title: 'Contacto', links: [{ label: 'Solicitar Presupuesto', url: '#' }, { label: 'Madrid, España', url: '#' }, { label: 'hola@nexusdigital.es', url: '#' }, { label: '+34 91 555 00 00', url: '#' }] },
     ],
@@ -964,7 +964,7 @@ function createLandingAbout(): AboutSection {
     imagePosition: 'right',
     stats: [
       { value: '2,000+', label: 'Startups Activas' },
-      { value: '$150M+', label: 'Revenue de Clientes' },
+      { value: '$150M+', label: 'Ingresos de Clientes' },
       { value: '99.9%', label: 'Uptime Garantizado' },
     ],
   });
@@ -999,8 +999,8 @@ function createLandingFooter(): FooterSection {
     brandDescription: 'La plataforma integral para startups que quieren escalar rápido. Analytics, automatización y colaboración en un solo lugar.',
     columns: [
       { title: 'Producto', links: [{ label: 'Características', url: '#' }, { label: 'Precios', url: '#' }, { label: 'Integraciones', url: '#' }, { label: 'Roadmap', url: '#' }, { label: 'Changelog', url: '#' }] },
-      { title: 'Recursos', links: [{ label: 'Documentación', url: '#' }, { label: 'Blog', url: '#' }, { label: 'Startup Guides', url: '#' }, { label: 'API Reference', url: '#' }] },
-      { title: 'Empresa', links: [{ label: 'Sobre Nosotros', url: '#' }, { label: 'Carreras', url: '#' }, { label: 'Contacto', url: '#' }, { label: 'Partners', url: '#' }] },
+      { title: 'Recursos', links: [{ label: 'Documentación', url: '#' }, { label: 'Blog', url: '#' }, { label: 'Guías para Startups', url: '#' }, { label: 'Referencia de API', url: '#' }] },
+      { title: 'Empresa', links: [{ label: 'Sobre Nosotros', url: '#' }, { label: 'Carreras', url: '#' }, { label: 'Contacto', url: '#' }, { label: 'Socios', url: '#' }] },
     ],
     socialLinks: [
       { platform: 'twitter', url: '#' },

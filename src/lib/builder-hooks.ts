@@ -124,12 +124,12 @@ export function useAutoSave<T>({
           body: JSON.stringify(data),
         });
 
-        if (!response.ok) throw new Error(`Save failed: ${response.status}`);
+        if (!response.ok) throw new Error(`Error al guardar: ${response.status}`);
 
         setLastSaved(new Date());
         onSave?.();
       } catch (err) {
-        const message = err instanceof Error ? err.message : 'Save failed';
+        const message = err instanceof Error ? err.message : 'Error al guardar';
         setError(message);
         onError?.(message);
       } finally {
@@ -155,12 +155,12 @@ export function useAutoSave<T>({
         body: JSON.stringify(data),
       });
 
-      if (!response.ok) throw new Error(`Save failed: ${response.status}`);
+      if (!response.ok) throw new Error(`Error al guardar: ${response.status}`);
       prevDataRef.current = JSON.stringify(data);
       setLastSaved(new Date());
       onSave?.();
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Save failed';
+      const message = err instanceof Error ? err.message : 'Error al guardar';
       setError(message);
       onError?.(message);
     } finally {

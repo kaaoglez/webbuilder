@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   Settings,
@@ -55,19 +55,6 @@ export default function SettingsPanel() {
   const { updateSettings, resetSettings, clearAllData } = store;
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [showClearDialog, setShowClearDialog] = useState(false);
-  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // Debounced toast: avoids spamming when sliders / color pickers fire rapidly
-  const saveSetting = useCallback(
-    (partial: Partial<SettingsState>) => {
-      updateSettings(partial);
-      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
-      toastTimerRef.current = setTimeout(() => {
-        toast.success('Cambios guardados exitosamente');
-      }, 600);
-    },
-    [updateSettings],
-  );
 
   const handleReset = () => {
     resetSettings();
@@ -102,7 +89,7 @@ export default function SettingsPanel() {
         description="Idioma y preferencias de la aplicación"
       >
         <SettingsRow label="Idioma de la interfaz">
-          <Select value={settings.language} onValueChange={(v) => saveSetting({ language: v })}>
+          <Select value={settings.language} onValueChange={(v) => updateSettings({ language: v })}>
             <SelectTrigger className="w-48">
               <SelectValue />
             </SelectTrigger>
@@ -117,7 +104,7 @@ export default function SettingsPanel() {
           <div className="flex items-center gap-3">
             <Switch
               checked={settings.autoSave}
-              onCheckedChange={(v) => saveSetting({ autoSave: v })}
+              onCheckedChange={(v) => updateSettings({ autoSave: v })}
             />
             <span className="text-sm text-muted-foreground">
               Guardar automáticamente cada {settings.autoSaveInterval}s
@@ -129,7 +116,7 @@ export default function SettingsPanel() {
           <SettingsRow label={`Intervalo de auto-guardado: ${settings.autoSaveInterval} segundos`}>
             <Slider
               value={[settings.autoSaveInterval]}
-              onValueChange={([v]) => saveSetting({ autoSaveInterval: v })}
+              onValueChange={([v]) => updateSettings({ autoSaveInterval: v })}
               min={10}
               max={120}
               step={5}
@@ -142,7 +129,7 @@ export default function SettingsPanel() {
           <div className="flex items-center gap-3">
             <Switch
               checked={settings.showNotifications}
-              onCheckedChange={(v) => saveSetting({ showNotifications: v })}
+              onCheckedChange={(v) => updateSettings({ showNotifications: v })}
             />
             <span className="text-sm text-muted-foreground">
               Mostrar notificaciones de acciones completadas
@@ -154,7 +141,7 @@ export default function SettingsPanel() {
       {/* ── Theme Defaults ── */}
       <SettingsSection
         icon={<Palette className="h-5 w-5 text-emerald-600" />}
-        title="Valores por Defecto — Temas"
+        title="Valores por Defecto — Themes"
         description="Colores y fuentes iniciales al crear un nuevo theme"
       >
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -164,12 +151,12 @@ export default function SettingsPanel() {
               <input
                 type="color"
                 value={settings.defaultPrimaryColor}
-                onChange={(e) => saveSetting({ defaultPrimaryColor: e.target.value })}
+                onChange={(e) => updateSettings({ defaultPrimaryColor: e.target.value })}
                 className="h-9 w-10 cursor-pointer rounded border border-gray-400 p-0.5"
               />
               <Input
                 value={settings.defaultPrimaryColor}
-                onChange={(e) => saveSetting({ defaultPrimaryColor: e.target.value })}
+                onChange={(e) => updateSettings({ defaultPrimaryColor: e.target.value })}
                 className="w-28 font-mono text-sm"
               />
             </div>
@@ -180,19 +167,19 @@ export default function SettingsPanel() {
               <input
                 type="color"
                 value={settings.defaultSecondaryColor}
-                onChange={(e) => saveSetting({ defaultSecondaryColor: e.target.value })}
+                onChange={(e) => updateSettings({ defaultSecondaryColor: e.target.value })}
                 className="h-9 w-10 cursor-pointer rounded border border-gray-400 p-0.5"
               />
               <Input
                 value={settings.defaultSecondaryColor}
-                onChange={(e) => saveSetting({ defaultSecondaryColor: e.target.value })}
+                onChange={(e) => updateSettings({ defaultSecondaryColor: e.target.value })}
                 className="w-28 font-mono text-sm"
               />
             </div>
           </div>
           <div className="space-y-1.5">
             <Label className="text-sm font-medium text-gray-700">Fuente por Defecto</Label>
-            <Select value={settings.defaultFont} onValueChange={(v) => saveSetting({ defaultFont: v })}>
+            <Select value={settings.defaultFont} onValueChange={(v) => updateSettings({ defaultFont: v })}>
               <SelectTrigger className="w-48">
                 <SelectValue />
               </SelectTrigger>
@@ -216,7 +203,7 @@ export default function SettingsPanel() {
           <div className="flex items-center gap-3">
             <Switch
               checked={settings.includeScreenshot}
-              onCheckedChange={(v) => saveSetting({ includeScreenshot: v })}
+              onCheckedChange={(v) => updateSettings({ includeScreenshot: v })}
             />
             <span className="text-sm text-muted-foreground">
               Genera una captura del preview como screenshot del theme
@@ -228,7 +215,7 @@ export default function SettingsPanel() {
           <div className="flex items-center gap-3">
             <Switch
               checked={settings.minifyCSS}
-              onCheckedChange={(v) => saveSetting({ minifyCSS: v })}
+              onCheckedChange={(v) => updateSettings({ minifyCSS: v })}
             />
             <span className="text-sm text-muted-foreground">
               Reduce el tamaño del archivo CSS en el ZIP exportado
@@ -240,7 +227,7 @@ export default function SettingsPanel() {
           <div className="flex items-center gap-3">
             <Switch
               checked={settings.includeREADME}
-              onCheckedChange={(v) => saveSetting({ includeREADME: v })}
+              onCheckedChange={(v) => updateSettings({ includeREADME: v })}
             />
             <span className="text-sm text-muted-foreground">
               Agrega un archivo README con instrucciones de instalación
@@ -259,7 +246,7 @@ export default function SettingsPanel() {
           <div className="flex items-center gap-3">
             <Switch
               checked={settings.developerMode}
-              onCheckedChange={(v) => saveSetting({ developerMode: v })}
+              onCheckedChange={(v) => updateSettings({ developerMode: v })}
             />
             <span className="text-sm text-muted-foreground">
               Muestra información técnica y logs en la interfaz

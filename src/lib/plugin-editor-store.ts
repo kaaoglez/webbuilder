@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import type { PluginType } from '@/lib/wp-plugin-generator';
 
 // ─────────────────────────────────────────────────────────────
@@ -463,4 +464,11 @@ export const usePluginEditorStore = create<PluginEditorState & PluginEditorActio
         isGenerating: false,
       }),
   }),
+  {
+    name: 'pageforge-plugin-editor',
+    partialize: (state) => ({
+      config: state.config,
+      activeTab: state.activeTab,
+    }),
+  },
 );

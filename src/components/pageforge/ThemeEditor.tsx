@@ -222,7 +222,7 @@ function ImageUrlField({
         </div>
         {value && (
           <div className="mt-2 flex items-center gap-2 p-2 bg-gray-100 rounded-lg border border-gray-400">
-            <img src={value} alt="Preview" className="h-16 w-auto max-w-full object-contain rounded cursor-pointer"
+            <img src={value} alt="Vista previa del logo" className="h-16 w-auto max-w-full object-contain rounded cursor-pointer"
               onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
             <span className="text-xs text-gray-500 shrink-0">Vista previa</span>
           </div>
@@ -609,6 +609,10 @@ function DesignTab() {
       link.href = `https://fonts.googleapis.com/css2?family=${fonts}:wght@400;600;700&display=swap`;
       document.head.appendChild(link);
     }
+    return () => {
+      const existing = document.getElementById(linkId);
+      if (existing) existing.remove();
+    };
   }, []);
 
   return (
@@ -3420,7 +3424,7 @@ export default function ThemeEditor() {
                 </button>
               </div>
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className="text-[11px] bg-emerald-950 text-emerald-400 border-emerald-700">Live</Badge>
+                <Badge variant="outline" className="text-[11px] bg-emerald-950 text-emerald-400 border-emerald-700">En Vivo</Badge>
                 <button
                   type="button"
                   onClick={() => setShowPreview(false)}

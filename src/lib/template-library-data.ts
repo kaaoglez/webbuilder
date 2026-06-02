@@ -820,13 +820,13 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
             },
             {
               icon: '✍️',
-              title: 'Content Strategy',
+              title: 'Estrategia de Contenido',
               description:
                 'Creación de calendarios editoriales, producción de contenido, copywriting y gestión de blogs corporativos.',
             },
             {
               icon: '📱',
-              title: 'Social Media',
+              title: 'Redes Sociales',
               description:
                 'Gestión de perfiles en Instagram, LinkedIn, TikTok y Twitter. Creación de contenido, community management y social ads.',
             },

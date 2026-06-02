@@ -46,7 +46,7 @@ const CARDS_MAP: Record<string, ActionCard> = {
     icon: Palette,
     iconBg: 'bg-emerald-100 dark:bg-emerald-950',
     iconColor: 'text-emerald-700 dark:text-emerald-400',
-    stats: ['15+ secciones', '7 categorías', 'PHP válido'],
+    stats: ['14 tipos de sección', '10 categorías', 'PHP válido'],
     accentBorder: 'border-l-emerald-500',
   },
   'create-plugin': {
@@ -70,7 +70,7 @@ const CARDS_MAP: Record<string, ActionCard> = {
     icon: BookOpen,
     iconBg: 'bg-violet-100 dark:bg-violet-950',
     iconColor: 'text-violet-700 dark:text-violet-400',
-    stats: ['7 industrias', 'Contenido demo', 'Importar con 1 clic'],
+    stats: ['10 industrias', 'Contenido demo', 'Importar con 1 clic'],
     accentBorder: 'border-l-violet-500',
   },
   'my-projects': {

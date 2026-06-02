@@ -10,7 +10,7 @@
 export const SECTION_CATEGORIES = {
   PRINCIPAL: 'Principal',
   CONTENIDO: 'Contenido',
-  SOCIAL_PROOF: 'Prueba Social',
+  SOCIAL_PROOF: 'Social Proof',
   CONVERSION: 'Conversión',
   SOPORTE: 'Soporte',
   ESTRUCTURAL: 'Estructural',

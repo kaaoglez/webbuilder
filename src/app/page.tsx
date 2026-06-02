@@ -9,6 +9,7 @@ import MediosView from '@/components/pageforge/MediosView';
 import { useProjectsStore } from '@/lib/projects-store';
 import { useMediaLibraryStore } from '@/lib/media-library-store';
 import { OnboardingOverlay } from '@/components/pageforge/OnboardingOverlay';
+import { ErrorBoundary } from '@/components/pageforge/ErrorBoundary';
 
 const DashboardCards = dynamic(() => import('@/components/pageforge/DashboardCards').then(m => ({ default: m.DashboardCards })));
 const StatsBar = dynamic(() => import('@/components/pageforge/StatsBar').then(m => ({ default: m.StatsBar })));
@@ -257,21 +258,21 @@ export default function PageForgeApp() {
                   <StatsBar />
                 </motion.div>
               ) : isThemeEditor ? (
-                <ThemeEditor />
+                <ErrorBoundary><ThemeEditor /></ErrorBoundary>
               ) : isPages ? (
-                <PagesManager />
+                <ErrorBoundary><PagesManager /></ErrorBoundary>
               ) : isPluginEditor ? (
-                <PluginEditor />
+                <ErrorBoundary><PluginEditor /></ErrorBoundary>
               ) : isTemplates ? (
-                <TemplateLibrary onNavigate={handleNavigate} />
+                <ErrorBoundary><TemplateLibrary onNavigate={handleNavigate} /></ErrorBoundary>
               ) : isMyProjects ? (
-                <MyProjects onNavigate={handleNavigate} />
+                <ErrorBoundary><MyProjects onNavigate={handleNavigate} /></ErrorBoundary>
               ) : isMedios ? (
-                <MediosView />
+                <ErrorBoundary><MediosView /></ErrorBoundary>
               ) : isSettings ? (
-                <SettingsPanel />
+                <ErrorBoundary><SettingsPanel /></ErrorBoundary>
               ) : (
-                <PlaceholderPanel item={activeItem} onNavigate={handleNavigate} />
+                <ErrorBoundary><PlaceholderPanel item={activeItem} onNavigate={handleNavigate} /></ErrorBoundary>
               )}
             </div>
           </main>

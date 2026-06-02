@@ -30,16 +30,6 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -453,7 +443,6 @@ function MediaLibraryDialogContent({
 }) {
   const { mediaItems, addMedia, removeMedia, updateMedia } = useMediaLibraryStore();
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -489,19 +478,11 @@ function MediaLibraryDialogContent({
   const handleDelete = useCallback(
     (id: string, e: React.MouseEvent) => {
       e.stopPropagation();
-      setDeleteConfirmId(id);
-    },
-    [],
-  );
-
-  const confirmDelete = useCallback(
-    (id: string) => {
       const item = mediaItems.find((m) => m.id === id);
       removeMedia(id);
       if (selectedId === id) {
         setSelectedId(null);
       }
-      setDeleteConfirmId(null);
       toast.success(`"${item?.name || 'Imagen'}" eliminada`);
     },
     [removeMedia, selectedId, mediaItems],
@@ -523,9 +504,12 @@ function MediaLibraryDialogContent({
 
   const handleRemoveSelected = useCallback(() => {
     if (selectedId) {
-      setDeleteConfirmId(selectedId);
+      const item = mediaItems.find((m) => m.id === selectedId);
+      removeMedia(selectedId);
+      setSelectedId(null);
+      toast.success(`"${item?.name || 'Imagen'}" eliminada`);
     }
-  }, [selectedId]);
+  }, [selectedId, removeMedia, mediaItems]);
 
   return (
     <div className="flex flex-col h-[90vh] max-h-[900px]">
@@ -625,20 +609,6 @@ function MediaLibraryDialogContent({
           {children}
         </div>
       )}
-      <AlertDialog open={deleteConfirmId !== null} onOpenChange={(open) => { if (!open) setDeleteConfirmId(null); }}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar esta imagen?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Esta acción no se puede deshacer. La imagen se eliminará permanentemente de la biblioteca.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={() => { if (deleteConfirmId) confirmDelete(deleteConfirmId); }} className="bg-red-600 hover:bg-red-700">Eliminar</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 }

@@ -1,44 +1,43 @@
 import JSZip from 'jszip';
 
 /**
- * Creates a ZIP file for a WordPress theme.
- * All files are placed inside a root folder named after the theme slug.
+ * Creates a ZIP file for a WordPress theme or plugin.
+ * All files are placed inside a root folder named after the slug.
  */
 export async function createThemeZip(
   files: Map<string, string>,
   themeSlug: string
 ): Promise<Uint8Array> {
-  const zip = new JSZip();
-  const themeFolder = zip.folder(themeSlug);
-
-  if (!themeFolder) {
-    throw new Error(`Failed to create theme folder: ${themeSlug}`);
-  }
-
-  for (const [filePath, content] of files) {
-    themeFolder.file(filePath, content);
-  }
-
-  return await zip.generateAsync({ type: 'uint8array' });
+  return createZip(files, themeSlug);
 }
 
 /**
  * Creates a ZIP file for a WordPress plugin.
- * All files are placed inside a root folder named after the plugin slug.
+ * All files are placed inside a root folder named after the slug.
  */
 export async function createPluginZip(
   files: Map<string, string>,
   pluginSlug: string
 ): Promise<Uint8Array> {
-  const zip = new JSZip();
-  const pluginFolder = zip.folder(pluginSlug);
+  return createZip(files, pluginSlug);
+}
 
-  if (!pluginFolder) {
-    throw new Error(`Failed to create plugin folder: ${pluginSlug}`);
+/**
+ * Core ZIP creation function shared by theme and plugin generators.
+ */
+async function createZip(
+  files: Map<string, string>,
+  slug: string
+): Promise<Uint8Array> {
+  const zip = new JSZip();
+  const folder = zip.folder(slug);
+
+  if (!folder) {
+    throw new Error(`Failed to create folder: ${slug}`);
   }
 
   for (const [filePath, content] of files) {
-    pluginFolder.file(filePath, content);
+    folder.file(filePath, content);
   }
 
   return await zip.generateAsync({ type: 'uint8array' });
