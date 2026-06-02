@@ -279,7 +279,7 @@ function AboutSection({
   textColor: string;
 }) {
   const d = section.data;
-  const title = (section.title || 'About Us') as string;
+  const title = (section.title || 'Sobre Nosotros') as string;
   const subtitle = (d.subtitle as string) || '';
   const image = (d.image as string) || '';
   const stats = (d.stats as Array<{ value: string; label: string }>) || [];
@@ -359,7 +359,7 @@ function ServicesFeaturesSection({
   backgroundColor: string;
 }) {
   const d = section.data;
-  const title = (section.title || 'Our Services') as string;
+  const title = (section.title || 'Nuestros Servicios') as string;
   const subtitle = (d.subtitle as string) || '';
   const items = (d.items as Array<{ icon: string; title: string; description: string }>) || [];
   const columns = (d.columns as number) || 3;
@@ -407,10 +407,10 @@ function ServicesFeaturesSection({
                 className="text-base font-bold mb-2"
                 style={{ fontFamily: headingFont, color: textColor }}
               >
-                {item.title || 'Service'}
+                {item.title || 'Servicio'}
               </h3>
               <p className="text-xs leading-relaxed" style={{ color: `${textColor}80` }}>
-                {item.description || 'Service description goes here.'}
+                {item.description || 'Descripción del servicio.'}
               </p>
             </div>
           ))}
@@ -434,7 +434,7 @@ function TestimonialsSection({
   textColor: string;
 }) {
   const d = section.data;
-  const title = (section.title || 'Testimonials') as string;
+  const title = (section.title || 'Testimonios') as string;
   const subtitle = (d.subtitle as string) || '';
   const testimonials = (d.testimonials as Array<{ quote: string; name: string; role: string; rating: number }>) || [];
 
@@ -516,7 +516,7 @@ function PricingSection({
   backgroundColor: string;
 }) {
   const d = section.data;
-  const title = (section.title || 'Pricing') as string;
+  const title = (section.title || 'Precios') as string;
   const subtitle = (d.subtitle as string) || '';
   const plans = (d.plans as Array<{
     name: string;
@@ -601,7 +601,7 @@ function PricingSection({
                   {(plan.features || []).map((feat, fi) => (
                     <div key={fi} className="flex items-center gap-2 text-xs" style={{ color: isHighlighted ? 'rgba(255,255,255,0.85)' : `${textColor}99` }}>
                       <span style={{ color: isHighlighted ? '#FFFFFF' : colors.primary }}>&#10003;</span>
-                      {feat || 'Feature'}
+                      {feat || 'Característica'}
                     </div>
                   ))}
                 </div>
@@ -614,7 +614,7 @@ function PricingSection({
                     borderRadius,
                   }}
                 >
-                  {plan.ctaText || 'Get Started'}
+                  {plan.ctaText || 'Comenzar'}
                 </span>
               </div>
             );
@@ -641,7 +641,7 @@ function CTASection({
   const d = section.data;
   const title = (section.title || 'Llamada a la Acción') as string;
   const subtitle = (d.subtitle as string) || '';
-  const ctaText = (d.ctaText as string) || 'Get Started';
+  const ctaText = (d.ctaText as string) || 'Comenzar';
 
   return (
     <section className="relative px-6 py-16 overflow-hidden">
@@ -702,7 +702,7 @@ function ContactSection({
   textColor: string;
 }) {
   const d = section.data;
-  const title = (section.title || 'Contact Us') as string;
+  const title = (section.title || 'Contáctanos') as string;
   const subtitle = (d.subtitle as string) || '';
   const email = (d.email as string) || '';
   const phone = (d.phone as string) || '';
@@ -762,7 +762,7 @@ function ContactSection({
             )}
             {!email && !phone && !address && (
               <p className="text-xs" style={{ color: `${textColor}50` }}>
-                Add email, phone, or address in the Contact section settings.
+                Agrega correo, teléfono o dirección en la configuración de la sección Contacto.
               </p>
             )}
           </div>
@@ -810,13 +810,13 @@ function ContactSection({
                   color: `${textColor}50`,
                 }}
               >
-                Your message...
+                Tu mensaje...
               </div>
               <span
                 className="inline-block px-6 py-2.5 text-sm font-semibold text-white cursor-default"
                 style={{ backgroundColor: colors.primary, borderRadius }}
               >
-                Send Message
+                Enviar Mensaje
               </span>
             </div>
           )}
@@ -842,7 +842,7 @@ function GallerySection({
   backgroundColor: string;
 }) {
   const d = section.data;
-  const title = (section.title || 'Gallery') as string;
+  const title = (section.title || 'Galería') as string;
   const subtitle = (d.subtitle as string) || '';
   const images = (d.images as Array<{ src: string; alt: string; caption: string }>) || [];
   const columns = (d.columns as number) || 3;
@@ -899,7 +899,7 @@ function GallerySection({
 
         {images.length === 0 && (
           <p className="text-center text-xs py-8" style={{ color: `${textColor}40` }}>
-            No images added yet. Add images in the Gallery section settings.
+            No se han agregado imágenes. Agrega imágenes en la configuración de la sección Galería.
           </p>
         )}
       </div>
@@ -921,7 +921,7 @@ function FAQSection({
   textColor: string;
 }) {
   const d = section.data;
-  const title = (section.title || 'FAQ') as string;
+  const title = (section.title || 'Preguntas Frecuentes') as string;
   const subtitle = (d.subtitle as string) || '';
   const items = (d.items as Array<{ question: string; answer: string }>) || [];
 
@@ -974,7 +974,7 @@ function FAQSection({
 
         {items.length === 0 && (
           <p className="text-center text-xs py-8" style={{ color: `${textColor}40` }}>
-            No FAQ items added yet.
+            No se han agregado preguntas.
           </p>
         )}
       </div>
@@ -996,7 +996,7 @@ function StatsSection({
   backgroundColor: string;
 }) {
   const d = section.data;
-  const title = (section.title || 'Stats') as string;
+  const title = (section.title || 'Estadísticas') as string;
   const items = (d.items as Array<{ icon: string; value: string; label: string }>) || [];
 
   return (
@@ -1037,7 +1037,7 @@ function StatsSection({
 
         {items.length === 0 && (
           <p className="text-center text-xs py-4" style={{ color: 'rgba(255,255,255,0.5)' }}>
-            No stats added yet.
+            No se han agregado estadísticas.
           </p>
         )}
       </div>
@@ -1059,7 +1059,7 @@ function TeamSection({
   textColor: string;
 }) {
   const d = section.data;
-  const title = (section.title || 'Our Team') as string;
+  const title = (section.title || 'Nuestro Equipo') as string;
   const members = (d.members as Array<{
     name: string;
     role: string;
@@ -1142,7 +1142,7 @@ function TeamSection({
 
         {members.length === 0 && (
           <p className="text-center text-xs py-8" style={{ color: `${textColor}40` }}>
-            No team members added yet.
+            No se han agregado miembros al equipo.
           </p>
         )}
       </div>
@@ -1166,14 +1166,14 @@ function BlogPostsSection({
   backgroundColor: string;
 }) {
   const d = section.data;
-  const title = (section.title || 'Latest Posts') as string;
+  const title = (section.title || 'Últimas Publicaciones') as string;
   const subtitle = (d.subtitle as string) || '';
 
   // Show 3 placeholder blog cards
   const placeholders = [
-    { title: 'Getting Started with WordPress', excerpt: 'Learn how to set up your first WordPress site in minutes.', date: 'Jan 15, 2025' },
-    { title: 'Top 10 Design Trends', excerpt: 'Explore the latest design trends that are shaping the web this year.', date: 'Jan 10, 2025' },
-    { title: 'SEO Best Practices', excerpt: 'Improve your search rankings with these essential SEO tips.', date: 'Jan 5, 2025' },
+    { title: 'Primeros Pasos con WordPress', excerpt: 'Aprende cómo configurar tu primer sitio WordPress en minutos.', date: '15 Ene, 2025' },
+    { title: 'Top 10 Tendencias de Diseño', excerpt: 'Explora las últimas tendencias de diseño que están marcando la pauta este año.', date: '10 Ene, 2025' },
+    { title: 'Mejores Prácticas de SEO', excerpt: 'Mejora tu posicionamiento en buscadores con estos consejos esenciales de SEO.', date: '5 Ene, 2025' },
   ];
 
   return (
@@ -1474,9 +1474,17 @@ function RenderSection({
 // Main Component
 // ─────────────────────────────────────────────────────────────
 
-export default function ThemeLivePreview() {
+interface ThemeLivePreviewProps {
+  previewPageSlug?: string | null;
+}
+
+export default function ThemeLivePreview({ previewPageSlug }: ThemeLivePreviewProps) {
   const config = useThemeEditorStore((s) => s.config);
-  const [activePreviewPage, setActivePreviewPage] = useState<string | null>(null);
+  const [internalActivePage, setInternalActivePage] = useState<string | null>(null);
+
+  // Use prop when provided, otherwise fall back to internal state
+  const activePreviewPage = previewPageSlug ?? internalActivePage;
+  const setActivePreviewPage = setInternalActivePage;
 
   // Extract config values with safe defaults
   const siteTitle = (config.siteTitle as string) || DEFAULTS.siteTitle;
@@ -1521,6 +1529,27 @@ export default function ThemeLivePreview() {
     const cleanUrl = url.startsWith('/') ? url : `/${url}`;
     return customPages.some((p: any) => `/${p.slug}` === cleanUrl);
   }, [customPages]);
+
+  // Filter nav items to only show links that work on the current page
+  const visibleNavItems = useMemo(() => {
+    if (!activePreviewPage) return navItems; // Home shows all
+    return navItems.filter((item) => {
+      const url = item.url || '';
+      // Home link always visible
+      if (!url || url === '/') return true;
+      // Custom page links always visible
+      if (isCustomPageUrl(url)) return true;
+      // Hash links (#about): only show if that section exists in current page
+      if (url.startsWith('#')) {
+        const sectionId = url.replace('#', '').replace('section-', '');
+        return sections.some((s: ThemeSection) => {
+          const cleanType = s.type.replace(/_/g, '-');
+          return s.type === sectionId || cleanType === sectionId;
+        });
+      }
+      return false;
+    });
+  }, [activePreviewPage, navItems, isCustomPageUrl, sections]);
 
   const colors = useMemo(
     () => ({ primary: primaryColor, secondary: secondaryColor, accent: accentColor }),
@@ -1639,9 +1668,9 @@ export default function ThemeLivePreview() {
               </div>
             </div>
 
-            {/* Nav items */}
+            {/* Nav items — filtered by active page context */}
             <nav className="hidden sm:flex items-center gap-1">
-              {navItems.slice(0, 6).map((item, i) => (
+              {visibleNavItems.slice(0, 6).map((item, i) => (
                 <a
                   key={i}
                   href={item.url || '#'}
@@ -1673,13 +1702,22 @@ export default function ThemeLivePreview() {
                     }
                   }}
                   onMouseEnter={(e) => {
-                    if (i !== 0) {
+                    // Highlight home link when on a custom page
+                    const isHomeLink = !item.url || item.url === '/';
+                    if (isHomeLink && activePreviewPage) {
+                      e.currentTarget.style.backgroundColor = primaryColor;
+                      e.currentTarget.style.color = '#FFFFFF';
+                    } else if (!isHomeLink) {
                       e.currentTarget.style.backgroundColor = primaryColor;
                       e.currentTarget.style.color = '#FFFFFF';
                     }
                   }}
                   onMouseLeave={(e) => {
-                    if (i !== 0) {
+                    const isHomeLink = !item.url || item.url === '/';
+                    if (isHomeLink && activePreviewPage) {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                      e.currentTarget.style.color = primaryColor;
+                    } else if (!isHomeLink) {
                       e.currentTarget.style.backgroundColor = 'transparent';
                       e.currentTarget.style.color = textColor;
                     }
@@ -1788,7 +1826,7 @@ export default function ThemeLivePreview() {
                       className="text-sm font-bold mb-3"
                       style={{ fontFamily: headingFont, color: '#FFFFFF' }}
                     >
-                      {col.title || `Column ${i + 1}`}
+                      {col.title || `Columna ${i + 1}`}
                     </h4>
                     <ul className="space-y-2">
                       {(col.links || []).map((link, li) => (
@@ -1811,7 +1849,7 @@ export default function ThemeLivePreview() {
             style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}
           >
             <div className="text-xs" style={{ color: '#6B7280' }}>
-              {copyrightText || `\u00A9 ${new Date().getFullYear()} ${siteTitle}. All rights reserved.`}
+              {copyrightText || `\u00A9 ${new Date().getFullYear()} ${siteTitle}. Todos los derechos reservados.`}
             </div>
 
             {/* Social links */}

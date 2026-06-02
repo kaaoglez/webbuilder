@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Plus,
@@ -2430,7 +2430,7 @@ function PageSectionItem({
 // Page List View
 // ─────────────────────────────────────────────────────────────
 
-function PageListView() {
+function PageListView({ onPreview }: { onPreview: (slug: string) => void }) {
   const config = useThemeEditorStore((s) => s.config);
   const { addPage, removePage, setActivePageId } = useThemeEditorStore();
   const pages = (config.pages || []) as ThemePage[];
@@ -2576,6 +2576,18 @@ function PageListView() {
                       <Pencil className="h-4 w-4" />
                     </Button>
                     <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-8 text-xs gap-1.5 border-emerald-300 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onPreview(page.slug);
+                      }}
+                    >
+                      <Eye className="h-3.5 w-3.5" />
+                      <span className="hidden sm:inline">Vista Previa</span>
+                    </Button>
+                    <Button
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8 text-gray-500 hover:text-red-500"
@@ -2638,7 +2650,7 @@ function PageListView() {
 // Page Editor View
 // ─────────────────────────────────────────────────────────────
 
-function PageEditorView() {
+function PageEditorView({ onPreview }: { onPreview: (slug: string) => void }) {
   const config = useThemeEditorStore((s) => s.config);
   const {
     activePageId,
@@ -2757,6 +2769,18 @@ function PageEditorView() {
           </div>
           </div>
 
+          <div className="flex items-center gap-2 shrink-0">
+            {activePage && (
+              <Button
+                variant="outline"
+                className="border-emerald-300 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800 gap-2"
+                onClick={() => onPreview(activePage.slug)}
+              >
+                <Eye className="h-4 w-4" />
+                Vista Previa
+              </Button>
+            )}
+          </div>
           <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
             <DialogTrigger asChild>
               <Button
@@ -2864,6 +2888,25 @@ export default function PagesManager() {
   const saveProject = useProjectsStore((s) => s.saveProject);
   const [isGenerating, setIsGenerating] = useState(false);
 
+  // Preview state
+  const [previewingPageSlug, setPreviewingPageSlug] = useState<string | null>(null);
+  const [ThemeLivePreviewComponent, setThemeLivePreviewComponent] = useState<React.ComponentType<{ previewPageSlug?: string | null }> | null>(null);
+
+  // Dynamically import ThemeLivePreview to avoid circular imports
+  useEffect(() => {
+    import('@/components/pageforge/ThemeLivePreview').then((mod) => {
+      setThemeLivePreviewComponent(() => mod.default);
+    });
+  }, []);
+
+  // Find page name for preview dialog title
+  const previewingPageName = useMemo(() => {
+    if (!previewingPageSlug) return null;
+    const pages = (config as any).pages || [];
+    const page = pages.find((p: any) => p.slug === previewingPageSlug);
+    return page?.name || null;
+  }, [previewingPageSlug, config]);
+
   const handleSave = useCallback(() => {
     saveProject(config.name || 'Sin Nombre', 'theme', config as Record<string, unknown>);
     toast.success('Proyecto guardado en Mis Proyectos');
@@ -2961,7 +3004,7 @@ export default function PagesManager() {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.2 }}
               >
-                <PageEditorView />
+                <PageEditorView onPreview={(slug) => setPreviewingPageSlug(slug)} />
               </motion.div>
             ) : (
               <motion.div
@@ -2971,12 +3014,46 @@ export default function PagesManager() {
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ duration: 0.2 }}
               >
-                <PageListView />
+                <PageListView onPreview={(slug) => setPreviewingPageSlug(slug)} />
               </motion.div>
             )}
           </AnimatePresence>
         </div>
       </div>
+
+      {/* Fullscreen Preview Overlay */}
+      {previewingPageSlug !== null && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex flex-col animate-in fade-in duration-200">
+          {/* Toolbar */}
+          <div className="flex items-center justify-between px-4 py-2 bg-[#1a1a1a] border-b border-gray-700 shrink-0">
+            <div className="flex items-center gap-3">
+              <Eye className="h-4 w-4 text-emerald-500" />
+              <span className="text-sm font-medium text-gray-200">
+                {previewingPageName || 'Vista Previa'}
+              </span>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-gray-400 hover:text-white hover:bg-gray-700"
+              onClick={() => setPreviewingPageSlug(null)}
+            >
+              <X className="h-5 w-5" />
+            </Button>
+          </div>
+          {/* Preview Content — scrollable, full remaining space */}
+          <div className="flex-1 overflow-y-auto bg-white">
+            {ThemeLivePreviewComponent && previewingPageSlug ? (
+              <ThemeLivePreviewComponent previewPageSlug={previewingPageSlug} />
+            ) : (
+              <div className="flex items-center justify-center h-full text-gray-400">
+                <Loader2 className="h-8 w-8 animate-spin mr-3" />
+                <span className="text-lg">Cargando vista previa...</span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

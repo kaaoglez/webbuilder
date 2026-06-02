@@ -53,17 +53,17 @@ interface TemplateLibraryProps {
 
 const SECTION_LABELS: Record<string, string> = {
   hero: 'Encabezado',
-  about: 'About',
-  services: 'Services',
-  features: 'Features',
-  testimonials: 'Testimonials',
-  pricing: 'Pricing',
+  about: 'Sobre Nosotros',
+  services: 'Servicios',
+  features: 'Características',
+  testimonials: 'Testimonios',
+  pricing: 'Precios',
   cta: 'Llamada a la Acción',
-  contact: 'Contact',
-  gallery: 'Gallery',
-  faq: 'FAQ',
-  stats: 'Stats',
-  team: 'Team',
+  contact: 'Contacto',
+  gallery: 'Galería',
+  faq: 'Preguntas Frecuentes',
+  stats: 'Estadísticas',
+  team: 'Equipo',
   blog_posts: 'Blog',
 };
 
@@ -143,7 +143,7 @@ export default function TemplateLibrary({ onNavigate }: TemplateLibraryProps) {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-foreground tracking-tight">
-              Template Library
+              Biblioteca de Plantillas
             </h1>
             <p className="text-sm text-muted-foreground">
               {templates.length} plantillas preconstruidas — Elige uno y personalízalo en el editor

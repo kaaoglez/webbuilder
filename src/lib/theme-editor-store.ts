@@ -278,6 +278,7 @@ interface ThemeEditorActions {
   addSection: (type: SectionType) => void;
   removeSection: (index: number) => void;
   moveSection: (fromIndex: number, toIndex: number) => void;
+  duplicateSection: (index: number) => void;
   updateSection: (index: number, partial: Partial<ThemeSection>) => void;
   toggleSection: (index: number) => void;
   updateSectionData: (index: number, dataPartial: Record<string, unknown>) => void;
@@ -617,6 +618,23 @@ export const useThemeEditorStore = create<ThemeEditorState & ThemeEditorActions>
       return {
         config: { ...state.config, sections },
         activeSectionIndex: toIndex,
+      };
+    }),
+
+  // Duplicate a section (clone and insert right after the original)
+  duplicateSection: (index) =>
+    set((state) => {
+      const sections = [...(state.config.sections || [])];
+      const original = sections[index];
+      if (!original) return state;
+      const clone: ThemeSection = {
+        ...original,
+        title: `${original.title} (copia)`,
+      };
+      sections.splice(index + 1, 0, clone);
+      return {
+        config: { ...state.config, sections },
+        activeSectionIndex: index + 1,
       };
     }),
 

@@ -51,6 +51,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { AdvancedOptions } from '@/components/pageforge/AdvancedOptions';
 
 // ─────────────────────────────────────────────────────────────
 // Section type constants (local to this component)
@@ -546,42 +547,44 @@ function TemplateDetailView({ template }: { template: ThemeTemplate }) {
         </Card>
       )}
 
-      {/* ─── Predesigned: Sidebar Widget Panel ─── */}
+      {/* ─── Predesigned: Advanced Options (Widgets) ─── */}
       {!isCustom && hasSidebar && template.sidebarWidgets.length > 0 && (
-        <Card className="border-gray-400 bg-white">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2">
-              <LayoutList className="h-4 w-4 text-gray-500" />
-              Widgets del Sidebar
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {template.sidebarWidgets.map((widget) => {
-                const widgetInfo = SIDEBAR_WIDGET_TYPES.find((w) => w.value === widget.type);
-                return (
-                  <div
-                    key={widget.id}
-                    className="flex items-center justify-between py-1.5 px-3 rounded-lg hover:bg-gray-200 transition-colors"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <span className="text-base">{widgetInfo?.icon || '📦'}</span>
-                      <Label className="text-sm text-gray-700 cursor-pointer">
-                        {widget.title || widgetInfo?.label || widget.type}
-                      </Label>
+        <AdvancedOptions>
+          <Card className="border-gray-400 bg-white">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <LayoutList className="h-4 w-4 text-gray-500" />
+                Widgets del Sidebar
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {template.sidebarWidgets.map((widget) => {
+                  const widgetInfo = SIDEBAR_WIDGET_TYPES.find((w) => w.value === widget.type);
+                  return (
+                    <div
+                      key={widget.id}
+                      className="flex items-center justify-between py-1.5 px-3 rounded-lg hover:bg-gray-200 transition-colors"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <span className="text-base">{widgetInfo?.icon || '📦'}</span>
+                        <Label className="text-sm text-gray-700 cursor-pointer">
+                          {widget.title || widgetInfo?.label || widget.type}
+                        </Label>
+                      </div>
+                      <Switch
+                        checked={widget.enabled}
+                        onCheckedChange={(checked) =>
+                          updateTemplateWidget(template.id, widget.id, { enabled: checked })
+                        }
+                      />
                     </div>
-                    <Switch
-                      checked={widget.enabled}
-                      onCheckedChange={(checked) =>
-                        updateTemplateWidget(template.id, widget.id, { enabled: checked })
-                      }
-                    />
-                  </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        </AdvancedOptions>
       )}
 
       {/* ─── Custom: Section Builder ─── */}
@@ -708,16 +711,18 @@ function TemplateDetailView({ template }: { template: ThemeTemplate }) {
         </Card>
       )}
 
-      {/* ─── Export Info ─── */}
-      <div className="flex items-center gap-2 text-xs text-gray-500 bg-gray-200 rounded-lg px-4 py-3 border border-gray-400">
-        <FileText className="h-3.5 w-3.5 shrink-0" />
-        <span>
-          Esta plantilla se exportará como{' '}
-          <code className="bg-gray-200 px-1.5 py-0.5 rounded text-[11px] font-mono text-gray-600">
-            {template.slug}.php
-          </code>
-        </span>
-      </div>
+      {/* ─── Export Info (Advanced) ─── */}
+      <AdvancedOptions>
+        <div className="flex items-center gap-2 text-xs text-gray-500 bg-gray-200 rounded-lg px-4 py-3 border border-gray-400">
+          <FileText className="h-3.5 w-3.5 shrink-0" />
+          <span>
+            Esta plantilla se exportará como{' '}
+            <code className="bg-gray-200 px-1.5 py-0.5 rounded text-[11px] font-mono text-gray-600">
+              {template.slug}.php
+            </code>
+          </span>
+        </div>
+      </AdvancedOptions>
     </div>
   );
 }

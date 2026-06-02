@@ -22,6 +22,37 @@ import { Separator } from '@/components/ui/separator';
 
 export type NavItem = 'dashboard' | 'create-theme' | 'create-pages' | 'create-plugin' | 'my-projects' | 'templates' | 'medios' | 'settings';
 
+// ─── Contextual Menu Map ───────────────────────────────────────
+// For each active view, define which nav items should be visible.
+// 'dashboard' shows everything; other views show only relevant items.
+// ───────────────────────────────────────────────────────────────
+
+const CONTEXTUAL_MENU: Record<NavItem, NavItem[]> = {
+  // Home: show everything
+  dashboard: ['dashboard', 'create-theme', 'create-pages', 'create-plugin', 'my-projects', 'templates', 'medios', 'settings'],
+
+  // Crear Theme: back to panel, child pages, media (for image picking)
+  'create-theme': ['dashboard', 'create-theme', 'create-pages', 'medios', 'settings'],
+
+  // Páginas: back to panel, parent (create-theme), media
+  'create-pages': ['dashboard', 'create-theme', 'create-pages', 'medios'],
+
+  // Crear Plugin: back to panel, media
+  'create-plugin': ['dashboard', 'create-plugin', 'medios'],
+
+  // Mis Proyectos: back to panel, editors (to re-edit), media
+  'my-projects': ['dashboard', 'create-theme', 'create-plugin', 'templates', 'medios'],
+
+  // Biblioteca de Plantillas: back to panel, create-theme (to load template)
+  templates: ['dashboard', 'create-theme', 'medios'],
+
+  // Medios: back to panel only
+  medios: ['dashboard'],
+
+  // Configuración: back to panel only
+  settings: ['dashboard'],
+};
+
 interface SidebarProps {
   activeItem: NavItem;
   onNavigate: (item: NavItem) => void;
@@ -74,19 +105,30 @@ export function Sidebar({ activeItem, onNavigate, isOpen, onClose, collapsed, on
     if (childItem?.parent) setExpandedParent(childItem.parent);
   }, [activeItem]);
 
+  // Filter nav items based on the current active view context
+  const visibleItems = React.useMemo(() => {
+    if (activeItem === 'dashboard') return navItems; // Home shows all
+    const allowed = CONTEXTUAL_MENU[activeItem] || [];
+    const allowedSet = new Set(allowed);
+    return navItems.filter(item => allowedSet.has(item.id));
+  }, [activeItem]);
+
   const groups = React.useMemo(() => {
     const map: Record<string, typeof navItems> = {};
-    for (const item of navItems) {
+    for (const item of visibleItems) {
       if (item.parent) continue; // skip children, they render under parent
       if (!map[item.group]) map[item.group] = [];
       map[item.group].push(item);
     }
     return Object.entries(map);
-  }, []);
+  }, [visibleItems]);
 
   const childrenOf = React.useCallback((parentId: NavItem) => {
-    return navItems.filter(n => n.parent === parentId);
-  }, []);
+    if (activeItem === 'dashboard') return navItems.filter(n => n.parent === parentId);
+    const allowed = CONTEXTUAL_MENU[activeItem] || [];
+    const allowedSet = new Set(allowed);
+    return navItems.filter(n => n.parent === parentId && allowedSet.has(n.id));
+  }, [activeItem]);
 
   const toggleParent = (id: NavItem) => {
     setExpandedParent(prev => prev === id ? null : id);
@@ -97,7 +139,7 @@ export function Sidebar({ activeItem, onNavigate, isOpen, onClose, collapsed, on
   };
 
   const isChildActive = (parentId: NavItem) => {
-    return navItems.some(n => n.parent === parentId && n.id === activeItem);
+    return visibleItems.some(n => n.parent === parentId && n.id === activeItem);
   };
 
   return (
@@ -167,6 +209,20 @@ export function Sidebar({ activeItem, onNavigate, isOpen, onClose, collapsed, on
 
         {/* Navigation */}
         <nav className="flex-1 py-4 px-3 overflow-y-auto">
+          {/* Back to Panel button — shown when NOT on dashboard */}
+          {activeItem !== 'dashboard' && (
+            <>
+              <button
+                onClick={() => { onNavigate('dashboard'); onClose(); }}
+                className="w-full flex items-center gap-3 rounded-lg text-sm font-medium transition-all duration-200 group mb-3 px-3 py-2 text-white/70 hover:bg-white/8 hover:text-white"
+              >
+                <LayoutDashboard className="h-[18px] w-[18px] flex-shrink-0 text-emerald-400" />
+                <span className="flex-1 text-left">Volver al Panel</span>
+              </button>
+              <Separator className="bg-white/10 mb-3" />
+            </>
+          )}
+
           {groups.map(([group, items], gi) => (
             <div key={group} className={cn(gi > 0 && 'mt-5')}>
               {!collapsed && (

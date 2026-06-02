@@ -24,6 +24,9 @@ export interface SettingsState {
 
   // Advanced
   developerMode: boolean;
+
+  // Onboarding
+  hasOnboarded: boolean;
 }
 
 export interface SettingsActions {
@@ -51,6 +54,8 @@ export const DEFAULT_SETTINGS: SettingsState = {
   includeREADME: true,
 
   developerMode: false,
+
+  hasOnboarded: false,
 };
 
 // ─────────────────────────────────────────────────────────────

@@ -8,6 +8,7 @@ import TemplateLibrary from '@/components/pageforge/TemplateLibrary';
 import MediosView from '@/components/pageforge/MediosView';
 import { useProjectsStore } from '@/lib/projects-store';
 import { useMediaLibraryStore } from '@/lib/media-library-store';
+import { OnboardingOverlay } from '@/components/pageforge/OnboardingOverlay';
 
 const DashboardCards = dynamic(() => import('@/components/pageforge/DashboardCards').then(m => ({ default: m.DashboardCards })));
 const StatsBar = dynamic(() => import('@/components/pageforge/StatsBar').then(m => ({ default: m.StatsBar })));
@@ -46,7 +47,7 @@ function PlaceholderPanel({
   > = {
     dashboard: {
       icon: LayoutDashboard,
-      title: 'Dashboard',
+      title: 'Panel',
       description: 'Vista general de PageForge v2',
       status: 'active',
     },
@@ -54,7 +55,7 @@ function PlaceholderPanel({
       icon: Palette,
       title: 'Crear WordPress Theme',
       description:
-        'Motor visual de generacion de themes WordPress. Disena secciones, elige colores y fuentes, configura la jerarquia de templates de WordPress y exporta un ZIP listo para instalar.',
+        'Motor visual de generación de themes WordPress. Diseña secciones, elige colores y fuentes, configura la jerarquía de templates de WordPress y exporta un ZIP listo para instalar.',
       status: 'pronto',
     },
     'create-pages': {
@@ -68,7 +69,7 @@ function PlaceholderPanel({
       icon: Puzzle,
       title: 'Crear WordPress Plugin',
       description:
-        'Generador visual de plugins WordPress. Formularios de contacto, sliders, custom post types, shortcodes, widgets, social share y mas. Sin escribir una sola linea de PHP.',
+        'Generador visual de plugins WordPress. Formularios de contacto, sliders, custom post types, shortcodes, widgets, social share y más. Sin escribir una sola línea de PHP.',
       status: 'pronto',
     },
     'my-projects': {
@@ -80,23 +81,23 @@ function PlaceholderPanel({
     },
     templates: {
       icon: BookOpen,
-      title: 'Template Library',
+      title: 'Biblioteca de Plantillas',
       description:
-        'Biblioteca de templates preconstruidos por industria. Restaurantes, Portafolios, SaaS, Agencias, E-commerce, Blogs. Contenido demo real incluido.',
+        'Biblioteca de plantillas preconstruidas por industria. Restaurantes, Portafolios, SaaS, Agencias, E-commerce, Blogs. Contenido demo real incluido.',
       status: 'pronto',
     },
     medios: {
       icon: ImageIcon,
       title: 'Biblioteca de Medios',
       description:
-        'Gestiona tus imagenes y archivos multimedia. Sube, edita, recorta y organiza todos los medios de tus proyectos WordPress.',
+        'Gestiona tus imágenes y archivos multimedia. Sube, edita, recorta y organiza todos los medios de tus proyectos WordPress.',
       status: 'active',
     },
     settings: {
       icon: Settings,
-      title: 'Configuracion',
+      title: 'Configuración',
       description:
-        'Ajustes de cuenta, preferencias de exportacion, configuracion de servidor, API keys y mas.',
+        'Ajustes de cuenta, preferencias de exportación, configuración de servidor, API keys y más.',
       status: 'pronto',
     },
   };
@@ -208,7 +209,7 @@ export default function PageForgeApp() {
                       </h1>
                       <p className="text-muted-foreground text-sm mt-2 max-w-2xl">
                         El primer generador visual de themes y plugins de WordPress que funciona
-                        sin WordPress. Disena, genera y exporta.
+                        sin WordPress. Diseña, genera y exporta.
                       </p>
                     </motion.div>
                   </div>
@@ -233,7 +234,7 @@ export default function PageForgeApp() {
                             </h3>
                             <p className="text-emerald-700/80 dark:text-emerald-400/80 text-sm mt-1 leading-relaxed">
                               Crea themes y plugins de WordPress de forma visual. Exporta archivos PHP
-                              validos como ZIP, listo para instalar en cualquier sitio WordPress.
+                              válidos como ZIP, listo para instalar en cualquier sitio WordPress.
                             </p>
                           </div>
                           <div className="flex items-center gap-2 flex-shrink-0">
@@ -276,6 +277,9 @@ export default function PageForgeApp() {
           </main>
         </div>
       </div>
+
+      {/* Onboarding overlay for first-time users */}
+      <OnboardingOverlay />
     </div>
   );
 }

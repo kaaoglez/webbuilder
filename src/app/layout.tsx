@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "PageForge v2 — WordPress Theme & Plugin Generator",
   description:
-    "El primer generador visual de themes y plugins de WordPress que funciona sin WordPress. Disena, genera archivos PHP validos y exporta como ZIP listo para instalar.",
+    "El primer generador visual de themes y plugins de WordPress que funciona sin WordPress. Diseña, genera archivos PHP válidos y exporta como ZIP listo para instalar.",
   keywords: [
     "PageForge",
     "WordPress theme generator",
@@ -34,14 +34,14 @@ export const metadata: Metadata = {
   openGraph: {
     title: "PageForge v2 — WordPress Theme & Plugin Generator",
     description:
-      "Genera themes y plugins de WordPress de forma visual. Exporta archivos PHP validos como ZIP.",
+      "Genera themes y plugins de WordPress de forma visual. Exporta archivos PHP válidos como ZIP.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: "PageForge v2 — WordPress Theme & Plugin Generator",
     description:
-      "Genera themes y plugins de WordPress de forma visual. Exporta archivos PHP validos como ZIP.",
+      "Genera themes y plugins de WordPress de forma visual. Exporta archivos PHP válidos como ZIP.",
   },
 };
 
@@ -51,7 +51,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="es" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
       >

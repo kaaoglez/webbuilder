@@ -63,10 +63,15 @@ import {
   Trash2,
   Layers,
   ExternalLink,
+  Copy,
+  Monitor,
+  Tablet,
+  Smartphone,
 } from 'lucide-react';
 
 import { useThemeEditorStore, FONT_OPTIONS } from '@/lib/theme-editor-store';
 import { SortableCardsProvider, SortableCardWrapper, DragHandle } from '@/components/pageforge/SortableCards';
+import { AdvancedOptions } from '@/components/pageforge/AdvancedOptions';
 import type { ThemeSection } from '@/lib/wp-theme-generator';
 import { useMediaPicker, MediaLibraryBrowser } from '@/components/pageforge/MediaLibrary';
 import { useMediaLibraryStore, formatFileSize } from '@/lib/media-library-store';
@@ -216,7 +221,7 @@ function ImageUrlField({
           </Button>
         </div>
         {value && (
-          <div className="mt-2 flex items-center gap-2 p-2 bg-gray-100 rounded-lg border border-gray-300">
+          <div className="mt-2 flex items-center gap-2 p-2 bg-gray-100 rounded-lg border border-gray-400">
             <img src={value} alt="Preview" className="h-16 w-auto max-w-full object-contain rounded cursor-pointer"
               onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
             <span className="text-xs text-gray-500 shrink-0">Vista previa</span>
@@ -241,7 +246,7 @@ function RepeatableCard({
 
   return (
     <>
-    <Card className="border border-gray-400 bg-white">
+    <Card className="border-gray-400 bg-white">
       <CardHeader className="flex flex-row items-center justify-between py-3 px-4">
         {title && <CardTitle className="text-sm font-medium text-gray-600">{title}</CardTitle>}
         {!title && <div />}
@@ -458,14 +463,6 @@ function InfoTab() {
               placeholder="Mi Theme WordPress"
             />
           </FormField>
-          <FormField label="URL Amigable">
-            <Input
-              value={config.slug || ''}
-              onChange={(e) => updateConfig({ slug: e.target.value })}
-              placeholder="mi-theme-wordpress"
-              className="bg-gray-200"
-            />
-          </FormField>
           <FormField label="Descripción">
             <Textarea
               value={config.description || ''}
@@ -475,13 +472,6 @@ function InfoTab() {
             />
           </FormField>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField label="Versión">
-              <Input
-                value={config.version || ''}
-                onChange={(e) => updateConfig({ version: e.target.value })}
-                placeholder="1.0.0"
-              />
-            </FormField>
             <FormField label="Autor">
               <Input
                 value={config.author || ''}
@@ -489,30 +479,47 @@ function InfoTab() {
                 placeholder="Nombre del autor"
               />
             </FormField>
+            <FormField label="Sitio Web del Autor">
+              <Input
+                value={config.authorUri || ''}
+                onChange={(e) => updateConfig({ authorUri: e.target.value })}
+                placeholder="https://tu-sitio.com"
+              />
+            </FormField>
           </div>
-          <FormField label="Sitio Web del Autor">
-            <Input
-              value={config.authorUri || ''}
-              onChange={(e) => updateConfig({ authorUri: e.target.value })}
-              placeholder="https://tu-sitio.com"
-            />
-          </FormField>
-          <FormField label="Dominio de Traducción">
-            <Input
-              value={config.textDomain || ''}
-              onChange={(e) => updateConfig({ textDomain: e.target.value })}
-              placeholder="mi-theme"
-              className="bg-gray-200"
-            />
-            <p className="text-xs text-gray-500 mt-1">(identificador para traducciones)</p>
-          </FormField>
-          <FormField label="Etiquetas (separadas por coma)">
-            <Input
-              value={config.tags || ''}
-              onChange={(e) => updateConfig({ tags: e.target.value })}
-              placeholder="one-column, custom-colors, two-columns"
-            />
-          </FormField>
+          <AdvancedOptions>
+            <FormField label="URL Amigable">
+              <Input
+                value={config.slug || ''}
+                onChange={(e) => updateConfig({ slug: e.target.value })}
+                placeholder="mi-theme-wordpress"
+                className="bg-gray-200"
+              />
+            </FormField>
+            <FormField label="Versión">
+              <Input
+                value={config.version || ''}
+                onChange={(e) => updateConfig({ version: e.target.value })}
+                placeholder="1.0.0"
+              />
+            </FormField>
+            <FormField label="Dominio de Traducción">
+              <Input
+                value={config.textDomain || ''}
+                onChange={(e) => updateConfig({ textDomain: e.target.value })}
+                placeholder="mi-theme"
+                className="bg-gray-200"
+              />
+              <p className="text-xs text-gray-500 mt-1">(identificador para traducciones)</p>
+            </FormField>
+            <FormField label="Etiquetas (separadas por coma)">
+              <Input
+                value={config.tags || ''}
+                onChange={(e) => updateConfig({ tags: e.target.value })}
+                placeholder="one-column, custom-colors, two-columns"
+              />
+            </FormField>
+          </AdvancedOptions>
         </CardContent>
       </Card>
       </SortableCardWrapper>
@@ -524,6 +531,17 @@ function InfoTab() {
 // ─────────────────────────────────────────────────────────────
 // TAB 2: DESIGN
 // ─────────────────────────────────────────────────────────────
+
+const COLOR_PRESETS = [
+  // Warm palette
+  '#EF4444', '#F97316', '#F59E0B', '#EAB308', '#84CC16',
+  // Cool palette
+  '#22C55E', '#10B981', '#14B8A6', '#06B6D4', '#0EA5E9',
+  // Deep palette
+  '#3B82F6', '#6366F1', '#8B5CF6', '#A855F7', '#D946EF',
+  // Neutrals
+  '#1F2937', '#374151', '#6B7280', '#9CA3AF', '#D1D5DB',
+];
 
 function ColorPickerField({
   label,
@@ -552,6 +570,24 @@ function ColorPickerField({
           className="w-32 font-mono text-sm"
         />
       </div>
+      {/* Color preset swatches */}
+      <div className="flex flex-wrap gap-1.5 mt-2">
+        {COLOR_PRESETS.map((color) => (
+          <button
+            key={color}
+            type="button"
+            onClick={() => onChange(color)}
+            className="w-5 h-5 rounded-sm border transition-transform hover:scale-125 focus:outline-none focus:ring-1 focus:ring-offset-1 focus:ring-gray-400"
+            style={{
+              backgroundColor: color,
+              borderColor: value === color ? '#111827' : 'transparent',
+              borderWidth: value === color ? 2 : 1,
+              boxShadow: value === color ? '0 0 0 1px white' : 'none',
+            }}
+            title={color}
+          />
+        ))}
+      </div>
     </FormField>
   );
 }
@@ -561,6 +597,19 @@ function DesignTab() {
   const designCardOrder = (config.cardOrders as Record<string, string[]>)?.design || ['colors', 'typography', 'borders'];
 
   const getOrder = (id: string) => designCardOrder.indexOf(id);
+
+  // Load Google Fonts for preview
+  useEffect(() => {
+    const fonts = FONT_OPTIONS.join('&family=').replace(/ /g, '+');
+    const linkId = 'google-fonts-preview';
+    if (!document.getElementById(linkId)) {
+      const link = document.createElement('link');
+      link.id = linkId;
+      link.rel = 'stylesheet';
+      link.href = `https://fonts.googleapis.com/css2?family=${fonts}:wght@400;600;700&display=swap`;
+      document.head.appendChild(link);
+    }
+  }, []);
 
   return (
     <SortableCardsProvider
@@ -602,7 +651,11 @@ function DesignTab() {
               <Select value={config.headingFont || 'Inter'} onValueChange={(v) => updateConfig({ headingFont: v })}>
                 <SelectTrigger><SelectValue placeholder="Seleccionar fuente" /></SelectTrigger>
                 <SelectContent>
-                  {FONT_OPTIONS.map((f) => (<SelectItem key={f} value={f}>{f}</SelectItem>))}
+                  {FONT_OPTIONS.map((f) => (
+                    <SelectItem key={f} value={f}>
+                      <span style={{ fontFamily: `'${f}', sans-serif` }} className="text-sm">{f}</span>
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </FormField>
@@ -610,7 +663,11 @@ function DesignTab() {
               <Select value={config.bodyFont || 'Inter'} onValueChange={(v) => updateConfig({ bodyFont: v })}>
                 <SelectTrigger><SelectValue placeholder="Seleccionar fuente" /></SelectTrigger>
                 <SelectContent>
-                  {FONT_OPTIONS.map((f) => (<SelectItem key={f} value={f}>{f}</SelectItem>))}
+                  {FONT_OPTIONS.map((f) => (
+                    <SelectItem key={f} value={f}>
+                      <span style={{ fontFamily: `'${f}', sans-serif` }} className="text-sm">{f}</span>
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </FormField>
@@ -1780,17 +1837,25 @@ function SectionConfigPanel({ section, sectionIndex }: { section: ThemeSection; 
 function SortableSectionItem({
   section,
   index,
+  total,
   isActive,
   onSelect,
   onToggle,
   onRemove,
+  onDuplicate,
+  onMoveUp,
+  onMoveDown,
 }: {
   section: ThemeSection;
   index: number;
+  total: number;
   isActive: boolean;
   onSelect: () => void;
   onToggle: () => void;
   onRemove: () => void;
+  onDuplicate: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
 }) {
   const {
     attributes,
@@ -1814,7 +1879,7 @@ function SortableSectionItem({
       style={style}
       onClick={onSelect}
       className={`
-        flex items-center gap-2 px-3 py-2.5 rounded-md cursor-pointer transition-all duration-150
+        group flex items-center gap-2 px-3 py-2.5 rounded-md cursor-pointer transition-all duration-150
         ${isActive
           ? 'bg-emerald-50 border-l-[3px] border-l-emerald-500 shadow-sm'
           : 'hover:bg-gray-200 border-l-[3px] border-l-transparent'
@@ -1835,6 +1900,28 @@ function SortableSectionItem({
         <GripVertical className="h-4 w-4" />
       </button>
 
+      {/* Move up/down buttons */}
+      <div className="flex flex-col shrink-0 -space-y-0.5">
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); onMoveUp(); }}
+          disabled={index === 0}
+          className="text-gray-400 hover:text-gray-600 disabled:opacity-20 disabled:cursor-not-allowed p-0 leading-none"
+          title="Mover arriba"
+        >
+          <ChevronUp className="h-3 w-3" />
+        </button>
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); onMoveDown(); }}
+          disabled={index === total - 1}
+          className="text-gray-400 hover:text-gray-600 disabled:opacity-20 disabled:cursor-not-allowed p-0 leading-none"
+          title="Mover abajo"
+        >
+          <ChevronDown className="h-3 w-3" />
+        </button>
+      </div>
+
       <div className="text-gray-500 shrink-0">{SECTION_TYPE_ICON[section.type]}</div>
       <div className="flex-1 min-w-0 truncate">
         <span className="text-sm font-medium block truncate">
@@ -1844,6 +1931,19 @@ function SortableSectionItem({
           {SECTION_TYPE_LABEL[section.type] || section.type}
         </span>
       </div>
+
+      {/* Action buttons (show on hover) */}
+      <div className="flex items-center gap-0.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); onDuplicate(); }}
+          className="text-gray-400 hover:text-emerald-600 p-1 rounded hover:bg-emerald-50"
+          title="Duplicar sección"
+        >
+          <Copy className="h-3.5 w-3.5" />
+        </button>
+      </div>
+
       <Switch
         checked={section.enabled}
         onCheckedChange={onToggle}
@@ -1876,6 +1976,7 @@ function SectionsTab() {
     addSection,
     removeSection,
     moveSection,
+    duplicateSection,
     toggleSection,
   } = useThemeEditorStore();
 
@@ -1943,10 +2044,14 @@ function SectionsTab() {
                       key={i}
                       section={section}
                       index={i}
+                      total={sections.length}
                       isActive={activeSectionIndex === i}
                       onSelect={() => setActiveSectionIndex(i)}
                       onToggle={() => toggleSection(i)}
                       onRemove={() => setRemoveConfirm(i)}
+                      onDuplicate={() => duplicateSection(i)}
+                      onMoveUp={() => i > 0 && moveSection(i, i - 1)}
+                      onMoveDown={() => i < sections.length - 1 && moveSection(i, i + 1)}
                     />
                   ))}
                 </div>
@@ -2472,10 +2577,14 @@ function NavigationTab() {
     // Section anchors (from front-page sections)
     const enabledSections = sections.filter((s: ThemeSection) => s.enabled);
     if (enabledSections.length > 0) {
+      const seenTypes = new Map<string, number>();
       enabledSections.forEach((s: ThemeSection) => {
         const slug = s.type;
+        const count = seenTypes.get(slug) || 0;
+        seenTypes.set(slug, count + 1);
+        const uniqueSlug = count > 0 ? `${slug}-${count + 1}` : slug;
         const title = s.title || slug.charAt(0).toUpperCase() + slug.slice(1);
-        options.push({ value: `#section-${slug}`, label: title, group: 'Secciones del Home' });
+        options.push({ value: `#section-${uniqueSlug}`, label: title, group: 'Secciones del Home' });
       });
     }
 
@@ -2998,6 +3107,7 @@ export default function ThemeEditor() {
   const { activeTab, setActiveTab, config, isGenerating, setIsGenerating } = useThemeEditorStore();
   const saveProject = useProjectsStore((s) => s.saveProject);
   const [showPreview, setShowPreview] = useState(false);
+  const [previewDeviceMode, setPreviewDeviceMode] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
   const tabsScrollRef = useRef<HTMLDivElement>(null);
   const [shadowState, setShadowState] = useState({ left: false, right: false });
 
@@ -3024,6 +3134,28 @@ export default function ThemeEditor() {
     return () => clearTimeout(timeout);
   }, [activeTab, updateScrollShadows]);
 
+  // Theme completion progress calculation
+  const themeProgress = useMemo(() => {
+    const checks = [
+      // Info: name, logo, site title
+      { done: !!(config.name && config.name.trim()), label: 'Nombre' },
+      { done: !!(config.siteTitle && config.siteTitle.trim()), label: 'Título del Sitio' },
+      { done: !!(config.logoUrl && config.logoUrl.trim()), label: 'Logo' },
+      // Navigation: at least 2 items
+      { done: (config.navItems || []).length >= 2, label: 'Navegación' },
+      // Sections: at least 1 enabled section with content
+      { done: (config.sections || []).some((s: any) => s.enabled && s.title), label: 'Secciones' },
+      // Footer: copyright text
+      { done: !!(config.copyrightText && config.copyrightText.trim()), label: 'Pie de Página' },
+      // Colors: primary color is not default
+      { done: config.primaryColor && config.primaryColor !== '#2563EB', label: 'Colores personalizados' },
+    ];
+    const completed = checks.filter(c => c.done).length;
+    const total = checks.length;
+    const percentage = Math.round((completed / total) * 100);
+    return { completed, total, percentage, checks };
+  }, [config]);
+
   // Also update shadows on resize
   useEffect(() => {
     const el = tabsScrollRef.current;
@@ -3041,6 +3173,8 @@ export default function ThemeEditor() {
     saveProject(config.name || 'Sin Nombre', 'theme', config as Record<string, unknown>);
     toast.success('Proyecto guardado en Mis Proyectos');
   };
+
+  const [generateConfirm, setGenerateConfirm] = useState(false);
 
   const handleGenerate = useCallback(async () => {
     setIsGenerating(true);
@@ -3083,6 +3217,21 @@ export default function ThemeEditor() {
       <header className="flex items-center justify-between px-4 md:px-6 py-3 bg-[#1a1a1a] border-b border-gray-700 shrink-0">
         <div className="flex items-center gap-3">
           <h1 className="text-white font-semibold text-lg">Editor de Theme</h1>
+          {/* Progress indicator */}
+          <div className="hidden md:flex items-center gap-2 ml-2">
+            <div className="w-24 h-1.5 bg-gray-700 rounded-full overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all duration-500 ease-out"
+                style={{
+                  width: `${themeProgress.percentage}%`,
+                  backgroundColor: themeProgress.percentage === 100 ? '#10B981' : themeProgress.percentage >= 50 ? '#F59E0B' : '#EF4444',
+                }}
+              />
+            </div>
+            <span className="text-[11px] text-gray-500 tabular-nums">
+              {themeProgress.percentage}%
+            </span>
+          </div>
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -3114,7 +3263,7 @@ export default function ThemeEditor() {
             Guardar
           </Button>
           <Button
-          onClick={handleGenerate}
+          onClick={() => setGenerateConfirm(true)}
           disabled={isGenerating}
           className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium"
         >
@@ -3216,20 +3365,136 @@ export default function ThemeEditor() {
         </Tabs>
 
         {/* LIVE PREVIEW PANEL — RIGHT SIDE, 2/3 of space */}
+        <AnimatePresence>
         {showPreview && (
-          <div className="flex-[2] border-l border-gray-400 bg-white overflow-hidden shrink-0 flex flex-col">
-            <div className="shrink-0 bg-white/90 backdrop-blur-sm border-b border-gray-400 px-4 py-2 flex items-center justify-between">
-              <span className="text-sm font-semibold text-gray-700">Vista Previa en Tiempo Real</span>
+          <motion.div
+            key="preview-panel"
+            initial={{ x: '100%', opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: '100%', opacity: 0 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            className="flex-[2] border-l border-gray-400 bg-white overflow-hidden shrink-0 flex flex-col"
+          >
+            {/* PREVIEW HEADER BAR */}
+            <div className="shrink-0 bg-[#1a1a1a] border-b border-gray-700 px-4 py-2.5 flex items-center justify-between">
+              <span className="text-sm font-semibold text-gray-300">Vista Previa en Tiempo Real</span>
+              <div className="flex items-center gap-1.5 bg-[#2a2a2a] rounded-lg p-1">
+                <button
+                  type="button"
+                  onClick={() => setPreviewDeviceMode('desktop')}
+                  className={cn(
+                    'p-1.5 rounded-md transition-all duration-150',
+                    previewDeviceMode === 'desktop'
+                      ? 'bg-emerald-600 text-white shadow-sm'
+                      : 'text-gray-500 hover:text-gray-300 hover:bg-[#3a3a3a]'
+                  )}
+                  title="Escritorio"
+                >
+                  <Monitor className="h-4 w-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPreviewDeviceMode('tablet')}
+                  className={cn(
+                    'p-1.5 rounded-md transition-all duration-150',
+                    previewDeviceMode === 'tablet'
+                      ? 'bg-emerald-600 text-white shadow-sm'
+                      : 'text-gray-500 hover:text-gray-300 hover:bg-[#3a3a3a]'
+                  )}
+                  title="Tablet"
+                >
+                  <Tablet className="h-4 w-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPreviewDeviceMode('mobile')}
+                  className={cn(
+                    'p-1.5 rounded-md transition-all duration-150',
+                    previewDeviceMode === 'mobile'
+                      ? 'bg-emerald-600 text-white shadow-sm'
+                      : 'text-gray-500 hover:text-gray-300 hover:bg-[#3a3a3a]'
+                  )}
+                  title="Móvil"
+                >
+                  <Smartphone className="h-4 w-4" />
+                </button>
+              </div>
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className="text-[11px] bg-emerald-50 text-emerald-700 border-emerald-200">Live</Badge>
+                <Badge variant="outline" className="text-[11px] bg-emerald-950 text-emerald-400 border-emerald-700">Live</Badge>
+                <button
+                  type="button"
+                  onClick={() => setShowPreview(false)}
+                  className="text-gray-500 hover:text-gray-300 transition-colors p-1 rounded hover:bg-[#2a2a2a]"
+                >
+                  <X className="h-4 w-4" />
+                </button>
               </div>
             </div>
-            <div className="flex-1 overflow-hidden">
-            <ThemeLivePreview />
+
+            {/* PREVIEW AREA */}
+            <div className="flex-1 overflow-y-auto bg-gray-200">
+              <div
+                className={cn(
+                  'transition-all duration-300 ease-in-out mx-auto',
+                  previewDeviceMode === 'desktop' && 'w-full',
+                  previewDeviceMode === 'tablet' && 'max-w-[768px]',
+                  previewDeviceMode === 'mobile' && 'max-w-[375px]',
+                  previewDeviceMode !== 'desktop' && 'px-0'
+                )}
+              >
+                {/* BROWSER CHROME FRAME */}
+                <div className="sticky top-0 z-10 bg-gray-800 rounded-t-lg border-b border-gray-700">
+                  <div className="flex items-center gap-2 px-4 py-2">
+                    {/* Traffic light dots */}
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-3 h-3 rounded-full bg-red-500" />
+                      <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                      <div className="w-3 h-3 rounded-full bg-green-500" />
+                    </div>
+                    {/* Fake URL bar */}
+                    <div className="flex-1 flex items-center gap-2">
+                      <div className="flex items-center gap-1 text-gray-400 text-xs">
+                        <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                      </div>
+                      <div className="flex-1 bg-gray-700 rounded-md px-3 py-1.5 text-gray-400 text-xs font-mono truncate">
+                        {config.siteTitle ? `${config.siteTitle.toLowerCase().replace(/\s+/g, '-')}.com` : 'mi-sitio-web.com'}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {/* Actual preview content */}
+                <div className="bg-white shadow-lg border-b border-gray-300">
+                  <ThemeLivePreview />
+                </div>
+              </div>
             </div>
-          </div>
+          </motion.div>
         )}
+        </AnimatePresence>
       </div>
+
+      {/* Generate confirmation dialog */}
+      <AlertDialog open={generateConfirm} onOpenChange={setGenerateConfirm}>
+        <AlertDialogContent className="max-w-sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Generar Theme WordPress</AlertDialogTitle>
+            <AlertDialogDescription>
+              Se generará un archivo ZIP con tu theme <strong>{config.name || 'Sin Nombre'}</strong> listo para instalar en WordPress.
+              {themeProgress.percentage < 100 && (
+                <span className="block mt-2 text-amber-600 font-medium">
+                  ⚠️ Tu theme está al {themeProgress.percentage}% de completitud. Puedes generar igualmente y seguir editando después.
+                </span>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { setGenerateConfirm(false); handleGenerate(); }} className="bg-emerald-600 hover:bg-emerald-700">
+              Generar ZIP
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

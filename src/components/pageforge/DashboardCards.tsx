@@ -41,36 +41,36 @@ const CARDS_MAP: Record<string, ActionCard> = {
     id: 'create-theme',
     title: 'Crear WordPress Theme',
     description:
-      'Disena visualmente tu theme de WordPress. Elige secciones, colores, fuentes. Exporta como ZIP listo para instalar.',
+      'Diseña visualmente tu theme de WordPress. Elige secciones, colores, fuentes. Exporta como ZIP listo para instalar.',
     buttonText: 'Crear Theme',
     icon: Palette,
     iconBg: 'bg-emerald-100 dark:bg-emerald-950',
     iconColor: 'text-emerald-700 dark:text-emerald-400',
-    stats: ['15+ secciones', '7 categorias', 'PHP valido'],
+    stats: ['15+ secciones', '7 categorías', 'PHP válido'],
     accentBorder: 'border-l-emerald-500',
   },
   'create-plugin': {
     id: 'create-plugin',
     title: 'Crear WordPress Plugin',
     description:
-      'Genera plugins de WordPress sin codigo. Formularios, sliders, shortcodes, widgets y mas.',
+      'Genera plugins de WordPress sin código. Formularios, sliders, shortcodes, widgets y más.',
     buttonText: 'Crear Plugin',
     icon: Puzzle,
     iconBg: 'bg-amber-100 dark:bg-amber-950',
     iconColor: 'text-amber-700 dark:text-amber-400',
-    stats: ['15 tipos de plugins', 'Configuracion visual', 'ZIP descargable'],
+    stats: ['15 tipos de plugins', 'Configuración visual', 'ZIP descargable'],
     accentBorder: 'border-l-amber-500',
   },
   templates: {
     id: 'templates',
-    title: 'Template Library',
+    title: 'Biblioteca de Plantillas',
     description:
-      'Templates preconstruidos por industria: Restaurantes, Portafolios, SaaS, Agencias, E-commerce, Blogs.',
-    buttonText: 'Explorar Templates',
+      'Plantillas preconstruidas por industria: Restaurantes, Portafolios, SaaS, Agencias, E-commerce, Blogs.',
+    buttonText: 'Explorar Plantillas',
     icon: BookOpen,
     iconBg: 'bg-violet-100 dark:bg-violet-950',
     iconColor: 'text-violet-700 dark:text-violet-400',
-    stats: ['7 industrias', 'Demo content', '1-click import'],
+    stats: ['7 industrias', 'Contenido demo', 'Importar con 1 clic'],
     accentBorder: 'border-l-violet-500',
   },
   'my-projects': {
@@ -82,7 +82,7 @@ const CARDS_MAP: Record<string, ActionCard> = {
     icon: FolderOpen,
     iconBg: 'bg-sky-100 dark:bg-sky-950',
     iconColor: 'text-sky-700 dark:text-sky-400',
-    stats: ['Auto-save', 'Re-export', 'Gestion central'],
+    stats: ['Auto-guardado', 'Re-exportar', 'Gestión central'],
     accentBorder: 'border-l-sky-500',
   },
 };
@@ -111,7 +111,7 @@ export function DashboardCards({ onNavigate }: DashboardCardsProps) {
     <section>
       <div className="flex items-center gap-2 mb-5">
         <Sparkles className="h-5 w-5 text-emerald-600" />
-        <h2 className="text-lg font-semibold text-foreground">Acciones Rapidas</h2>
+        <h2 className="text-lg font-semibold text-foreground">Acciones Rápidas</h2>
       </div>
 
       <SortableCardsProvider
