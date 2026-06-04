@@ -568,7 +568,7 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
             },
             {
               icon: '🔒',
-              title: 'Seguridad Enterprise',
+              title: 'Seguridad Empresarial',
               description:
                 'Encriptación AES-256, autenticación de dos factores, SSO con SAML/OAuth y cumplimiento SOC 2 Type II.',
             },
@@ -597,7 +597,7 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
           subtitle: 'Elige el plan perfecto para el tamaño de tu equipo. Cancela cuando quieras.',
           plans: [
             {
-              name: 'Starter',
+              name: 'Inicial',
               price: '$19',
               period: '/mes por usuario',
               description: 'Ideal para equipos pequeños que están comenzando',
@@ -612,7 +612,7 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
               ctaText: 'Prueba Gratis 14 Días',
             },
             {
-              name: 'Professional',
+              name: 'Profesional',
               price: '$49',
               period: '/mes por usuario',
               description: 'Para equipos en crecimiento que necesitan más poder',
@@ -629,12 +629,12 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
               ctaText: 'Prueba Gratis 14 Días',
             },
             {
-              name: 'Enterprise',
+              name: 'Empresarial',
               price: '$99',
               period: '/mes por usuario',
               description: 'Para organizaciones que requieren control total',
               features: [
-                'Todo en Professional',
+                'Todo en Profesional',
                 'Almacenamiento ilimitado',
                 'SSO / SAML',
                 'Auditoría y logs',
@@ -659,7 +659,7 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
           testimonials: [
             {
               quote:
-                'Migramos de tres herramientas diferentes a CloudFlow y redujimos el tiempo de gestión de proyectos en un 40%. La automatización inteligente es un game changer para nuestro equipo de 50 personas.',
+                'Migramos de tres herramientas diferentes a CloudFlow y redujimos el tiempo de gestión de proyectos en un 40%. La automatización inteligente es un cambio radical para nuestro equipo de 50 personas.',
               name: 'Alejandro Reyes',
               role: 'CTO — Innovatech Solutions',
               rating: 5,
@@ -702,7 +702,7 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
             {
               question: '¿Qué pasa si mi equipo crece?',
               answer:
-                'CloudFlow escala contigo. Puedes agregar usuarios ilimitados en cualquier plan. Solo pagas por los usuarios activos. Si superas los 100 usuarios, nuestro plan Enterprise ofrece precios personalizados.',
+                'CloudFlow escala contigo. Puedes agregar usuarios ilimitados en cualquier plan. Solo pagas por los usuarios activos. Si superas los 100 usuarios, nuestro plan Empresarial ofrece precios personalizados.',
             },
             {
               question: '¿Ofrecen migración desde otras herramientas?',
@@ -820,13 +820,13 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
             },
             {
               icon: '✍️',
-              title: 'Estrategia de Contenido',
+              title: 'Content Strategy',
               description:
                 'Creación de calendarios editoriales, producción de contenido, copywriting y gestión de blogs corporativos.',
             },
             {
               icon: '📱',
-              title: 'Redes Sociales',
+              title: 'Social Media',
               description:
                 'Gestión de perfiles en Instagram, LinkedIn, TikTok y Twitter. Creación de contenido, community management y social ads.',
             },

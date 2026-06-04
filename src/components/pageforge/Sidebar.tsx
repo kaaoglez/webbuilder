@@ -41,26 +41,26 @@ interface NavItemDef {
 }
 
 const navItems: NavItemDef[] = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, description: 'Vista general', group: 'Principal' },
+  { id: 'dashboard', label: 'Panel', icon: LayoutDashboard, description: 'Vista general', group: 'Principal' },
   { id: 'create-theme', label: 'Crear Theme', icon: Palette, description: 'Generador de themes WP', group: 'Crear' },
   { id: 'create-pages', label: 'Páginas', icon: FileText, description: 'Gestión de páginas', group: 'Crear', parent: 'create-theme' },
   { id: 'create-plugin', label: 'Crear Plugin', icon: Puzzle, description: 'Generador de plugins WP', group: 'Crear' },
   { id: 'my-projects', label: 'Mis Proyectos', icon: FolderOpen, description: 'Proyectos guardados', group: 'Gestión' },
-  { id: 'templates', label: 'Template Library', icon: BookOpen, description: 'Templates preconstruidos', group: 'Gestión' },
+  { id: 'templates', label: 'Biblioteca de Plantillas', icon: BookOpen, description: 'Templates preconstruidos', group: 'Gestión' },
   { id: 'medios', label: 'Medios', icon: ImageIcon, description: 'Biblioteca de medios', group: 'Gestión' },
-  { id: 'settings', label: 'Configuracion', icon: Settings, description: 'Ajustes de cuenta', group: 'Sistema' },
+  { id: 'settings', label: 'Configuración', icon: Settings, description: 'Ajustes de cuenta', group: 'Sistema' },
 ];
 
 // Breadcrumb map
 export const BREADCRUMBS: Record<NavItem, { title: string; subtitle: string }> = {
-  dashboard: { title: 'Dashboard', subtitle: 'Vista general' },
+  dashboard: { title: 'Panel', subtitle: 'Vista general' },
   'create-theme': { title: 'Crear WordPress Theme', subtitle: 'Editor visual de temas' },
   'create-plugin': { title: 'Crear WordPress Plugin', subtitle: 'Generador de plugins' },
   'create-pages': { title: 'Páginas', subtitle: 'Gestión de páginas del theme' },
   'my-projects': { title: 'Mis Proyectos', subtitle: 'Proyectos guardados' },
-  templates: { title: 'Template Library', subtitle: 'Templates preconstruidos' },
+  templates: { title: 'Biblioteca de Plantillas', subtitle: 'Templates preconstruidos' },
   medios: { title: 'Biblioteca de Medios', subtitle: 'Gestión de imágenes y archivos' },
-  settings: { title: 'Configuracion', subtitle: 'Ajustes de cuenta' },
+  settings: { title: 'Configuración', subtitle: 'Ajustes de cuenta' },
 };
 
 export function Sidebar({ activeItem, onNavigate, isOpen, onClose, collapsed, onToggleCollapse }: SidebarProps) {
@@ -192,17 +192,27 @@ export function Sidebar({ activeItem, onNavigate, isOpen, onClose, collapsed, on
                             onNavigate(item.id);
                             onClose();
                           }}
-                          className={cn(
-                            'w-full flex items-center gap-3 rounded-lg text-sm font-medium transition-all duration-200 group px-3 py-2',
-                            (isActive || childActive)
-                              ? 'bg-white/15 text-white shadow-sm'
-                              : 'text-white/70 hover:bg-white/8 hover:text-white'
-                          )}
+                          className="w-full flex items-center gap-3 rounded-lg text-sm font-medium transition-all duration-200 group px-3 py-2"
+                          style={{
+                            backgroundColor: (isActive || childActive) ? 'rgba(255,255,255,0.15)' : 'transparent',
+                            color: (isActive || childActive) ? '#FFFFFF' : 'rgba(255,255,255,0.7)',
+                          }}
+                          onMouseEnter={(e) => {
+                            if (!isActive && !childActive) {
+                              e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.08)';
+                              e.currentTarget.style.color = '#FFFFFF';
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (!isActive && !childActive) {
+                              e.currentTarget.style.backgroundColor = 'transparent';
+                              e.currentTarget.style.color = 'rgba(255,255,255,0.7)';
+                            }
+                          }}
                         >
-                          <Icon className={cn(
-                            'h-[18px] w-[18px] flex-shrink-0 transition-colors duration-200',
-                            (isActive || childActive) ? 'text-emerald-400' : 'text-white/50 group-hover:text-white/80'
-                          )} />
+                          <Icon className="h-[18px] w-[18px] flex-shrink-0 transition-colors duration-200"
+                            style={{ color: (isActive || childActive) ? '#34D399' : 'rgba(255,255,255,0.5)' }}
+                          />
                           <span className="flex-1 text-left">{item.label}</span>
                           <span
                             role="button"
@@ -214,11 +224,11 @@ export function Sidebar({ activeItem, onNavigate, isOpen, onClose, collapsed, on
                             className="p-0.5 rounded hover:bg-white/10 transition-colors cursor-pointer"
                           >
                             <ChevronDown
-                              className={cn(
-                                'h-3.5 w-3.5 transition-transform duration-200',
-                                expanded ? 'rotate-180' : 'rotate-0',
-                                (isActive || childActive) ? 'text-white/80' : 'text-white/40'
-                              )}
+                              className="h-3.5 w-3.5 transition-transform duration-200"
+                              style={{
+                                transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                                color: (isActive || childActive) ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.4)',
+                              }}
                             />
                           </span>
                         </button>
@@ -323,13 +333,13 @@ export function Sidebar({ activeItem, onNavigate, isOpen, onClose, collapsed, on
         <div className="p-4">
           {!collapsed && (
             <div className="rounded-lg bg-white/8 p-3 border border-white/10">
-              <p className="text-white/80 text-xs font-semibold">WordPress Generator</p>
+              <p className="text-white/80 text-xs font-semibold">Generador WordPress</p>
               <p className="text-white/50 text-[11px] mt-1 leading-relaxed">
-                Genera themes y plugins de WordPress sin codigo
+                Genera themes y plugins de WordPress sin código
               </p>
               <div className="mt-3 flex items-center gap-1.5">
                 <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-emerald-400 text-[11px] font-medium">Online</span>
+                <span className="text-emerald-400 text-[11px] font-medium">En línea</span>
               </div>
             </div>
           )}
@@ -370,7 +380,7 @@ export function Topbar({ activeItem, onToggleSidebar }: { activeItem: NavItem; o
       <div className="flex items-center gap-3">
         <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/8 border border-white/10">
           <div className="w-2 h-2 rounded-full bg-emerald-400" />
-          <span className="text-white/70 text-xs font-medium">WordPress Generator</span>
+          <span className="text-white/70 text-xs font-medium">Generador WordPress</span>
         </div>
         <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center cursor-pointer hover:bg-emerald-500 transition-colors">
           <span className="text-white text-xs font-bold">U</span>

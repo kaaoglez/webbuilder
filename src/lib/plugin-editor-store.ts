@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 import type { PluginType } from '@/lib/wp-plugin-generator';
 
 // ─────────────────────────────────────────────────────────────
@@ -65,7 +64,7 @@ export function getDefaultOptions(pluginType: PluginType): Record<string, unknow
 
     case 'custom-post-type':
       return {
-        postTypeName: 'Products',
+        postTypeName: 'Productos',
         postTypeSlug: 'products',
         supports: ['title', 'editor', 'thumbnail', 'excerpt'],
         public: true,
@@ -73,8 +72,8 @@ export function getDefaultOptions(pluginType: PluginType): Record<string, unknow
         showInRest: true,
         menuIcon: 'dashicons-cart',
         labels: {
-          singular: 'Product',
-          plural: 'Products',
+          singular: 'Producto',
+          plural: 'Productos',
         },
       };
 
@@ -151,12 +150,12 @@ export function getDefaultOptions(pluginType: PluginType): Record<string, unknow
             name: 'Pro',
             price: '$29',
             period: '/mes',
-            features: ['Todo lo anterior', 'Soporte prioritario', 'API Access'],
+            features: ['Todo lo anterior', 'Soporte prioritario', 'Acceso API'],
             highlighted: true,
             buttonLabel: 'Elegir Pro',
           },
           {
-            name: 'Enterprise',
+            name: 'Empresarial',
             price: '$99',
             period: '/mes',
             features: [
@@ -464,11 +463,4 @@ export const usePluginEditorStore = create<PluginEditorState & PluginEditorActio
         isGenerating: false,
       }),
   }),
-  {
-    name: 'pageforge-plugin-editor',
-    partialize: (state) => ({
-      config: state.config,
-      activeTab: state.activeTab,
-    }),
-  },
 );

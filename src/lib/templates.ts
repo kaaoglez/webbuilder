@@ -53,16 +53,16 @@ export interface TemplateMeta {
 // ─────────────────────────────────────────────────────────────
 
 export const TEMPLATE_CATEGORIES: { id: TemplateCategory; label: string; emoji: string; count: number }[] = [
-  { id: 'business', label: 'Empresa / Corporativa', emoji: '🏢', count: 2 },
-  { id: 'portfolio', label: 'Portafolio', emoji: '📸', count: 2 },
-  { id: 'blog', label: 'Blog / Revista', emoji: '📝', count: 2 },
-  { id: 'ecommerce', label: 'Tienda en Línea', emoji: '🛒', count: 2 },
-  { id: 'saas', label: 'SaaS / Tecnología', emoji: '💻', count: 2 },
-  { id: 'restaurant', label: 'Restaurante / Gastronomía', emoji: '🍽️', count: 1 },
-  { id: 'medical', label: 'Médico / Salud', emoji: '🏥', count: 1 },
-  { id: 'education', label: 'Educación / LMS', emoji: '🎓', count: 1 },
-  { id: 'realestate', label: 'Inmobiliaria', emoji: '🏠', count: 1 },
-  { id: 'legal', label: 'Abogados / Legal', emoji: '⚖️', count: 1 },
+  { id: 'business', label: 'Business / Corporate', emoji: '🏢', count: 2 },
+  { id: 'portfolio', label: 'Portfolio', emoji: '📸', count: 2 },
+  { id: 'blog', label: 'Blog / Magazine', emoji: '📝', count: 2 },
+  { id: 'ecommerce', label: 'E-Commerce', emoji: '🛒', count: 2 },
+  { id: 'saas', label: 'SaaS / Tech', emoji: '💻', count: 2 },
+  { id: 'restaurant', label: 'Restaurant / Food', emoji: '🍽️', count: 1 },
+  { id: 'medical', label: 'Medical / Health', emoji: '🏥', count: 1 },
+  { id: 'education', label: 'Education / LMS', emoji: '🎓', count: 1 },
+  { id: 'realestate', label: 'Real Estate', emoji: '🏠', count: 1 },
+  { id: 'legal', label: 'Lawyer / Legal', emoji: '⚖️', count: 1 },
 ];
 
 // ─────────────────────────────────────────────────────────────
@@ -81,7 +81,7 @@ const templates: TemplateMeta[] = [
   // ─── BUSINESS / CORPORATE ─────────────────────────────────
   {
     id: 'business-pro',
-    name: 'Business Pro',
+    name: 'Empresa Pro',
     category: 'business',
     description: 'Sitio corporativo profesional con hero impactante, servicios, equipo, testimonios y CTA. Ideal para empresas medianas y grandes.',
     badge: 'Popular',
@@ -93,7 +93,7 @@ const templates: TemplateMeta[] = [
     headingFont: 'Montserrat',
     bodyFont: 'Open Sans',
     borderRadius: 8,
-    themeName: 'Business Pro',
+    themeName: 'Empresa Pro',
     themeSlug: 'business-pro',
     themeDescription: 'Tema WordPress profesional corporativo generado por PageForge',
     sections: [
@@ -115,7 +115,7 @@ const templates: TemplateMeta[] = [
           { icon: '💻', title: 'Desarrollo Web', description: 'Sitios web modernos, rápidos y optimizados para conversión.' },
           { icon: '📱', title: 'Marketing Digital', description: 'Estrategias de SEO, SEM y redes sociales para maximizar tu alcance.' },
           { icon: '🔒', title: 'Ciberseguridad', description: 'Protección integral de datos y sistemas contra amenazas digitales.' },
-          { icon: '☁️', title: 'Soluciones en la Nube', description: 'Infraestructura en la nube escalable y segura para tu operación.' },
+          { icon: '☁️', title: 'Cloud Solutions', description: 'Infraestructura en la nube escalable y segura para tu operación.' },
           { icon: '🤖', title: 'Inteligencia Artificial', description: 'Automatización y análisis inteligente para tomar mejores decisiones.' },
         ],
         columns: 3,
@@ -185,7 +185,7 @@ const templates: TemplateMeta[] = [
       { title: 'Recursos', links: [{ label: 'Blog', url: '/blog' }, { label: 'Casos de Éxito', url: '#' }, { label: 'FAQ', url: '#' }] },
       { title: 'Contacto', links: [{ label: 'Ubicación', url: '#contact' }, { label: 'Email', url: '#contact' }, { label: 'Teléfono', url: '#contact' }] },
     ],
-    copyrightText: 'Business Pro. Todos los derechos reservados.',
+    copyrightText: 'Empresa Pro. Todos los derechos reservados.',
     socialLinks: [
       { platform: 'linkedin', url: '#' },
       { platform: 'twitter', url: '#' },
@@ -195,9 +195,9 @@ const templates: TemplateMeta[] = [
   },
   {
     id: 'startup-hub',
-    name: 'Startup Hub',
+    name: 'Centro de Startups',
     category: 'business',
-    description: 'Diseño moderno y audaz para startups tecnológicas. Landing page optimizada para conversión con secciones de características, precios y testimonios.',
+    description: 'Diseño moderno y audaz para startups tecnológicas. Landing page optimizada para conversión con secciones de features, pricing y testimonios.',
     badge: 'Nuevo',
     primaryColor: '#7C3AED',
     secondaryColor: '#4F46E5',
@@ -207,7 +207,7 @@ const templates: TemplateMeta[] = [
     headingFont: 'Inter',
     bodyFont: 'Inter',
     borderRadius: 12,
-    themeName: 'Startup Hub',
+    themeName: 'Centro de Startups',
     themeSlug: 'startup-hub',
     themeDescription: 'Tema WordPress de landing page para startups moderno por PageForge',
     sections: [
@@ -281,7 +281,7 @@ const templates: TemplateMeta[] = [
       { title: 'Recursos', links: [{ label: 'Documentación', url: '#' }, { label: 'Referencia API', url: '#' }, { label: 'Comunidad', url: '#' }] },
       { title: 'Legal', links: [{ label: 'Política de Privacidad', url: '#' }, { label: 'Términos de Servicio', url: '#' }] },
     ],
-    copyrightText: 'Startup Hub. Todos los derechos reservados.',
+    copyrightText: 'Centro de Startups. Todos los derechos reservados.',
     socialLinks: [
       { platform: 'twitter', url: '#' },
       { platform: 'linkedin', url: '#' },
@@ -292,7 +292,7 @@ const templates: TemplateMeta[] = [
   // ─── PORTFOLIO ─────────────────────────────────────────────
   {
     id: 'portfolio-creative',
-    name: 'Portfolio Creative',
+    name: 'Portafolio Creativo',
     category: 'portfolio',
     description: 'Portafolio elegante y minimalista para fotógrafos, diseñadores y artistas. Galería de proyectos destacados con contacto integrado.',
     badge: 'Popular',
@@ -304,7 +304,7 @@ const templates: TemplateMeta[] = [
     headingFont: 'Playfair Display',
     bodyFont: 'Lato',
     borderRadius: 4,
-    themeName: 'Portfolio Creative',
+    themeName: 'Portafolio Creativo',
     themeSlug: 'portfolio-creative',
     themeDescription: 'Tema WordPress de portafolio elegante para creativos por PageForge',
     sections: [
@@ -381,7 +381,7 @@ const templates: TemplateMeta[] = [
       { title: 'Navegación', links: [{ label: 'Trabajo', url: '#gallery' }, { label: 'Sobre Mí', url: '#about' }, { label: 'Servicios', url: '#services' }, { label: 'Contacto', url: '#contact' }] },
       { title: 'Redes Sociales', links: [{ label: 'Instagram', url: '#' }, { label: 'Behance', url: '#' }, { label: 'Dribbble', url: '#' }, { label: 'LinkedIn', url: '#' }] },
     ],
-    copyrightText: 'Portfolio Creative. Todos los derechos reservados.',
+    copyrightText: 'Portafolio Creativo. Todos los derechos reservados.',
     socialLinks: [
       { platform: 'instagram', url: '#' },
       { platform: 'linkedin', url: '#' },
@@ -390,7 +390,7 @@ const templates: TemplateMeta[] = [
   },
   {
     id: 'portfolio-architect',
-    name: 'Architecture Studio',
+    name: 'Estudio de Arquitectura',
     category: 'portfolio',
     description: 'Portafolio sofisticado para estudios de arquitectura e interiorismo. Grid visual impactante con secciones de proceso y servicios.',
     primaryColor: '#292524',
@@ -401,7 +401,7 @@ const templates: TemplateMeta[] = [
     headingFont: 'Raleway',
     bodyFont: 'Source Sans Pro',
     borderRadius: 2,
-    themeName: 'Architecture Studio',
+    themeName: 'Estudio de Arquitectura',
     themeSlug: 'architecture-studio',
     themeDescription: 'Tema WordPress de portafolio de arquitectura sofisticado por PageForge',
     sections: [
@@ -475,7 +475,7 @@ const templates: TemplateMeta[] = [
       { title: 'Proyectos', links: [{ label: 'Residencial', url: '#' }, { label: 'Comercial', url: '#' }, { label: 'Cultural', url: '#' }] },
       { title: 'Contacto', links: [{ label: 'Email', url: '#contact' }, { label: 'Teléfono', url: '#contact' }, { label: 'Ubicación', url: '#contact' }] },
     ],
-    copyrightText: 'Architecture Studio. Todos los derechos reservados.',
+    copyrightText: 'Estudio de Arquitectura. Todos los derechos reservados.',
     socialLinks: [
       { platform: 'instagram', url: '#' },
       { platform: 'linkedin', url: '#' },
@@ -486,9 +486,9 @@ const templates: TemplateMeta[] = [
   // ─── BLOG / MAGAZINE ───────────────────────────────────────
   {
     id: 'blog-personal',
-    name: 'Personal Blog',
+    name: 'Blog Personal',
     category: 'blog',
-    description: 'Blog personal limpio y enfocado en la lectura. Tipografía elegante, secciones de publicaciones destacadas y suscripción por correo.',
+    description: 'Blog personal limpio y enfocado en la lectura. Tipografía elegante, secciones de featured posts y suscripción por email.',
     badge: 'Popular',
     primaryColor: '#059669',
     secondaryColor: '#0D9488',
@@ -498,7 +498,7 @@ const templates: TemplateMeta[] = [
     headingFont: 'Merriweather',
     bodyFont: 'Lato',
     borderRadius: 6,
-    themeName: 'Personal Blog',
+    themeName: 'Blog Personal',
     themeSlug: 'personal-blog',
     themeDescription: 'Tema WordPress de blog personal limpio por PageForge',
     sections: [
@@ -552,7 +552,7 @@ const templates: TemplateMeta[] = [
       { title: 'Enlaces', links: [{ label: 'Sobre Mí', url: '#about' }, { label: 'Archivo', url: '#' }, { label: 'RSS', url: '#' }] },
       { title: 'Redes Sociales', links: [{ label: 'Twitter', url: '#' }, { label: 'LinkedIn', url: '#' }, { label: 'GitHub', url: '#' }] },
     ],
-    copyrightText: 'Personal Blog. Todos los derechos reservados.',
+    copyrightText: 'Blog Personal. Todos los derechos reservados.',
     socialLinks: [
       { platform: 'twitter', url: '#' },
       { platform: 'linkedin', url: '#' },
@@ -561,7 +561,7 @@ const templates: TemplateMeta[] = [
   },
   {
     id: 'magazine-news',
-    name: 'News Magazine',
+    name: 'Revista de Noticias',
     category: 'blog',
     description: 'Magazine de noticias moderno con diseño editorial. Grid de contenido, categorías, y secciones de artículos destacados.',
     primaryColor: '#DC2626',
@@ -572,7 +572,7 @@ const templates: TemplateMeta[] = [
     headingFont: 'Oswald',
     bodyFont: 'Roboto',
     borderRadius: 4,
-    themeName: 'News Magazine',
+    themeName: 'Revista de Noticias',
     themeSlug: 'news-magazine',
     themeDescription: 'Tema WordPress de revista de noticias moderna por PageForge',
     sections: [
@@ -631,7 +631,7 @@ const templates: TemplateMeta[] = [
       { title: 'Más', links: [{ label: 'Cultura', url: '#' }, { label: 'Salud', url: '#' }, { label: 'Opinión', url: '#' }, { label: 'Video', url: '#' }] },
       { title: 'Nosotros', links: [{ label: 'Nuestro Equipo', url: '#' }, { label: 'Empleo', url: '#' }, { label: 'Contacto', url: '#' }, { label: 'Publicidad', url: '#' }] },
     ],
-    copyrightText: 'News Magazine. Todos los derechos reservados.',
+    copyrightText: 'Revista de Noticias. Todos los derechos reservados.',
     socialLinks: [
       { platform: 'twitter', url: '#' },
       { platform: 'facebook', url: '#' },
@@ -643,7 +643,7 @@ const templates: TemplateMeta[] = [
   // ─── E-COMMERCE ────────────────────────────────────────────
   {
     id: 'ecommerce-fashion',
-    name: 'Fashion Store',
+    name: 'Tienda de Moda',
     category: 'ecommerce',
     description: 'Tienda de moda elegante con estética premium. Secciones de productos destacados, categorías, testimonios de clientes.',
     badge: 'Popular',
@@ -655,7 +655,7 @@ const templates: TemplateMeta[] = [
     headingFont: 'Poppins',
     bodyFont: 'Open Sans',
     borderRadius: 0,
-    themeName: 'Fashion Store',
+    themeName: 'Tienda de Moda',
     themeSlug: 'fashion-store',
     themeDescription: 'Tema WordPress de e-commerce de moda premium por PageForge',
     sections: [
@@ -721,7 +721,7 @@ const templates: TemplateMeta[] = [
       { title: 'Ayuda', links: [{ label: 'Info de Envío', url: '#' }, { label: 'Devoluciones', url: '#' }, { label: 'Guía de Tallas', url: '#' }, { label: 'FAQ', url: '#' }] },
       { title: 'Empresa', links: [{ label: 'Nuestra Historia', url: '#' }, { label: 'Sostenibilidad', url: '#' }, { label: 'Empleo', url: '#' }] },
     ],
-    copyrightText: 'Fashion Store. Todos los derechos reservados.',
+    copyrightText: 'Tienda de Moda. Todos los derechos reservados.',
     socialLinks: [
       { platform: 'instagram', url: '#' },
       { platform: 'facebook', url: '#' },
@@ -731,7 +731,7 @@ const templates: TemplateMeta[] = [
   },
   {
     id: 'ecommerce-electronics',
-    name: 'Tech Store',
+    name: 'Tienda de Tecnología',
     category: 'ecommerce',
     description: 'Tienda de electrónica con diseño moderno y tech. Categorías de productos, especificaciones técnicas y soporte.',
     primaryColor: '#0F172A',
@@ -742,7 +742,7 @@ const templates: TemplateMeta[] = [
     headingFont: 'Inter',
     bodyFont: 'Roboto',
     borderRadius: 8,
-    themeName: 'Tech Store',
+    themeName: 'Tienda de Tecnología',
     themeSlug: 'tech-store',
     themeDescription: 'Tema WordPress de e-commerce de electrónica moderno por PageForge',
     sections: [
@@ -815,7 +815,7 @@ const templates: TemplateMeta[] = [
       { title: 'Soporte', links: [{ label: 'Centro de Ayuda', url: '#' }, { label: 'Rastrear Pedido', url: '#' }, { label: 'Devoluciones', url: '#' }, { label: 'Garantía', url: '#' }] },
       { title: 'Empresa', links: [{ label: 'Sobre Nosotros', url: '#' }, { label: 'Empleo', url: '#' }, { label: 'Blog', url: '#' }] },
     ],
-    copyrightText: 'Tech Store. Todos los derechos reservados.',
+    copyrightText: 'Tienda de Tecnología. Todos los derechos reservados.',
     socialLinks: [
       { platform: 'twitter', url: '#' },
       { platform: 'facebook', url: '#' },
@@ -827,9 +827,9 @@ const templates: TemplateMeta[] = [
   // ─── SAAS / TECH ───────────────────────────────────────────
   {
     id: 'saas-app',
-    name: 'SaaS Landing',
+    name: 'Landing SaaS',
     category: 'saas',
-    description: 'Landing page para producto SaaS con diseño limpio. Características, precios, integraciones, testimonios y CTA de prueba gratuita.',
+    description: 'Landing page para producto SaaS con diseño limpio. Features, pricing, integraciones, testimonios y CTA de trial gratuito.',
     primaryColor: '#2563EB',
     secondaryColor: '#7C3AED',
     accentColor: '#10B981',
@@ -838,7 +838,7 @@ const templates: TemplateMeta[] = [
     headingFont: 'Inter',
     bodyFont: 'Inter',
     borderRadius: 8,
-    themeName: 'SaaS Landing',
+    themeName: 'Landing SaaS',
     themeSlug: 'saas-landing',
     themeDescription: 'Tema WordPress de landing page SaaS moderna por PageForge',
     sections: [
@@ -920,7 +920,7 @@ const templates: TemplateMeta[] = [
       { title: 'Recursos', links: [{ label: 'Documentación', url: '#' }, { label: 'API', url: '#' }, { label: 'Estado', url: '#' }] },
       { title: 'Legal', links: [{ label: 'Privacidad', url: '#' }, { label: 'Términos', url: '#' }, { label: 'Seguridad', url: '#' }] },
     ],
-    copyrightText: 'SaaS Landing. Todos los derechos reservados.',
+    copyrightText: 'Landing SaaS. Todos los derechos reservados.',
     socialLinks: [
       { platform: 'twitter', url: '#' },
       { platform: 'linkedin', url: '#' },
@@ -929,7 +929,7 @@ const templates: TemplateMeta[] = [
   },
   {
     id: 'dev-tools',
-    name: 'Dev Tools',
+    name: 'Herramientas Dev',
     category: 'saas',
     description: 'Landing page para herramientas de desarrolladores. Estilo dark/tech con features técnicas, documentación y pricing.',
     primaryColor: '#10B981',
@@ -940,7 +940,7 @@ const templates: TemplateMeta[] = [
     headingFont: 'JetBrains Mono',
     bodyFont: 'Inter',
     borderRadius: 6,
-    themeName: 'Dev Tools',
+    themeName: 'Herramientas Dev',
     themeSlug: 'dev-tools',
     themeDescription: 'Tema WordPress de landing page de herramientas para desarrolladores por PageForge',
     sections: [
@@ -1002,7 +1002,7 @@ const templates: TemplateMeta[] = [
       { title: 'Recursos', links: [{ label: 'Documentación', url: '#' }, { label: 'Ejemplos', url: '#' }, { label: 'Blog', url: '#' }, { label: 'Estado', url: '#' }] },
       { title: 'Comunidad', links: [{ label: 'GitHub', url: '#' }, { label: 'Discord', url: '#' }, { label: 'Twitter', url: '#' }] },
     ],
-    copyrightText: 'Dev Tools. Todos los derechos reservados.',
+    copyrightText: 'Herramientas Dev. Todos los derechos reservados.',
     socialLinks: [
       { platform: 'github', url: '#' },
       { platform: 'twitter', url: '#' },
@@ -1012,7 +1012,7 @@ const templates: TemplateMeta[] = [
   // ─── RESTAURANT / FOOD ────────────────────────────────────
   {
     id: 'restaurant-elegant',
-    name: 'Restaurant Elegant',
+    name: 'Restaurante Elegante',
     category: 'restaurant',
     description: 'Restaurante de alta cocina con diseño sofisticado. Secciones de menú, galería de platos, reservas y testimonios.',
     primaryColor: '#78350F',
@@ -1023,7 +1023,7 @@ const templates: TemplateMeta[] = [
     headingFont: 'Playfair Display',
     bodyFont: 'Lato',
     borderRadius: 4,
-    themeName: 'Restaurant Elegant',
+    themeName: 'Restaurante Elegante',
     themeSlug: 'restaurant-elegant',
     themeDescription: 'Tema WordPress de restaurante de alta cocina por PageForge',
     sections: [
@@ -1099,7 +1099,7 @@ const templates: TemplateMeta[] = [
       { title: 'Visita', links: [{ label: 'Reservaciones', url: '#contact' }, { label: 'Cómo Llegar', url: '#contact' }, { label: 'Estacionamiento', url: '#' }] },
       { title: 'Conecta', links: [{ label: 'Instagram', url: '#' }, { label: 'Facebook', url: '#' }, { label: 'TripAdvisor', url: '#' }] },
     ],
-    copyrightText: 'Restaurant Elegant. Todos los derechos reservados.',
+    copyrightText: 'Restaurante Elegante. Todos los derechos reservados.',
     socialLinks: [
       { platform: 'instagram', url: '#' },
       { platform: 'facebook', url: '#' },
@@ -1109,7 +1109,7 @@ const templates: TemplateMeta[] = [
   // ─── MEDICAL / HEALTH ─────────────────────────────────────
   {
     id: 'medical-clinic',
-    name: 'Medical Clinic',
+    name: 'Clínica Médica',
     category: 'medical',
     description: 'Clínica médica profesional con diseño confiable. Especialidades, equipo médico, testimonios de pacientes y contacto con formulario.',
     primaryColor: '#0F766E',
@@ -1122,7 +1122,7 @@ const templates: TemplateMeta[] = [
     borderRadius: 8,
     themeName: 'Clínica Médica',
     themeSlug: 'medical-clinic',
-    themeDescription: 'Tema WordPress de clínica médica profesional por PageForge',
+    themeDescription: 'Theme WordPress de clínica médica profesional por PageForge',
     sections: [
       s('hero', 'Tu Salud, Nuestra Prioridad', 'Cuidado compasivo respaldado por años de excelencia médica', {
         title: 'Tu Salud, Nuestra Prioridad',
@@ -1213,7 +1213,7 @@ const templates: TemplateMeta[] = [
   // ─── EDUCATION / LMS ───────────────────────────────────────
   {
     id: 'education-academy',
-    name: 'Online Academy',
+    name: 'Academia en Línea',
     category: 'education',
     description: 'Academia online con diseño moderno. Catálogo de cursos, instructores, precios y testimonios de estudiantes.',
     primaryColor: '#4F46E5',
@@ -1224,9 +1224,9 @@ const templates: TemplateMeta[] = [
     headingFont: 'Poppins',
     bodyFont: 'Open Sans',
     borderRadius: 10,
-    themeName: 'Online Academy',
+    themeName: 'Academia en Línea',
     themeSlug: 'online-academy',
-    themeDescription: 'Tema WordPress de academia online moderna por PageForge',
+    themeDescription: 'Tema WordPress de academia en línea moderna por PageForge',
     sections: [
       s('hero', 'Aprende de los Mejores, en Cualquier Lugar', 'Cursos de clase mundial impartidos por expertos de la industria. Comienza a aprender hoy.', {
         title: 'Aprende de los Mejores, en Cualquier Lugar',
@@ -1305,7 +1305,7 @@ const templates: TemplateMeta[] = [
       { title: 'Cursos', links: [{ label: 'Desarrollo Web', url: '#' }, { label: 'Ciencia de Datos', url: '#' }, { label: 'Diseño', url: '#' }, { label: 'Marketing', url: '#' }] },
       { title: 'Soporte', links: [{ label: 'Centro de Ayuda', url: '#' }, { label: 'Contacto', url: '#' }, { label: 'FAQ', url: '#' }] },
     ],
-    copyrightText: 'Online Academy. Todos los derechos reservados.',
+    copyrightText: 'Academia en Línea. Todos los derechos reservados.',
     socialLinks: [
       { platform: 'twitter', url: '#' },
       { platform: 'facebook', url: '#' },
@@ -1317,7 +1317,7 @@ const templates: TemplateMeta[] = [
   // ─── REAL ESTATE ───────────────────────────────────────────
   {
     id: 'realestate-agency',
-    name: 'Real Estate Agency',
+    name: 'Agencia Inmobiliaria',
     category: 'realestate',
     description: 'Inmobiliaria profesional con búsqueda de propiedades, agentes destacados, testimonios y formulario de contacto.',
     primaryColor: '#1F2937',
@@ -1328,7 +1328,7 @@ const templates: TemplateMeta[] = [
     headingFont: 'Montserrat',
     bodyFont: 'Open Sans',
     borderRadius: 6,
-    themeName: 'Real Estate Agency',
+    themeName: 'Agencia Inmobiliaria',
     themeSlug: 'real-estate-agency',
     themeDescription: 'Tema WordPress de agencia inmobiliaria profesional por PageForge',
     sections: [
@@ -1418,7 +1418,7 @@ const templates: TemplateMeta[] = [
       { title: 'Empresa', links: [{ label: 'Sobre Nosotros', url: '#about' }, { label: 'Nuestros Agentes', url: '#team' }, { label: 'Testimonios', url: '#testimonials' }] },
       { title: 'Contacto', links: [{ label: 'Oficina', url: '#contact' }, { label: 'Teléfono', url: '#contact' }, { label: 'Email', url: '#contact' }] },
     ],
-    copyrightText: 'Real Estate Agency. Todos los derechos reservados.',
+    copyrightText: 'Agencia Inmobiliaria. Todos los derechos reservados.',
     socialLinks: [
       { platform: 'facebook', url: '#' },
       { platform: 'instagram', url: '#' },
@@ -1429,7 +1429,7 @@ const templates: TemplateMeta[] = [
   // ─── LAWYER / LEGAL ───────────────────────────────────────
   {
     id: 'legal-firm',
-    name: 'Legal Firm',
+    name: 'Firma Legal',
     category: 'legal',
     description: 'Firma de abogados con diseño profesional y confiable. Áreas de práctica, equipo de abogados, casos de éxito y consulta.',
     primaryColor: '#1E3A5F',
@@ -1440,7 +1440,7 @@ const templates: TemplateMeta[] = [
     headingFont: 'Montserrat',
     bodyFont: 'Open Sans',
     borderRadius: 4,
-    themeName: 'Legal Firm',
+    themeName: 'Firma Legal',
     themeSlug: 'legal-firm',
     themeDescription: 'Tema WordPress de firma de abogados profesional por PageForge',
     sections: [
@@ -1531,7 +1531,7 @@ const templates: TemplateMeta[] = [
       { title: 'Firma', links: [{ label: 'Sobre Nosotros', url: '#about' }, { label: 'Nuestros Abogados', url: '#team' }, { label: 'Resultados', url: '#' }] },
       { title: 'Contacto', links: [{ label: 'Oficina', url: '#contact' }, { label: 'Teléfono', url: '#contact' }, { label: 'Email', url: '#contact' }] },
     ],
-    copyrightText: 'Legal Firm. Todos los derechos reservados.',
+    copyrightText: 'Firma Legal. Todos los derechos reservados.',
     socialLinks: [
       { platform: 'linkedin', url: '#' },
       { platform: 'facebook', url: '#' },

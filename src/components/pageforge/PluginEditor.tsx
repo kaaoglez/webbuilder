@@ -106,7 +106,7 @@ function ImageUrlField({
         </div>
         {value && (
           <div className="mt-2 flex items-center gap-2 p-2 bg-gray-200 rounded-lg border border-gray-400">
-            <img src={value} alt="Vista previa del logo" className="h-10 w-auto object-contain rounded"
+            <img src={value} alt="Preview" className="h-10 w-auto object-contain rounded"
               onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
             <span className="text-xs text-gray-500">Vista previa</span>
           </div>
@@ -467,7 +467,7 @@ function TypeTab() {
                           )}
                           {pt.hasSettings && !pt.hasShortcode && (
                             <Badge variant="secondary" className="text-[10px]">
-                              Página de Ajustes
+                              Settings Page
                             </Badge>
                           )}
                         </motion.button>
@@ -604,9 +604,9 @@ function OptionsRenderer({
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex items-center gap-2">
-              <SwitchField label="Autoplay" checked={options.autoplay as boolean || false} onChange={(v) => update('autoplay', v)} />
+              <SwitchField label="Reproducción Automática" checked={options.autoplay as boolean || false} onChange={(v) => update('autoplay', v)} />
             </div>
-            <FormField label={`Velocidad de Autoplay: ${(options.autoplaySpeed as number) || 5000}ms`}>
+            <FormField label={`Velocidad de Reproducción Automática: ${(options.autoplaySpeed as number) || 5000}ms`}>
               <Input
                 type="number"
                 min={1000}
@@ -652,7 +652,7 @@ function OptionsRenderer({
               <Input
                 value={(options.postTypeName as string) || ''}
                 onChange={(e) => handleNameChange(e.target.value)}
-                placeholder="Products"
+                placeholder="Productos"
               />
             </FormField>
             <FormField label="URL Amigable">
@@ -1518,7 +1518,7 @@ function GenerateTab() {
                 </Badge>
               )}
               {pluginMeta.hasSettings && (
-                <Badge variant="secondary">Página de Ajustes</Badge>
+                <Badge variant="secondary">Settings Page</Badge>
               )}
             </div>
           )}
